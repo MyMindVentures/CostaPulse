@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { getLocale } from "next-intl/server";
 import { AppShell } from "@/components/layout/AppShell";
+import { SiteFooter } from "@/components/layout/SiteFooter";
 import { getMarketingNavContext } from "@/server/auth/marketing-nav";
 import { getSiteLogoAsset } from "@/server/repositories/media-assets";
 import { getPublishedSiteNavigation } from "@/server/repositories/site-navigation";
@@ -36,6 +37,13 @@ export async function PublicAppShell({
       navigation={shell.navigation}
       logoSrc={shell.logoSrc}
       logoAlt={shell.logoAlt}
+      footer={
+        <SiteFooter
+          navigation={shell.navigation}
+          logoSrc={shell.logoSrc}
+          logoAlt={shell.logoAlt}
+        />
+      }
     >
       {children}
     </AppShell>
