@@ -10,6 +10,7 @@ import {
   Star,
   Users
 } from "lucide-react";
+import { getExperienceHeroImageSrc } from "@/lib/media/experience-media";
 import type { ExperienceCardViewModel } from "@/server/repositories/catalog";
 
 type ExperienceCardProps = {
@@ -42,13 +43,14 @@ export function ExperienceCard({ experience, fallbackIndex = 0 }: ExperienceCard
   const price = formatPrice(experience);
   const category = experience.categoryLabel ?? "Costa Blanca experience";
   const href = `/experiences/${experience.slug}`;
+  const imageSrc = getExperienceHeroImageSrc(experience.heroImagePath);
 
   return (
     <article className="experience-card">
       <div className={`experience-card-media media-${(fallbackIndex % 3) + 1}`}>
-        {experience.heroImagePath ? (
+        {imageSrc ? (
           <Image
-            src={experience.heroImagePath}
+            src={imageSrc}
             alt={experience.title}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 960px) 50vw, 33vw"

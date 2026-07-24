@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Check, Clock3, MapPin, ShieldCheck, Users } from "lucide-react";
 import { BrandLink } from "@/components/shared/brand-link";
 import { Container } from "@/components/ui/container";
+import { getExperienceHeroImageSrc } from "@/lib/media/experience-media";
 import type { ExperienceDetailViewModel } from "@/server/repositories/catalog";
 
 type ExperienceDetailPageProps = {
@@ -21,6 +22,7 @@ export function ExperienceDetailPageFeature({ experience }: ExperienceDetailPage
   const startingPrice = experience.startingPriceMinor !== null && experience.currency
     ? formatMoney(experience.startingPriceMinor, experience.currency)
     : null;
+  const imageSrc = getExperienceHeroImageSrc(experience.heroImagePath);
 
   return (
     <main className="experience-detail-page">
@@ -35,8 +37,8 @@ export function ExperienceDetailPageFeature({ experience }: ExperienceDetailPage
       </header>
 
       <section className="detail-hero">
-        {experience.heroImagePath ? (
-          <Image src={experience.heroImagePath} alt="" fill priority className="detail-hero-image" sizes="100vw" />
+        {imageSrc ? (
+          <Image src={imageSrc} alt="" fill priority className="detail-hero-image" sizes="100vw" />
         ) : <div className="detail-hero-fallback" aria-hidden />}
         <div className="detail-hero-overlay" aria-hidden />
         <Container className="detail-hero-content">
