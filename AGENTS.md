@@ -1,6 +1,6 @@
 # CostaPulse — Agent Operating Guide
 
-This file defines the working contract for AI coding agents and human contributors in the CostaPulse repository.
+This file is the binding working contract for every AI coding agent and human contributor in the CostaPulse repository.
 
 ## 1. Product mission
 
@@ -15,24 +15,24 @@ The product should make it effortless for visitors to discover, compare, book, p
 - Local concierge services
 - Partner referrals through trackable QR codes
 
-CostaPulse must feel trustworthy, premium, local, energetic, and easy to use on mobile.
+CostaPulse must feel trustworthy, premium, local, energetic, and effortless on mobile.
 
 ## 2. Product principles
 
-Every implementation decision should support these principles:
+Every decision must support these principles:
 
-1. **Conversion first** — Make the path from discovery to paid booking obvious and frictionless.
-2. **Mobile first** — Assume most customers are browsing outdoors or while travelling on a phone.
-3. **Trust by design** — Show clear pricing, inclusions, availability, cancellation terms, host identity, reviews, and safety information.
-4. **Premium without complexity** — Use polished visuals and interactions without making the interface heavy or confusing.
-5. **Local authenticity** — CostaPulse should feel specific to the Costa Blanca, not like a generic marketplace template.
-6. **Operational realism** — Booking logic must account for capacity, schedules, locations, weather dependencies, lead times, and manual confirmation where required.
-7. **Accessible by default** — Accessibility is part of product quality, not a later enhancement.
-8. **Privacy and security by default** — Collect only necessary data and protect all booking, payment, customer, and partner information.
+1. **Conversion first** — The path from discovery to paid booking must be obvious and frictionless.
+2. **Mobile first** — Assume customers are travelling and browsing on a phone.
+3. **Trust by design** — Show clear prices, inclusions, availability, policies, host identity, reviews, and safety information.
+4. **Premium without complexity** — Use polished visuals without creating a heavy or confusing experience.
+5. **Local authenticity** — CostaPulse must feel specific to the Costa Blanca.
+6. **Operational realism** — Respect capacity, schedules, locations, weather, lead times, and manual confirmation.
+7. **Accessible by default** — Accessibility is part of product quality.
+8. **Privacy and security by default** — Collect only necessary data and protect it throughout the system.
 
-## 3. Default technical direction
+## 3. Required technical direction
 
-Until the repository establishes a different stack, prefer:
+Unless the repository explicitly establishes a different approved choice, use:
 
 - Next.js with the App Router
 - React
@@ -46,50 +46,199 @@ Until the repository establishes a different stack, prefer:
 - Playwright for critical end-to-end flows
 - Vitest or Jest with React Testing Library for unit and component tests
 
-Do not introduce a major framework, state-management library, UI kit, ORM, or infrastructure dependency without a clear need and a documented trade-off.
+Do not introduce a major framework, ORM, state-management library, UI kit, infrastructure service, or deployment dependency without a clear need and documented trade-off.
 
-## 4. Railway hosting and deployment
+## 4. Mandatory MCP usage
 
-CostaPulse is hosted on **Railway**. Railway is the production deployment target and all infrastructure, build, runtime, logging, health-check, and environment-variable decisions must be compatible with Railway.
+Every coding agent must use the available **Supabase MCP** and **GitHub MCP** as primary sources of truth whenever the task touches their domain.
+
+### GitHub MCP is mandatory
+
+Use GitHub MCP before, during, and after implementation to:
+
+- Inspect the repository, default branch, current files, and established patterns
+- Read the nearest `AGENTS.md` files before editing
+- Inspect relevant commits, branches, pull requests, issues, and repository configuration when available
+- Read the latest version of every file before modifying it
+- Avoid overwriting concurrent or newer changes
+- Make focused file changes with accurate commit messages
+- Review the final diff or compare the resulting commit against its base
+- Confirm that only intended files changed
+
+Rules:
+
+- Never work from an assumed or stale repository state.
+- Never invent a file, branch, API contract, dependency, or configuration that can be verified through GitHub MCP.
+- Never replace an existing file without first reading its latest blob SHA or equivalent current version.
+- Do not bypass GitHub MCP by relying only on copied snippets when repository access is available.
+- Keep commits focused, reviewable, and free from unrelated changes.
+
+### Supabase MCP is mandatory
+
+Use Supabase MCP for every task involving or potentially affecting:
+
+- Database schemas, tables, columns, relations, constraints, indexes, views, or functions
+- Migrations and migration history
+- Row-level security policies
+- Authentication, users, sessions, or roles
+- Storage buckets and storage policies
+- Realtime behavior
+- Server-side data access
+- Booking, payment, voucher, referral, partner, availability, profile, or review data
+- Generated database types
+- Production or staging data assumptions
+
+Use Supabase MCP to:
+
+- Inspect the actual schema before designing code
+- Verify existing migrations before adding a new migration
+- Inspect relations, constraints, indexes, RLS policies, functions, and triggers
+- Confirm generated types and database contracts
+- Apply or verify migrations through the approved Supabase workflow
+- Run safe read-only validation queries where appropriate
+- Verify that policies and constraints enforce the intended security and business rules
+- Confirm that backend code matches the real database rather than an imagined schema
+
+Rules:
+
+- Never guess table names, columns, enum values, policies, relationships, or migration state.
+- Never treat TypeScript interfaces as proof of the database schema.
+- Never change production data destructively without explicit owner approval.
+- Never disable RLS to make development easier.
+- Never expose the Supabase service-role key to client-side code.
+- Never edit an already deployed migration to rewrite history; create a new migration.
+- If Supabase MCP is unavailable, do not invent database facts. Continue only with work that is provably independent of Supabase and clearly report the blocked validation.
+
+### Tool evidence in completion reports
+
+For meaningful feature work, the agent's final report must state:
+
+- What was inspected through GitHub MCP
+- What was inspected or changed through Supabase MCP
+- Which migration, schema, RLS, backend, and frontend validations were performed
+- Which checks could not be performed and why
+
+A task is not complete merely because code was generated. The repository and Supabase state must support the implementation.
+
+## 5. Mandatory implementation order
+
+Every feature and functional change must be developed in this order:
+
+```text
+1. Database
+2. Backend
+3. Frontend
+4. End-to-end validation
+```
+
+This is the default and required dependency direction. The frontend must consume stable backend contracts, and the backend must operate against a verified database model.
+
+### Phase 1 — Database first
+
+Before writing backend or frontend code:
+
+1. Use Supabase MCP to inspect the current schema, migrations, constraints, indexes, RLS, functions, triggers, and generated types relevant to the task.
+2. Define the data model and invariants required by the feature.
+3. Reuse existing tables and columns when they represent the domain correctly.
+4. Add a new migration for every schema change.
+5. Add appropriate foreign keys, uniqueness rules, checks, indexes, defaults, and timestamps.
+6. Add or update RLS policies before exposing data paths.
+7. Protect concurrency-sensitive behavior at database level where possible.
+8. Regenerate or update database types after schema changes.
+9. Validate the migration and resulting schema through Supabase MCP.
+
+Do not proceed to backend implementation while the required database contract is unclear, unsafe, or unverified.
+
+### Phase 2 — Backend second
+
+After the database contract is verified:
+
+1. Implement server-side repositories, services, route handlers, server actions, jobs, or webhook handlers.
+2. Parse all external input with explicit schemas.
+3. Enforce authorization and business rules server-side.
+4. Recalculate prices, discounts, voucher amounts, capacity, and booking eligibility from trusted persisted data.
+5. Use transactions, constraints, or locks for concurrency-sensitive operations.
+6. Return stable typed contracts and predictable errors to the frontend.
+7. Keep privileged Supabase and Stripe operations server-only.
+8. Add unit and integration tests for business logic, database interaction, authorization, and failure states.
+9. Verify backend behavior against the actual Supabase schema using Supabase MCP.
+
+Do not start frontend integration until the backend contract and failure behavior are defined and tested.
+
+### Phase 3 — Frontend third
+
+After database and backend foundations are working:
+
+1. Build the user interface against the real typed backend contract.
+2. Never duplicate authoritative business rules in the browser.
+3. Treat client calculations as previews only; the server remains authoritative.
+4. Implement loading, empty, validation, error, unauthorized, unavailable, sold-out, payment-failure, and success states.
+5. Preserve mobile-first behavior, accessibility, localization readiness, and premium visual quality.
+6. Do not mock data when a working backend contract is available.
+7. Remove temporary mocks before declaring the feature complete.
+8. Add component and end-to-end tests for the user journey.
+
+### Phase 4 — End-to-end validation
+
+Before completion:
+
+1. Verify the migration and RLS state through Supabase MCP.
+2. Verify backend reads and writes against Supabase.
+3. Verify the frontend uses the intended backend contract.
+4. Test the complete user journey and critical failure paths.
+5. Run linting, formatting, type checking, tests, production build, and production start checks.
+6. Use GitHub MCP to review the final repository diff.
+7. Confirm Railway compatibility and that no secrets or unrelated changes entered the repository.
+
+### Permitted phase skipping
+
+A phase may be skipped only when the change demonstrably does not touch that layer.
+
+Examples:
+
+- A copy-only text correction may skip database and backend work.
+- A pure design-token adjustment may skip database and backend work.
+- A database-only index optimization may not require frontend work.
+
+Even when skipping a phase, the agent must explicitly state why that layer is unaffected. Agents must not label a functional feature as “frontend-only” merely to avoid inspecting its data and backend dependencies.
+
+## 6. Railway hosting and deployment
+
+CostaPulse is hosted on **Railway**. All infrastructure, build, runtime, logging, health-check, and environment-variable decisions must be Railway-compatible.
 
 ### Deployment rules
 
-- Treat the application as a long-running Node.js service or container deployed on Railway.
-- Ensure the production build and start commands work without Vercel-specific tooling.
-- The application must listen on the `PORT` environment variable provided by Railway and bind to `0.0.0.0` when required by the runtime.
-- Keep the runtime stateless. Do not rely on the local filesystem for persistent uploads, sessions, generated assets, or operational data.
-- Store persistent application data in Supabase or another explicitly approved managed service.
-- Store uploaded media in Supabase Storage or another explicitly approved object-storage service, not on Railway's ephemeral application filesystem.
+- Treat the application as a long-running Node.js service or container.
+- Production build and start commands must work without Vercel tooling.
+- Listen on Railway's injected `PORT` and bind to `0.0.0.0` when required.
+- Keep the runtime stateless.
+- Do not use the local application filesystem for persistent uploads, sessions, generated assets, or operational data.
+- Store persistent data in Supabase or another explicitly approved managed service.
+- Store media in Supabase Storage or another approved object store.
 - Use Railway-managed environment variables for production secrets and configuration.
-- Emit logs to standard output and standard error so Railway can collect them.
-- Add a lightweight health endpoint such as `/api/health` when the app requires deployment health checks.
-- Health checks must not expose secrets or detailed internal diagnostics.
-- Support graceful shutdown where background work, open connections, or in-flight requests require it.
+- Emit logs to standard output and standard error.
+- Add a safe lightweight health endpoint such as `/api/health` when needed.
+- Support graceful shutdown where background work or open connections require it.
 - Keep deploys reproducible from the repository and lockfile.
-- Prefer Railway's native build system unless a Dockerfile is necessary for deterministic builds or system dependencies.
-- When a Dockerfile is used, keep it production-focused, minimal, non-root where practical, and compatible with Railway's injected `PORT`.
-- Database migrations must run through an explicit, controlled deployment step. Do not make every web process race to execute migrations on startup.
-- Stripe webhook routes must use the public Railway production domain or the configured CostaPulse custom domain.
-- Configure trusted application URLs through environment variables; never hard-code a temporary Railway deployment URL into business logic.
+- Prefer Railway's native build system unless a Dockerfile is necessary.
+- Keep Dockerfiles production-focused, minimal, and non-root where practical.
+- Run database migrations through an explicit controlled deployment step.
+- Do not let every web instance race to execute migrations on startup.
+- Configure Stripe webhooks against the production custom domain or Railway domain.
+- Never hard-code a temporary Railway deployment URL into business logic.
 
-### Platform restrictions
+Do not add Vercel-specific dependencies unless explicitly approved, including:
 
-Do not add or depend on Vercel-specific services or assumptions unless the owner explicitly requests them. This includes:
+- Vercel KV, Postgres, Blob, Edge Config, or Cron
+- Vercel-specific deployment APIs or environment assumptions
+- A `vercel.json` file
+- Runtime features that require Vercel Edge
 
-- Vercel KV
-- Vercel Postgres
-- Vercel Blob
-- Edge Config
-- Vercel Cron
-- Vercel Analytics as a required operational dependency
-- Vercel-specific middleware, routing, deployment APIs, or environment assumptions
-- A `vercel.json` file without an explicit requirement
+Keep code platform-agnostic where practical, while treating Railway compatibility as mandatory.
 
-Keep application code platform-agnostic where practical, while treating Railway compatibility as mandatory.
+## 7. Repository structure
 
-## 5. Repository structure
-
-Prefer a feature-oriented structure that keeps domain logic out of presentation components.
+Prefer a feature-oriented structure:
 
 ```text
 src/
@@ -107,7 +256,7 @@ src/
     profiles/
     reviews/
   lib/                    # Shared integrations and infrastructure
-  server/                 # Server-only services, repositories, actions
+  server/                 # Server-only services and repositories
   styles/
   types/
   config/
@@ -123,33 +272,33 @@ supabase/
 Rules:
 
 - Keep route files thin.
-- Put business rules in domain services, not React components.
-- Do not import server-only code into client components.
+- Keep business rules out of React components.
+- Never import server-only code into client components.
 - Avoid large catch-all utility files.
 - Co-locate feature-specific tests and types where practical.
-- Add a short local `AGENTS.md` only when a subdirectory genuinely needs different rules.
+- Add a local `AGENTS.md` only when a directory genuinely needs different rules.
 
-## 6. Core domain model
+## 8. Core domain model
 
-Use clear domain terminology consistently.
+Use consistent domain terminology.
 
 ### Experience
 
-A bookable offering with a public profile, host/team member, location, media, pricing, duration, capacity, inclusions, requirements, cancellation policy, and availability rules.
+A bookable offering with a public profile, host or team member, location, media, pricing, duration, capacity, inclusions, requirements, cancellation policy, and availability rules.
 
 ### Experience variant
 
-A purchasable configuration of an experience, such as private charter, group session, duration, vessel, package, or add-on combination.
+A purchasable configuration such as a private charter, group session, duration, vessel, package, or add-on combination.
 
 ### Availability slot
 
-A bookable start time with capacity and operational status. Availability must be checked server-side immediately before booking is finalized.
+A bookable start time with capacity and operational status. Recheck availability server-side immediately before commitment.
 
 ### Booking
 
-The customer reservation record. It is the operational source of truth and must not be inferred only from a Stripe payment.
+The customer reservation record and operational source of truth.
 
-Recommended booking states:
+Recommended states:
 
 ```text
 draft
@@ -164,23 +313,23 @@ partially_refunded
 no_show
 ```
 
-Keep payment state separate from booking state.
+Keep booking state separate from payment state.
 
 ### Partner
 
-A hospitality business or local partner that promotes CostaPulse through a unique referral link or QR code.
+A hospitality business or local partner promoting CostaPulse through a unique referral link or QR code.
 
 ### Referral
 
-An attribution record connecting a partner, customer session, and eventual booking. Referral attribution must survive navigation and must not depend only on client-side state.
+An attribution record connecting a partner, customer session, and eventual booking. Attribution must survive navigation and cannot depend only on client-side state.
 
 ### Voucher
 
-A customer benefit generated after an eligible referred booking is successfully paid and confirmed. The intended baseline is 10% of the qualifying booking amount, but the percentage and eligibility rules must be configurable.
+A customer benefit created after an eligible referred booking is paid and confirmed. The baseline is 10% of the qualifying booking amount, but percentage and eligibility rules must be configurable.
 
 Voucher records should include:
 
-- Unique non-guessable code
+- Non-guessable unique code
 - Partner
 - Booking
 - Customer
@@ -194,27 +343,24 @@ Voucher records should include:
 
 Voucher issuance and redemption must be idempotent and auditable.
 
-## 7. Booking and payment invariants
+## 9. Booking and payment invariants
 
 These rules are non-negotiable:
 
-- Never trust price, discount, capacity, partner, or voucher values submitted by the browser.
-- Recalculate all monetary totals on the server from persisted data.
-- Store money in integer minor units and always store the currency.
-- Use Stripe webhooks as the authoritative source for payment completion.
-- Verify webhook signatures.
-- Make webhook handlers idempotent.
-- Prevent double booking with a database constraint, transaction, lock, or equivalent concurrency-safe mechanism.
-- Never mark a booking confirmed solely because the client returned from a checkout success URL.
-- Preserve a full audit trail for cancellations, refunds, voucher issuance, and voucher redemption.
-- Use explicit time zones. Store instants in UTC and retain the experience's local IANA time zone.
-- Display all customer-facing dates and times in the experience's local time zone unless the user explicitly chooses another.
-- Define cancellation deadlines using exact date-time rules, not vague day calculations.
-- Do not expose Stripe secret keys, Supabase service-role keys, webhook secrets, or other privileged credentials to the client.
+- Never trust browser-submitted prices, discounts, capacity, partner, or voucher values.
+- Recalculate monetary totals on the server from persisted data.
+- Store money in integer minor units with currency.
+- Use Stripe webhooks as the authority for payment completion.
+- Verify webhook signatures and make handlers idempotent.
+- Prevent double booking with database-level concurrency protection.
+- Never confirm a booking only because the client returned from a checkout success URL.
+- Preserve an audit trail for cancellations, refunds, voucher issuance, and redemption.
+- Store instants in UTC and retain the experience's local IANA time zone.
+- Display customer-facing times in the experience's local time zone unless explicitly changed.
+- Define cancellation deadlines with exact date-time rules.
+- Never expose Stripe secrets, Supabase service-role keys, webhook secrets, or privileged credentials to the client.
 
-## 8. Partner QR referral flow
-
-The QR partner system is a core CostaPulse growth loop.
+## 10. Partner QR referral flow
 
 Expected flow:
 
@@ -226,30 +372,30 @@ Expected flow:
 6. Payment succeeds and the booking becomes eligible.
 7. A voucher is issued exactly once.
 8. The customer receives clear voucher instructions.
-9. The partner can validate or redeem the voucher through an authenticated or signed flow.
+9. The partner validates or redeems it through an authenticated or signed flow.
 
 Requirements:
 
 - Referral codes must be opaque and non-sequential.
 - Invalid or disabled codes must fail gracefully.
-- Never allow a query string alone to overwrite an already locked booking attribution without an explicit rule.
-- Define attribution windows and document them.
-- Protect voucher redemption against replay and race conditions.
-- Provide partner-facing reporting from trusted server-side data.
-- Avoid exposing customer personal data to partners unless operationally necessary and legally justified.
+- A query string alone may not overwrite locked booking attribution.
+- Attribution windows must be explicit and documented.
+- Redemption must resist replay and race conditions.
+- Partner reporting must use trusted server-side data.
+- Do not expose unnecessary customer personal data to partners.
 
-## 9. UX and visual system
+## 11. UX and visual system
 
 CostaPulse should feel like a premium Mediterranean experience brand.
 
-### Experience
+### Experience rules
 
-- Lead with emotional imagery, but keep booking information immediately accessible.
-- Make the primary booking CTA visually dominant.
-- Show price format clearly: per person, per group, from-price, taxes, deposits, and add-ons.
-- Use progressive disclosure for details.
+- Lead with emotional imagery while keeping booking information accessible.
+- Make the primary booking CTA dominant.
+- Explain whether prices are per person, per group, starting prices, taxes, deposits, or add-ons.
+- Use progressive disclosure.
 - Provide useful empty, loading, error, unavailable, and sold-out states.
-- Never use dark patterns, hidden fees, fake scarcity, or misleading availability.
+- Never use hidden fees, fake scarcity, dark patterns, or misleading availability.
 
 ### Visual direction
 
@@ -259,17 +405,12 @@ Prefer:
 - Deep coastal blue, turquoise, warm sand, white, and selective coral or sunset accents
 - Strong editorial typography with highly readable body text
 - Generous spacing and restrained motion
-- Rounded surfaces used selectively rather than everywhere
-- Real photography over generic stock imagery whenever possible
+- Selective rather than excessive rounded surfaces
+- Real photography over generic stock imagery
 
-Avoid:
+Avoid generic SaaS styling, excessive glass effects, neon treatments, low contrast, and decorative UI that slows booking.
 
-- Generic SaaS dashboards on customer-facing pages
-- Excessive gradients, glass effects, neon treatments, and animation
-- Low-contrast text over photography
-- Decorative UI that slows booking completion
-
-### Responsive design
+### Responsive validation
 
 Validate at minimum:
 
@@ -279,173 +420,124 @@ Validate at minimum:
 - Standard laptop
 - Wide desktop
 
-There must be no horizontal scrolling in normal page content.
+Normal page content must never scroll horizontally.
 
-## 10. Accessibility
+## 12. Accessibility
 
 Target WCAG 2.2 AA.
 
-Required practices:
-
 - Use semantic HTML before ARIA.
 - Ensure complete keyboard navigation.
-- Keep visible focus states.
-- Associate labels, descriptions, and errors with form controls.
+- Preserve visible focus states.
+- Associate labels, descriptions, and errors with controls.
 - Do not communicate state through color alone.
 - Respect reduced-motion preferences.
-- Provide meaningful alternative text for informative images.
-- Use empty alt text for purely decorative images.
-- Maintain sufficient color contrast.
-- Announce asynchronous booking and payment errors accessibly.
-- Ensure dialogs, date pickers, menus, and carousels have correct focus behavior.
+- Provide meaningful alternative text.
+- Use empty alt text for decorative images.
+- Maintain sufficient contrast.
+- Announce asynchronous errors accessibly.
+- Ensure dialogs, date pickers, menus, and carousels manage focus correctly.
 
-## 11. Internationalization and localization
+## 13. Internationalization
 
-Design for multilingual support from the beginning, even when the first release uses one language.
+Design for multilingual support from the start. Likely languages are English, Spanish, Dutch, French, and German.
 
-Likely languages include English, Spanish, Dutch, French, and German.
-
-Rules:
-
-- Do not hard-code customer-facing copy deep inside reusable components.
-- Use locale-aware formatting for dates, numbers, and currency.
+- Do not hard-code copy deep inside reusable components.
+- Use locale-aware date, number, and currency formatting.
 - Do not concatenate translated sentence fragments.
-- Allow text expansion without breaking layouts.
-- Keep route strategy and SEO metadata compatible with localized pages.
-- Store canonical content independently from translated content where appropriate.
+- Allow text expansion.
+- Keep routes and SEO metadata compatible with localized pages.
+- Separate canonical and translated content where appropriate.
 
-## 12. SEO and discoverability
+## 14. SEO
 
 For public pages:
 
 - Use meaningful server-rendered titles and descriptions.
 - Add canonical URLs.
-- Generate Open Graph and social sharing metadata.
-- Use structured data where valid, such as `Product`, `TouristTrip`, `LocalBusiness`, `Person`, `Review`, `BreadcrumbList`, or `FAQPage`.
-- Do not generate misleading schema or ratings.
+- Generate Open Graph metadata.
+- Use valid structured data where appropriate.
+- Never fabricate ratings or misleading schema.
 - Provide indexable experience, location, category, and team profile pages.
 - Optimize images and Core Web Vitals.
 - Use descriptive URLs and heading structure.
 - Include sitemap and robots configuration.
 
-## 13. Data, validation, and API design
+## 15. Data, validation, and API design
 
 - Validate every external input at the server boundary.
 - Prefer explicit schemas over loose objects.
 - Treat database rows and third-party payloads as untrusted until parsed.
 - Return predictable typed errors.
-- Never leak stack traces, SQL details, secrets, or internal identifiers to customers.
-- Use database migrations for every schema change.
-- Never edit an already deployed migration to change production history; add a new migration.
-- Add indexes based on actual query patterns.
-- Use row-level security where Supabase data can be reached through user sessions.
-- Keep privileged operations on trusted server code only.
+- Never leak stack traces, SQL details, secrets, or internal identifiers.
+- Use migrations for every schema change.
+- Add indexes based on real query patterns.
+- Use RLS wherever Supabase data is reachable through user sessions.
+- Keep privileged operations in trusted server code.
 
-## 14. Authentication and authorization
+## 16. Authentication and authorization
 
-Customer checkout should not require an account unless there is a strong product reason.
+Customer checkout should not require an account without a strong product reason.
 
 For protected areas:
 
 - Use explicit roles such as `customer`, `team_member`, `operator`, `partner`, and `admin`.
-- Enforce authorization server-side for every protected action.
+- Enforce authorization server-side.
 - Never rely on hidden buttons or client route guards as authorization.
 - Apply least privilege.
-- Require strong controls for refunds, voucher redemption, partner reporting, availability changes, and content publishing.
-- Log sensitive operational actions with actor, time, target, and outcome.
+- Strongly protect refunds, voucher redemption, reports, availability changes, and publishing.
+- Audit sensitive actions with actor, time, target, and outcome.
 
-## 15. Privacy and legal readiness
+## 17. Privacy and legal readiness
 
 Build for GDPR-conscious operation.
 
-- Collect only data needed for booking and service delivery.
-- Document the purpose of personal data fields.
-- Do not log full payment details or unnecessary personal information.
+- Collect only data needed for booking and delivery.
+- Document the purpose of personal-data fields.
+- Do not log payment details or unnecessary personal data.
 - Support retention and deletion workflows.
-- Make marketing consent explicit and separate from transactional communication.
-- Use consent controls before non-essential analytics or advertising cookies.
+- Separate marketing consent from transactional communication.
+- Require consent before non-essential analytics or advertising cookies.
 - Keep legal copy configurable and versioned where acceptance must be proven.
-- Treat health, identity, licence, and safety information as sensitive.
+- Treat health, identity, licence, and safety data as sensitive.
 
-Agents must not invent legal guarantees. Flag legal, insurance, licensing, tax, maritime, tourism, or consumer-protection assumptions for owner review.
+Agents must not invent legal guarantees. Flag legal, insurance, licensing, tax, maritime, tourism, food-service, transport, or consumer-protection assumptions for owner review.
 
-## 16. Performance standards
+## 18. Performance and observability
 
 - Prefer server components for content-heavy pages.
 - Use client components only when interactivity requires them.
 - Avoid unnecessary global state.
 - Lazy-load non-critical media and scripts.
-- Use responsive optimized images with stable dimensions.
+- Use responsive images with stable dimensions.
 - Prevent layout shift.
 - Keep third-party scripts minimal.
-- Cache public content intentionally, but never cache user-specific or booking-sensitive responses incorrectly.
-- Revalidate availability and pricing at the point of commitment.
-- Avoid runtime features that require a Vercel Edge environment.
+- Cache public content intentionally.
+- Never incorrectly cache booking-sensitive or user-specific responses.
+- Revalidate availability and pricing at commitment.
 - Validate production behavior in Railway's Node.js runtime.
 
-## 17. Observability
+Production-critical logs should include safe identifiers for requests, bookings, payments, experiences, referrals, state transitions, and error categories.
 
-Production-critical flows need structured observability.
+Never log secrets, full card data, access tokens, or unnecessary personal information. Emit logs in a format useful in Railway's log stream.
 
-Capture:
+Track business events such as experience views, availability checks, checkout starts, payment results, booking state changes, referrals, voucher issuance, and voucher redemption. Analytics is never the operational source of truth.
 
-- Request or correlation identifier
-- Booking identifier
-- Payment provider identifier
-- Experience identifier
-- Partner/referral identifier when relevant
-- State transition
-- Error category
-- Safe diagnostic context
+## 19. Testing requirements
 
-Never log secrets, full card data, access tokens, or unnecessary personal information.
-
-Track business events such as:
-
-- Experience viewed
-- Availability checked
-- Checkout started
-- Payment succeeded or failed
-- Booking confirmed or cancelled
-- Referral attributed
-- Voucher issued
-- Voucher redeemed
-
-Analytics must not become the source of truth for operational records.
-
-Logs must remain useful in Railway's log stream and should use structured JSON where it materially improves filtering and incident diagnosis.
-
-## 18. Testing requirements
-
-Every meaningful change should include the smallest effective test coverage.
+Every meaningful change needs effective test coverage.
 
 ### Unit tests
 
-Use for:
-
-- Pricing calculations
-- Capacity rules
-- Cancellation deadlines
-- Referral attribution
-- Voucher calculations and expiry
-- State transitions
-- Validation schemas
-- Date and time-zone logic
+Use for pricing, capacity, cancellation deadlines, attribution, vouchers, state transitions, schemas, and time-zone logic.
 
 ### Integration tests
 
-Use for:
-
-- Database constraints and policies
-- Booking creation
-- Concurrency-sensitive availability
-- Stripe webhook handling
-- Voucher issuance and redemption
-- Authorization boundaries
+Use for database constraints, RLS, booking creation, concurrency, webhooks, voucher issuance, redemption, and authorization.
 
 ### End-to-end tests
 
-Protect the revenue-critical journey:
+Protect the revenue-critical flow:
 
 1. Discover an experience.
 2. Select date, time, participants, and options.
@@ -453,34 +545,26 @@ Protect the revenue-critical journey:
 4. Enter customer details.
 5. Complete payment in test mode.
 6. Receive a confirmed booking.
-7. Verify partner attribution and voucher issuance when applicable.
+7. Verify referral attribution and voucher issuance when applicable.
 
-Also test payment failure, expired availability, duplicate webhook delivery, cancellation, refund, and mobile usability.
+Also test payment failure, expired availability, duplicate webhooks, cancellation, refunds, unauthorized access, and mobile usability.
 
-Do not remove, skip, or weaken tests merely to make CI pass.
+Do not remove or weaken tests merely to make CI pass.
 
-For deployment-related changes, also verify:
-
-- The production build completes.
-- The production start command launches successfully.
-- The service listens on Railway's injected `PORT`.
-- The health endpoint returns a safe successful response.
-- Required environment variables fail fast with clear server-side diagnostics.
-
-## 19. Code quality conventions
+## 20. Code quality
 
 - Use TypeScript strict mode.
 - Avoid `any`; justify rare exceptions locally.
-- Prefer small named functions and explicit types at boundaries.
-- Use descriptive domain names instead of abbreviations.
+- Prefer small named functions and explicit boundary types.
+- Use descriptive domain names.
 - Avoid premature abstraction.
-- Do not duplicate business logic between client and server; server logic is authoritative.
+- Do not duplicate server business logic in the client.
 - Keep components focused and composable.
-- Add comments for non-obvious decisions, not for obvious syntax.
-- Remove dead code rather than commenting it out.
+- Comment non-obvious decisions, not obvious syntax.
+- Remove dead code.
 - Keep linting, formatting, type checking, tests, and builds clean.
 
-Suggested commands once the app is initialized:
+Suggested commands once configured:
 
 ```bash
 npm run lint
@@ -491,20 +575,20 @@ npm run build
 npm run start
 ```
 
-Use the package manager already established by the lockfile. Do not create multiple lockfiles.
+Use the package manager established by the lockfile. Never create multiple lockfiles.
 
-## 20. Environment variables
+## 21. Environment variables
 
 - Commit a safe `.env.example` with names and comments only.
 - Never commit live credentials or personal tokens.
 - Validate required variables at startup.
-- Clearly separate public variables from server-only variables.
+- Separate public variables from server-only variables.
 - Use development and test credentials locally.
-- Use Railway-managed environment variables for production configuration and secrets.
+- Use Railway-managed variables for production secrets and configuration.
 - Never assume local `.env` files exist in production.
-- Do not expose Railway-provided internal variables to the browser unless explicitly safe and necessary.
+- Never expose Railway internal variables or server secrets to the browser.
 
-Potential categories:
+Possible categories include:
 
 ```text
 PORT
@@ -518,13 +602,11 @@ STRIPE_WEBHOOK_SECRET
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 ```
 
-These are examples, not permission to add unused configuration. Railway normally injects `PORT`; application code must consume it rather than assigning a fixed production port.
+These are examples, not permission to add unused configuration. Railway injects `PORT`; consume it rather than fixing a production port.
 
-## 21. Git and pull request workflow
+## 22. Git and pull request workflow
 
-Unless instructed otherwise:
-
-- Create focused branches from the current default branch.
+- Create focused branches from the current default branch unless instructed otherwise.
 - Use concise conventional commit messages.
 - Keep commits logically scoped.
 - Do not rewrite shared history.
@@ -532,80 +614,91 @@ Unless instructed otherwise:
 - Do not mix broad refactors with product features.
 - Include migrations, generated types, tests, and documentation required by the change.
 
-Pull requests should explain:
+Pull requests must explain:
 
-- What changed
-- Why it changed
+- What changed and why
 - User and business impact
-- Screenshots or recordings for visible UI changes
+- Database and migration changes
+- RLS and authorization implications
+- Backend contracts
+- Screenshots or recordings for UI changes
 - Testing performed
-- Database or environment changes
 - Railway deployment implications
 - Risks, assumptions, and follow-up work
 
-## 22. Agent execution protocol
+## 23. Agent execution protocol
 
-Before coding:
+### Before coding
 
 1. Read this file and any nearer `AGENTS.md`.
-2. Inspect the repository, package scripts, existing patterns, and current branch.
-3. Understand the requested outcome and identify revenue, security, data, deployment, and UX risks.
-4. Prefer the smallest coherent implementation that fully solves the request.
+2. Use GitHub MCP to inspect current repository state and patterns.
+3. Use Supabase MCP to inspect all relevant database and authentication state.
+4. Identify affected layers: database, backend, frontend, infrastructure, tests, and documentation.
+5. Plan the work in the mandatory Database → Backend → Frontend order.
+6. Identify revenue, security, data, concurrency, deployment, and UX risks.
 
-While coding:
+### While coding
 
-1. Preserve established architecture and style.
-2. Keep the application runnable after each logical step.
-3. Reuse existing primitives before creating new ones.
-4. Never invent API behavior, environment values, legal terms, pricing, operational capacity, or availability rules.
-5. Add or update tests alongside behavior.
-6. Maintain accessibility and responsive behavior.
-7. Preserve Railway compatibility and avoid Vercel-specific assumptions.
-8. Do not make unrelated changes.
+1. Complete and validate database work first.
+2. Complete and validate backend work second.
+3. Complete and validate frontend work third.
+4. Keep the application runnable after each logical step.
+5. Reuse established patterns and primitives.
+6. Never invent API behavior, schema, environment values, legal terms, prices, capacity, or availability rules.
+7. Add tests alongside behavior.
+8. Preserve accessibility, mobile quality, and Railway compatibility.
+9. Use GitHub MCP and Supabase MCP throughout, not only at the beginning.
+10. Do not make unrelated changes.
 
-Before finishing:
+### Before finishing
 
-1. Review the diff.
-2. Run relevant linting, type checks, tests, production build, and production start checks.
-3. Check mobile and desktop behavior for UI work.
-4. Check empty, loading, error, success, unavailable, and unauthorized states.
-5. Confirm no secrets or sensitive data entered the diff.
-6. Confirm Railway runtime, `PORT`, environment-variable, logging, and health-check compatibility for deployment-related work.
-7. Summarize changed files, validation performed, assumptions, and remaining risks.
+1. Reinspect Supabase schema, migrations, RLS, and relevant data contracts through Supabase MCP.
+2. Review the complete GitHub diff through GitHub MCP.
+3. Run relevant linting, type checks, tests, production build, and production start checks.
+4. Test mobile and desktop UI behavior.
+5. Test empty, loading, error, success, unavailable, sold-out, payment, and unauthorized states.
+6. Confirm no secrets or sensitive data entered the diff.
+7. Confirm Railway `PORT`, runtime, variables, logging, and health-check compatibility.
+8. Report files changed, MCP checks performed, tests run, assumptions, and remaining risks.
 
-## 23. Definition of done
+## 24. Definition of done
 
 A task is done only when:
 
+- The mandatory Database → Backend → Frontend sequence was followed, or unaffected layers were explicitly justified.
+- GitHub MCP was used to inspect and validate repository state.
+- Supabase MCP was used for every relevant database, authentication, storage, or data-contract concern.
 - The requested user outcome works end to end.
-- Business rules are enforced server-side.
-- Data changes are migration-backed and safe.
-- Errors are handled clearly.
+- Database constraints and RLS enforce critical invariants.
+- Backend business rules and authorization are server-side.
+- Frontend code uses stable typed backend contracts.
+- Data changes are migration-backed and verified.
+- Errors and edge cases are handled clearly.
 - Accessibility and responsive behavior are preserved.
 - Relevant tests pass.
 - Linting, type checking, production build, and production start pass where configured.
 - Railway deployment compatibility is preserved.
 - Security, privacy, localization, and SEO implications were considered.
 - Documentation and `.env.example` are updated when needed.
-- No unrelated code, secrets, debug output, dead code, or Vercel-specific deployment assumptions remain.
+- GitHub MCP confirms no unrelated files, secrets, debug output, dead code, or Vercel-specific assumptions remain.
 
-## 24. Owner decisions that agents must not guess
+## 25. Owner decisions agents must not guess
 
-Stop and surface the assumption when implementation depends on unresolved decisions such as:
+Surface assumptions when implementation depends on unresolved decisions such as:
 
 - Exact experiences, prices, commissions, deposits, taxes, and currencies
 - Voucher percentage, validity, transferability, and redemption rules
 - Partner attribution window and commission model
-- Automatic versus manual booking confirmation
+- Automatic versus manual confirmation
 - Cancellation and refund terms
 - Customer eligibility, age, health, waiver, or licence requirements
-- Maritime, tourism, transport, food-service, insurance, and local permit requirements
-- Supported service areas and pickup locations
+- Maritime, tourism, transport, food-service, insurance, and permit requirements
+- Service areas and pickup locations
 - Weather cancellation policy
-- Brand assets and final written tone
-- Railway service topology, regions, custom domains, scaling, persistent volumes, cron jobs, and deployment strategy unless already configured in the repository
+- Brand assets and final tone
+- Railway regions, domains, scaling, volumes, cron jobs, and service topology
 
-When progress is still possible, isolate the uncertain policy behind configuration or a clearly marked interface rather than hard-coding an assumption.
+When progress remains possible, isolate uncertain policy behind configuration or a clearly marked interface rather than hard-coding an assumption.
 
 ---
 
