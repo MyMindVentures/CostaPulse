@@ -32,7 +32,7 @@ Do not set a Dockerfile builder or Dockerfile path in the Railway dashboard.
 5. Railpack detects the `start` script in `package.json`.
 6. Next.js runs the standalone server and listens on Railway's injected `PORT`.
 7. Railway waits for `GET /api/health` to return HTTP 200 before switching traffic.
-8. Verify `/`, `/admin`, `/api/health`, `/sitemap.xml`, and `/robots.txt`.
+8. Verify `/`, `/admin`, `/api/health`, `/api/ready`, `/sitemap.xml`, and `/robots.txt`.
 
 ## Required variables
 
@@ -44,18 +44,54 @@ Public `NEXT_PUBLIC_*` variables are embedded during `next build`; changing them
 
 ## Pre-deployment gate
 
+Use `npm ci` for reproducible installs because the repository commits `package-lock.json`.
+
+### PowerShell
+
+```powershell
+npm ci
+npm run format:check
+npm run lint
+npm run typecheck
+npm run test
+npm run build
+$env:PORT=3000
+npm run start
+```
+
+In a second PowerShell session:
+
+```powershell
+(Invoke-WebRequest -UseBasicParsing http://localhost:3000/api/health).StatusCode
+(Invoke-WebRequest -UseBasicParsing http://localhost:3000/api/ready).StatusCode
+```
+
+Expected result: `200` for both endpoints when required public variables are present and no optional integration is partially configured.
+
+After stopping the local server, clear the temporary variable:
+
+```powershell
+Remove-Item Env:PORT
+```
+
+### POSIX shell
+
 ```bash
-npm install
+npm ci
 npm run format:check
 npm run lint
 npm run typecheck
 npm run test
 npm run build
 PORT=3000 npm run start
-curl --fail http://localhost:3000/api/health
 ```
 
-The repository now includes a committed `package-lock.json`, so use `npm ci` consistently where reproducible installs are required.
+In a second shell:
+
+```bash
+curl --fail http://localhost:3000/api/health
+curl --fail http://localhost:3000/api/ready
+```
 
 ## Security gate
 

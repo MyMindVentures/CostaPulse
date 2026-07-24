@@ -6,6 +6,7 @@ export function GET() {
   return NextResponse.json(
     {
       status: "ok",
+      check: "liveness",
       service: "costapulse",
       timestamp: new Date().toISOString()
     },

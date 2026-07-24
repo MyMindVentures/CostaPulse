@@ -30,18 +30,25 @@ cd CostaPulse
 
 - **Railway project name:** `CostaPulse`
 - **Hosting platform:** Railway
-- **Builder:** repository-root `Dockerfile`
+- **Builder:** Railpack via root `railway.json`
 - **Application healthcheck:** `/api/health`
 - **Application runtime:** Next.js standalone Node.js server
 - **Runtime bind address:** `0.0.0.0`
 - **Runtime port:** Railway-provided `PORT`
+- **Config file path:** `/railway.json`
 
 Railway deployment configuration is committed in:
 
 ```text
 railway.json
-Dockerfile
-.dockerignore
+```
+
+Canonical deployment guidance lives in the repository root:
+
+```text
+RAILWAY.md
+DEPLOYMENT.md
+ENVIRONMENT.md
 ```
 
 The service must define these public environment variables:
@@ -154,7 +161,8 @@ docs/USER-ROLES-AND-CAPABILITIES.md
 Detailed Railway deployment guidance is documented in:
 
 ```text
-docs/RAILWAY-DEPLOYMENT.md
+RAILWAY.md
+DEPLOYMENT.md
 ```
 
 ## Deployment Architecture

@@ -29,6 +29,8 @@ If the dashboard contains old Docker builder, Dockerfile path, build-command, or
 
 Next.js produces standalone output. The `start` script in `package.json` launches `.next/standalone/server.js`, and Railpack uses that script automatically. Railway injects `PORT`; do not define it manually. The standalone server reads Railway's `PORT` and defaults its hostname appropriately for the platform.
 
+Railway should continue probing `GET /api/health` as a liveness check. Use `GET /api/ready` as an operator-facing readiness check for required public variables and partially configured optional integrations; do not point the Railway health check at `/api/ready`.
+
 The service is stateless. Do not store uploads or operational data on the application filesystem. Use Supabase Database and Supabase Storage.
 
 ## Variables
