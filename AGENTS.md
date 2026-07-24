@@ -2,6 +2,99 @@
 
 This file is the binding working contract for every AI coding agent and human contributor in the CostaPulse repository.
 
+## 0. Non-negotiable hard guardrails
+
+These rules override convenience, speed, prototypes, temporary shortcuts, and agent preferences. A change that violates any rule below is incomplete and must not be merged.
+
+### 0.1 Nothing hard-coded
+
+- Do not hard-code user-facing copy, prices, percentages, capacities, durations, availability, experience details, locations, contact details, legal text, feature flags, identifiers, URLs, bucket names, storage paths, currencies, locale lists, roles, statuses, or business rules inside components or route handlers.
+- Persist business and editorial content in the approved database or content source and expose it through typed backend contracts.
+- Store deployment-specific values and secrets in validated environment configuration.
+- Keep true technical constants centralized, named, typed, documented, and configurable where business requirements may change.
+- Never duplicate authoritative values across database, backend, and frontend.
+- No magic strings or magic numbers in production logic.
+
+### 0.2 All content in all supported European languages
+
+- Every customer-facing content model and feature must support all European languages enabled by CostaPulse.
+- The supported locale registry must be centralized and configurable; components may not define their own locale lists.
+- No feature is complete when any enabled locale falls back to untranslated production copy.
+- Database-backed editorial content must use a normalized translation model or another explicitly approved multilingual structure.
+- Validation must detect missing, empty, stale, or unpublished translations for every enabled locale.
+- Dates, times, numbers, currencies, pluralization, metadata, validation messages, emails, transactional messages, accessibility labels, alt text, and structured content must be locale-aware.
+- Machine-generated translations may be used only as reviewable drafts, never silently published as approved content.
+
+### 0.3 Mandatory language switcher
+
+- Every public customer journey must provide a visible, accessible language switcher.
+- Switching language must preserve the current page, query parameters, selected experience, referral attribution, booking context, and other safe navigation state.
+- The selected locale must persist consistently across navigation and return visits.
+- Localized routes, canonical URLs, hreflang links, metadata, sitemap entries, and structured data must stay synchronized.
+- Locale detection may suggest a language but must not trap or silently override the customer's explicit choice.
+
+### 0.4 No mock data and no bucket-file content source
+
+- Production code must not use mock records, placeholder arrays, fake reviews, fabricated ratings, demo bookings, static JSON content, fixture content, or locally bundled pseudo-database files.
+- Do not read JSON, CSV, Markdown, text, or other files from Supabase Storage buckets as an alternative to a proper database/content model.
+- Storage buckets are for approved binary assets such as images, video, documents, and generated exports; their metadata and relationships belong in the database.
+- Tests may use isolated factories and fixtures under test-only paths. Test fixtures must never be imported by production code or shipped as runtime fallbacks.
+- Empty database states must render deliberate empty states rather than fabricated content.
+
+### 0.5 Database and backend are authoritative
+
+- Every functional frontend flow must be designed from the verified database schema and stable backend contract.
+- Frontend code may not query undocumented tables, infer schema, invent fields, bypass authorization, or implement an independent business-rule model.
+- All writes go through approved server-side services, route handlers, server actions, or RPCs with validation and authorization.
+- Direct browser access to Supabase is allowed only for explicitly approved, RLS-protected read or write paths with a documented reason.
+- Prices, discounts, availability, capacity, booking eligibility, referrals, vouchers, payment state, permissions, and workflow transitions are always recalculated or verified server-side.
+- Schema migrations, generated database types, backend validators, API contracts, frontend types, and tests must evolve together in one coherent change.
+
+### 0.6 Frontend must use the design system
+
+- All production UI must use approved design tokens, typography, spacing, colors, radii, shadows, breakpoints, icons, motion, and reusable primitives from the CostaPulse design system.
+- Do not introduce one-off visual values, inline styling, arbitrary Tailwind values, duplicate components, or unapproved third-party UI patterns when an existing primitive or token applies.
+- New visual patterns must first be implemented as reusable design-system primitives with documented variants, states, accessibility behavior, and responsive rules.
+- Every component must support loading, empty, error, disabled, focus, hover, active, validation, and responsive states where applicable.
+- Visual consistency, WCAG 2.2 AA accessibility, mobile-first behavior, and premium brand quality are release requirements.
+
+### 0.7 Premium stack only
+
+- Use the approved stack defined in this document and established by the repository.
+- Do not introduce low-quality shortcuts, abandoned packages, duplicate libraries, client-side-only security solutions, untyped integrations, or infrastructure that conflicts with Railway, Supabase, Stripe, Next.js, or the existing architecture.
+- New dependencies require a demonstrated need, active maintenance, acceptable security posture, TypeScript support, bundle/runtime impact review, and compatibility with the current stack.
+- Prefer robust, supported, observable, testable, server-authoritative implementations over quick demos.
+
+### 0.8 Every flow must be tested
+
+- Every new or changed user flow requires automated coverage at the correct levels: unit, integration, component, and end-to-end.
+- Happy paths alone are insufficient. Test validation, empty states, authorization, unavailable data, concurrency, retries, network/server failures, payment failures, duplicate events, localization, responsive behavior, and accessibility where relevant.
+- Revenue-critical flows must run against realistic test database state and approved payment test mode, not UI-only mocks.
+- A flow is not complete while tests are skipped, quarantined, weakened, or replaced with manual assertions.
+- Lint, formatting, strict type checking, unit/integration tests, Playwright flows, production build, and production start checks must pass before completion where configured.
+
+### 0.9 Database, Storage, Backend, and Frontend must be seamless
+
+Every feature must form one traceable vertical contract:
+
+```text
+Database schema and constraints
+→ Storage policies and asset metadata when applicable
+→ RLS and authorization
+→ Server repository/service
+→ Validated backend contract
+→ Typed frontend integration
+→ Design-system UI
+→ Automated end-to-end verification
+```
+
+- No orphan database fields, storage objects, backend endpoints, frontend controls, or untranslated content.
+- Storage uploads must create or update database metadata atomically or through a recoverable workflow.
+- Deleting or replacing an asset must preserve referential integrity and clean up obsolete objects safely.
+- The frontend must display only states that the backend can actually produce and handle every documented backend error.
+- Contract changes must update migrations, policies, generated types, validators, services, UI, and tests together.
+- Completion reports must state how all affected layers were inspected, changed, and validated.
+
 ## 1. Product mission
 
 CostaPulse is a premium booking and discovery platform for authentic Costa Blanca experiences.
@@ -115,7 +208,7 @@ For meaningful feature work, the agent's final report must state:
 
 - What was inspected through GitHub MCP
 - What was inspected or changed through Supabase MCP
-- Which migration, schema, RLS, backend, and frontend validations were performed
+- Which migration, schema, RLS, storage, backend, frontend, localization, design-system, and end-to-end validations were performed
 - Which checks could not be performed and why
 
 A task is not complete merely because code was generated. The repository and Supabase state must support the implementation.
@@ -126,9 +219,10 @@ Every feature and functional change must be developed in this order:
 
 ```text
 1. Database
-2. Backend
-3. Frontend
-4. End-to-end validation
+2. Storage and storage policies when applicable
+3. Backend
+4. Frontend
+5. End-to-end validation
 ```
 
 This is the default and required dependency direction. The frontend must consume stable backend contracts, and the backend must operate against a verified database model.
@@ -149,9 +243,23 @@ Before writing backend or frontend code:
 
 Do not proceed to backend implementation while the required database contract is unclear, unsafe, or unverified.
 
-### Phase 2 — Backend second
+### Phase 2 — Storage second when applicable
 
-After the database contract is verified:
+After the database contract is verified and before frontend upload or asset rendering work:
+
+1. Inspect actual buckets, object naming conventions, limits, MIME rules, and storage policies through Supabase MCP.
+2. Define database metadata and ownership for every uploaded asset.
+3. Enforce upload, read, replace, and delete permissions through storage policies and server-side authorization.
+4. Use deterministic, collision-resistant object paths without exposing sensitive identifiers unnecessarily.
+5. Validate file type, size, ownership, and intended use before accepting uploads.
+6. Keep bucket objects and database metadata synchronized through recoverable workflows.
+7. Verify signed/public URL behavior, expiry, caching, transformations, replacement, and cleanup.
+
+Do not treat bucket files as editorial or business content records.
+
+### Phase 3 — Backend third
+
+After the database and applicable storage contracts are verified:
 
 1. Implement server-side repositories, services, route handlers, server actions, jobs, or webhook handlers.
 2. Parse all external input with explicit schemas.
@@ -160,35 +268,37 @@ After the database contract is verified:
 5. Use transactions, constraints, or locks for concurrency-sensitive operations.
 6. Return stable typed contracts and predictable errors to the frontend.
 7. Keep privileged Supabase and Stripe operations server-only.
-8. Add unit and integration tests for business logic, database interaction, authorization, and failure states.
-9. Verify backend behavior against the actual Supabase schema using Supabase MCP.
+8. Add unit and integration tests for business logic, database interaction, authorization, storage behavior, and failure states.
+9. Verify backend behavior against the actual Supabase schema and policies using Supabase MCP.
 
 Do not start frontend integration until the backend contract and failure behavior are defined and tested.
 
-### Phase 3 — Frontend third
+### Phase 4 — Frontend fourth
 
-After database and backend foundations are working:
+After database, storage when applicable, and backend foundations are working:
 
 1. Build the user interface against the real typed backend contract.
-2. Never duplicate authoritative business rules in the browser.
-3. Treat client calculations as previews only; the server remains authoritative.
-4. Implement loading, empty, validation, error, unauthorized, unavailable, sold-out, payment-failure, and success states.
-5. Preserve mobile-first behavior, accessibility, localization readiness, and premium visual quality.
-6. Do not mock data when a working backend contract is available.
-7. Remove temporary mocks before declaring the feature complete.
-8. Add component and end-to-end tests for the user journey.
+2. Use only approved design-system tokens and components.
+3. Never duplicate authoritative business rules in the browser.
+4. Treat client calculations as previews only; the server remains authoritative.
+5. Implement loading, empty, validation, error, unauthorized, unavailable, sold-out, payment-failure, and success states.
+6. Implement all enabled locales and the language switcher as part of the feature, not as later polish.
+7. Preserve mobile-first behavior, accessibility, localization, and premium visual quality.
+8. Do not mock data when a working backend contract is available.
+9. Remove temporary mocks before declaring the feature complete.
+10. Add component and end-to-end tests for the user journey.
 
-### Phase 4 — End-to-end validation
+### Phase 5 — End-to-end validation
 
 Before completion:
 
-1. Verify the migration and RLS state through Supabase MCP.
-2. Verify backend reads and writes against Supabase.
-3. Verify the frontend uses the intended backend contract.
-4. Test the complete user journey and critical failure paths.
+1. Verify migration, RLS, storage, and translation-content state through Supabase MCP.
+2. Verify backend reads, writes, uploads, replacements, and deletes against Supabase when applicable.
+3. Verify the frontend uses the intended backend contract and design-system primitives.
+4. Test the complete user journey in every enabled locale and test critical failure paths.
 5. Run linting, formatting, type checking, tests, production build, and production start checks.
 6. Use GitHub MCP to review the final repository diff.
-7. Confirm Railway compatibility and that no secrets or unrelated changes entered the repository.
+7. Confirm Railway compatibility and that no secrets, mocks, hard-coded business content, bucket-content files, arbitrary styling, or unrelated changes entered the repository.
 
 ### Permitted phase skipping
 
@@ -196,9 +306,9 @@ A phase may be skipped only when the change demonstrably does not touch that lay
 
 Examples:
 
-- A copy-only text correction may skip database and backend work.
+- A correction to an existing translation record may skip schema changes but still requires localization validation.
 - A pure design-token adjustment may skip database and backend work.
-- A database-only index optimization may not require frontend work.
+- A database-only index optimization may not require storage or frontend work.
 
 Even when skipping a phase, the agent must explicitly state why that layer is unaffected. Agents must not label a functional feature as “frontend-only” merely to avoid inspecting its data and backend dependencies.
 
@@ -263,10 +373,10 @@ src/
 public/
 tests/
   e2e/
-  fixtures/
+  fixtures/               # Test-only; never imported by production runtime
 supabase/
   migrations/
-  seed.sql
+  seed.sql                # Development/test setup only; never a production fallback
 ```
 
 Rules:
@@ -276,7 +386,7 @@ Rules:
 - Never import server-only code into client components.
 - Avoid large catch-all utility files.
 - Co-locate feature-specific tests and types where practical.
-- Add a local `AGENTS.md` only when a directory genuinely needs different rules.
+- Add a local `AGENTS.md` only when a directory genuinely needs stricter or different rules.
 
 ## 8. Core domain model
 
@@ -325,7 +435,7 @@ An attribution record connecting a partner, customer session, and eventual booki
 
 ### Voucher
 
-A customer benefit created after an eligible referred booking is paid and confirmed. The baseline is 10% of the qualifying booking amount, but percentage and eligibility rules must be configurable.
+A customer benefit created after an eligible referred booking is paid and confirmed. The baseline is 10% of the qualifying booking amount, but percentage and eligibility rules must be configurable and database-backed.
 
 Voucher records should include:
 
@@ -371,7 +481,7 @@ Expected flow:
 5. The booking stores the attributed partner and referral source.
 6. Payment succeeds and the booking becomes eligible.
 7. A voucher is issued exactly once.
-8. The customer receives clear voucher instructions.
+8. The customer receives clear localized voucher instructions.
 9. The partner validates or redeems it through an authenticated or signed flow.
 
 Requirements:
@@ -379,7 +489,7 @@ Requirements:
 - Referral codes must be opaque and non-sequential.
 - Invalid or disabled codes must fail gracefully.
 - A query string alone may not overwrite locked booking attribution.
-- Attribution windows must be explicit and documented.
+- Attribution windows must be explicit, configurable, and documented.
 - Redemption must resist replay and race conditions.
 - Partner reporting must use trusted server-side data.
 - Do not expose unnecessary customer personal data to partners.
@@ -396,6 +506,15 @@ CostaPulse should feel like a premium Mediterranean experience brand.
 - Use progressive disclosure.
 - Provide useful empty, loading, error, unavailable, and sold-out states.
 - Never use hidden fees, fake scarcity, dark patterns, or misleading availability.
+
+### Design-system enforcement
+
+- The design system is the only source of truth for production UI.
+- Use semantic tokens rather than raw colors, pixel values, shadows, radii, or typography values.
+- Prefer existing primitives and variants; extend the system before creating one-off UI.
+- Arbitrary Tailwind values require an explicit documented exception and should normally become a token.
+- Do not copy-paste near-identical components between features.
+- Every new primitive requires accessibility, responsive, interaction-state, and component tests.
 
 ### Visual direction
 
@@ -432,7 +551,7 @@ Target WCAG 2.2 AA.
 - Associate labels, descriptions, and errors with controls.
 - Do not communicate state through color alone.
 - Respect reduced-motion preferences.
-- Provide meaningful alternative text.
+- Provide meaningful localized alternative text.
 - Use empty alt text for decorative images.
 - Maintain sufficient contrast.
 - Announce asynchronous errors accessibly.
@@ -440,39 +559,47 @@ Target WCAG 2.2 AA.
 
 ## 13. Internationalization
 
-Design for multilingual support from the start. Likely languages are English, Spanish, Dutch, French, and German.
+Internationalization is mandatory architecture, not optional polish.
 
-- Do not hard-code copy deep inside reusable components.
-- Use locale-aware date, number, and currency formatting.
+- Maintain one centralized, typed registry of all enabled European locales.
+- Every public and transactional content item must have a validated translation for every enabled locale before publication.
+- Do not hard-code copy inside reusable components, pages, route handlers, emails, metadata, or validation schemas.
+- Use locale-aware date, time, number, currency, unit, list, and plural formatting.
 - Do not concatenate translated sentence fragments.
-- Allow text expansion.
-- Keep routes and SEO metadata compatible with localized pages.
-- Separate canonical and translated content where appropriate.
+- Allow significant text expansion and different word order.
+- Provide a persistent accessible language switcher across every public flow.
+- Preserve route, query, referral, booking, and safe form state when switching language.
+- Keep localized routes, canonical URLs, alternate hreflang links, metadata, structured data, sitemap entries, emails, and notifications aligned.
+- Separate canonical domain data from translated editorial fields.
+- Missing translations must fail validation or block publication; production must not silently display source-language copy.
+- Translation completeness must be covered by automated tests.
 
 ## 14. SEO
 
 For public pages:
 
-- Use meaningful server-rendered titles and descriptions.
-- Add canonical URLs.
-- Generate Open Graph metadata.
+- Use meaningful localized server-rendered titles and descriptions.
+- Add canonical URLs and hreflang alternatives.
+- Generate localized Open Graph metadata.
 - Use valid structured data where appropriate.
 - Never fabricate ratings or misleading schema.
-- Provide indexable experience, location, category, and team profile pages.
+- Provide indexable localized experience, location, category, and team profile pages.
 - Optimize images and Core Web Vitals.
-- Use descriptive URLs and heading structure.
-- Include sitemap and robots configuration.
+- Use descriptive localized URLs and heading structure.
+- Include synchronized localized sitemap and robots configuration.
 
-## 15. Data, validation, and API design
+## 15. Data, storage, validation, and API design
 
 - Validate every external input at the server boundary.
 - Prefer explicit schemas over loose objects.
-- Treat database rows and third-party payloads as untrusted until parsed.
+- Treat database rows, storage metadata, and third-party payloads as untrusted until parsed.
 - Return predictable typed errors.
-- Never leak stack traces, SQL details, secrets, or internal identifiers.
+- Never leak stack traces, SQL details, secrets, storage internals, or internal identifiers.
 - Use migrations for every schema change.
 - Add indexes based on real query patterns.
 - Use RLS wherever Supabase data is reachable through user sessions.
+- Use storage policies for every bucket and object operation.
+- Store asset metadata, ownership, ordering, captions, alt text, locale data, and domain relationships in PostgreSQL rather than content files in buckets.
 - Keep privileged operations in trusted server code.
 
 ## 16. Authentication and authorization
@@ -481,11 +608,11 @@ Customer checkout should not require an account without a strong product reason.
 
 For protected areas:
 
-- Use explicit roles such as `customer`, `team_member`, `operator`, `partner`, and `admin`.
-- Enforce authorization server-side.
+- Use explicit roles such as `customer`, `team_member`, `operator`, `partner`, and `admin` from one authoritative role model.
+- Enforce authorization server-side and through RLS/storage policies where applicable.
 - Never rely on hidden buttons or client route guards as authorization.
 - Apply least privilege.
-- Strongly protect refunds, voucher redemption, reports, availability changes, and publishing.
+- Strongly protect refunds, voucher redemption, reports, availability changes, asset management, translation publishing, and publishing.
 - Audit sensitive actions with actor, time, target, and outcome.
 
 ## 17. Privacy and legal readiness
@@ -495,10 +622,10 @@ Build for GDPR-conscious operation.
 - Collect only data needed for booking and delivery.
 - Document the purpose of personal-data fields.
 - Do not log payment details or unnecessary personal data.
-- Support retention and deletion workflows.
+- Support retention and deletion workflows across database and storage.
 - Separate marketing consent from transactional communication.
 - Require consent before non-essential analytics or advertising cookies.
-- Keep legal copy configurable and versioned where acceptance must be proven.
+- Keep legal copy configurable, localized, and versioned where acceptance must be proven.
 - Treat health, identity, licence, and safety data as sensitive.
 
 Agents must not invent legal guarantees. Flag legal, insurance, licensing, tax, maritime, tourism, food-service, transport, or consumer-protection assumptions for owner review.
@@ -513,43 +640,48 @@ Agents must not invent legal guarantees. Flag legal, insurance, licensing, tax, 
 - Prevent layout shift.
 - Keep third-party scripts minimal.
 - Cache public content intentionally.
-- Never incorrectly cache booking-sensitive or user-specific responses.
+- Never incorrectly cache booking-sensitive, locale-sensitive, or user-specific responses.
 - Revalidate availability and pricing at commitment.
 - Validate production behavior in Railway's Node.js runtime.
 
-Production-critical logs should include safe identifiers for requests, bookings, payments, experiences, referrals, state transitions, and error categories.
+Production-critical logs should include safe identifiers for requests, bookings, payments, experiences, referrals, state transitions, storage operations, locale, and error categories.
 
-Never log secrets, full card data, access tokens, or unnecessary personal information. Emit logs in a format useful in Railway's log stream.
+Never log secrets, full card data, access tokens, signed asset URLs, or unnecessary personal information. Emit logs in a format useful in Railway's log stream.
 
-Track business events such as experience views, availability checks, checkout starts, payment results, booking state changes, referrals, voucher issuance, and voucher redemption. Analytics is never the operational source of truth.
+Track business events such as experience views, availability checks, checkout starts, payment results, booking state changes, referrals, voucher issuance, voucher redemption, language changes, and asset-processing failures. Analytics is never the operational source of truth.
 
 ## 19. Testing requirements
 
-Every meaningful change needs effective test coverage.
+Every meaningful change and every user flow needs effective automated coverage.
 
 ### Unit tests
 
-Use for pricing, capacity, cancellation deadlines, attribution, vouchers, state transitions, schemas, and time-zone logic.
+Use for pricing, capacity, cancellation deadlines, attribution, vouchers, state transitions, schemas, time-zone logic, locale formatting, translation completeness, and storage path generation.
 
 ### Integration tests
 
-Use for database constraints, RLS, booking creation, concurrency, webhooks, voucher issuance, redemption, and authorization.
+Use for database constraints, RLS, storage policies, booking creation, concurrency, webhooks, voucher issuance, redemption, authorization, translation publication, and asset lifecycle behavior.
+
+### Component tests
+
+Use for design-system variants, interaction states, forms, language switching, accessibility, errors, loading states, and responsive behavior where practical.
 
 ### End-to-end tests
 
-Protect the revenue-critical flow:
+Protect the complete revenue-critical flow in every enabled locale:
 
-1. Discover an experience.
-2. Select date, time, participants, and options.
-3. See an accurate total.
-4. Enter customer details.
-5. Complete payment in test mode.
-6. Receive a confirmed booking.
-7. Verify referral attribution and voucher issuance when applicable.
+1. Select or switch language.
+2. Discover an experience from real test database content.
+3. Select date, time, participants, and options.
+4. See an accurate localized total.
+5. Enter customer details.
+6. Complete payment in test mode.
+7. Receive a confirmed localized booking result.
+8. Verify referral attribution and voucher issuance when applicable.
 
-Also test payment failure, expired availability, duplicate webhooks, cancellation, refunds, unauthorized access, and mobile usability.
+Also test missing translations, payment failure, expired availability, duplicate webhooks, cancellation, refunds, unauthorized access, storage failures, asset replacement/deletion, mobile usability, keyboard operation, and accessible error handling.
 
-Do not remove or weaken tests merely to make CI pass.
+Do not remove or weaken tests merely to make CI pass. Do not use production-runtime mocks to satisfy end-to-end coverage.
 
 ## 20. Code quality
 
@@ -559,9 +691,10 @@ Do not remove or weaken tests merely to make CI pass.
 - Use descriptive domain names.
 - Avoid premature abstraction.
 - Do not duplicate server business logic in the client.
+- Do not duplicate locale registries, design tokens, schemas, or status definitions.
 - Keep components focused and composable.
 - Comment non-obvious decisions, not obvious syntax.
-- Remove dead code.
+- Remove dead code, mocks, placeholders, debug output, and temporary fallbacks.
 - Keep linting, formatting, type checking, tests, and builds clean.
 
 Suggested commands once configured:
@@ -577,16 +710,17 @@ npm run start
 
 Use the package manager established by the lockfile. Never create multiple lockfiles.
 
-## 21. Environment variables
+## 21. Environment variables and configuration
 
 - Commit a safe `.env.example` with names and comments only.
 - Never commit live credentials or personal tokens.
 - Validate required variables at startup.
 - Separate public variables from server-only variables.
 - Use development and test credentials locally.
-- Use Railway-managed variables for production secrets and configuration.
+- Use Railway-managed variables for production secrets and deployment-specific configuration.
 - Never assume local `.env` files exist in production.
 - Never expose Railway internal variables or server secrets to the browser.
+- Do not place editorial content or business rules in environment variables when they belong in the database.
 
 Possible categories include:
 
@@ -612,17 +746,19 @@ These are examples, not permission to add unused configuration. Railway injects 
 - Do not rewrite shared history.
 - Never force-push unless explicitly requested and safe.
 - Do not mix broad refactors with product features.
-- Include migrations, generated types, tests, and documentation required by the change.
+- Include migrations, storage policies, generated types, translations, design-system changes, tests, and documentation required by the change.
 
 Pull requests must explain:
 
 - What changed and why
 - User and business impact
 - Database and migration changes
-- RLS and authorization implications
+- RLS, storage, and authorization implications
 - Backend contracts
+- Localization coverage and language-switch behavior
+- Design-system components and tokens used or added
 - Screenshots or recordings for UI changes
-- Testing performed
+- Automated testing performed for every changed flow
 - Railway deployment implications
 - Risks, assumptions, and follow-up work
 
@@ -632,61 +768,71 @@ Pull requests must explain:
 
 1. Read this file and any nearer `AGENTS.md`.
 2. Use GitHub MCP to inspect current repository state and patterns.
-3. Use Supabase MCP to inspect all relevant database and authentication state.
-4. Identify affected layers: database, backend, frontend, infrastructure, tests, and documentation.
-5. Plan the work in the mandatory Database → Backend → Frontend order.
-6. Identify revenue, security, data, concurrency, deployment, and UX risks.
+3. Use Supabase MCP to inspect all relevant database, authentication, storage, and translation-content state.
+4. Identify affected layers: database, storage, backend, frontend, localization, design system, infrastructure, tests, and documentation.
+5. Plan the work in the mandatory Database → Storage → Backend → Frontend → End-to-end order.
+6. Identify revenue, security, data, concurrency, localization, accessibility, deployment, and UX risks.
+7. Identify and reject any proposed hard-coded values, mock runtime data, bucket-content files, or one-off styling before implementation begins.
 
 ### While coding
 
 1. Complete and validate database work first.
-2. Complete and validate backend work second.
-3. Complete and validate frontend work third.
-4. Keep the application runnable after each logical step.
-5. Reuse established patterns and primitives.
-6. Never invent API behavior, schema, environment values, legal terms, prices, capacity, or availability rules.
-7. Add tests alongside behavior.
-8. Preserve accessibility, mobile quality, and Railway compatibility.
-9. Use GitHub MCP and Supabase MCP throughout, not only at the beginning.
-10. Do not make unrelated changes.
+2. Complete and validate storage work second when applicable.
+3. Complete and validate backend work third.
+4. Complete and validate frontend and localization work fourth.
+5. Keep the application runnable after each logical step.
+6. Reuse established schemas, services, configuration, design-system primitives, and locale infrastructure.
+7. Never invent API behavior, schema, environment values, legal terms, prices, capacity, availability rules, translations, or storage structure.
+8. Add tests alongside every behavior and flow.
+9. Preserve accessibility, mobile quality, premium design, and Railway compatibility.
+10. Use GitHub MCP and Supabase MCP throughout, not only at the beginning.
+11. Do not make unrelated changes.
 
 ### Before finishing
 
-1. Reinspect Supabase schema, migrations, RLS, and relevant data contracts through Supabase MCP.
+1. Reinspect Supabase schema, migrations, RLS, storage policies, buckets, and relevant data contracts through Supabase MCP.
 2. Review the complete GitHub diff through GitHub MCP.
-3. Run relevant linting, type checks, tests, production build, and production start checks.
-4. Test mobile and desktop UI behavior.
-5. Test empty, loading, error, success, unavailable, sold-out, payment, and unauthorized states.
-6. Confirm no secrets or sensitive data entered the diff.
-7. Confirm Railway `PORT`, runtime, variables, logging, and health-check compatibility.
-8. Report files changed, MCP checks performed, tests run, assumptions, and remaining risks.
+3. Search the diff for hard-coded business content, magic values, mocks, fixture imports, static content files, bucket-content reads, arbitrary visual values, missing translations, and duplicated contracts.
+4. Run relevant linting, type checks, unit/integration/component tests, Playwright flows, production build, and production start checks.
+5. Test every changed flow in every enabled locale.
+6. Test mobile and desktop UI behavior and the language switcher.
+7. Test empty, loading, error, success, unavailable, sold-out, payment, storage, and unauthorized states.
+8. Confirm no secrets or sensitive data entered the diff.
+9. Confirm Railway `PORT`, runtime, variables, logging, and health-check compatibility.
+10. Report files changed, MCP checks performed, affected layers, tests run, locale coverage, design-system compliance, assumptions, and remaining risks.
 
 ## 24. Definition of done
 
 A task is done only when:
 
-- The mandatory Database → Backend → Frontend sequence was followed, or unaffected layers were explicitly justified.
+- The mandatory Database → Storage → Backend → Frontend → End-to-end sequence was followed, or unaffected layers were explicitly justified.
 - GitHub MCP was used to inspect and validate repository state.
 - Supabase MCP was used for every relevant database, authentication, storage, or data-contract concern.
 - The requested user outcome works end to end.
-- Database constraints and RLS enforce critical invariants.
+- No user-facing or business content is improperly hard-coded.
+- No production flow depends on mock data, placeholder data, fixture files, static JSON/Markdown content, or files read from storage buckets as a content database.
+- Every enabled European locale is complete and tested, and the language switcher preserves the user journey.
+- Database constraints, RLS, and storage policies enforce critical invariants.
 - Backend business rules and authorization are server-side.
-- Frontend code uses stable typed backend contracts.
+- Frontend code uses stable typed backend contracts and approved design-system primitives.
+- Database, Storage, Backend, and Frontend behavior are traceable and synchronized.
 - Data changes are migration-backed and verified.
+- Asset metadata and lifecycle remain consistent with storage objects.
 - Errors and edge cases are handled clearly.
 - Accessibility and responsive behavior are preserved.
-- Relevant tests pass.
+- Every changed flow has passing automated coverage.
 - Linting, type checking, production build, and production start pass where configured.
 - Railway deployment compatibility is preserved.
-- Security, privacy, localization, and SEO implications were considered.
+- Security, privacy, localization, storage, design-system, and SEO implications were validated.
 - Documentation and `.env.example` are updated when needed.
-- GitHub MCP confirms no unrelated files, secrets, debug output, dead code, or Vercel-specific assumptions remain.
+- GitHub MCP confirms no unrelated files, secrets, debug output, dead code, mocks, hard-coded business values, arbitrary styling, missing translations, or Vercel-specific assumptions remain.
 
 ## 25. Owner decisions agents must not guess
 
 Surface assumptions when implementation depends on unresolved decisions such as:
 
 - Exact experiences, prices, commissions, deposits, taxes, and currencies
+- Exact enabled European locales and publication workflow
 - Voucher percentage, validity, transferability, and redemption rules
 - Partner attribution window and commission model
 - Automatic versus manual confirmation
@@ -695,11 +841,12 @@ Surface assumptions when implementation depends on unresolved decisions such as:
 - Maritime, tourism, transport, food-service, insurance, and permit requirements
 - Service areas and pickup locations
 - Weather cancellation policy
-- Brand assets and final tone
+- Brand assets, final tone, and design-token changes
+- Storage limits, transformation strategy, retention, and asset moderation
 - Railway regions, domains, scaling, volumes, cron jobs, and service topology
 
-When progress remains possible, isolate uncertain policy behind configuration or a clearly marked interface rather than hard-coding an assumption.
+When progress remains possible, isolate uncertain policy behind database-backed configuration or a clearly marked typed interface rather than hard-coding an assumption.
 
 ---
 
-**North star:** CostaPulse should make booking an exceptional Costa Blanca experience feel as exciting, clear, and dependable as the experience itself.
+**North star:** CostaPulse should make booking an exceptional Costa Blanca experience feel as exciting, clear, dependable, multilingual, and technically seamless as the experience itself.
