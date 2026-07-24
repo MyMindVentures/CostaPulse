@@ -40,7 +40,7 @@ Until the repository establishes a different stack, prefer:
 - Tailwind CSS
 - Supabase for PostgreSQL, authentication, storage, and server-side data access
 - Stripe for payments, refunds, and webhook-driven payment state
-- Vercel for deployment
+- Railway with the repository Dockerfile for deployment
 - Zod for runtime validation
 - React Hook Form for complex forms
 - Playwright for critical end-to-end flows
