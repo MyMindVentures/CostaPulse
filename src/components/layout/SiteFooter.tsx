@@ -1,10 +1,17 @@
 import Link from "next/link";
 import type { SiteNavigationViewModel } from "@/lib/view-models/site-navigation";
+import styles from "./SiteFooter.module.css";
 
 type SiteFooterProps = {
   navigation: SiteNavigationViewModel;
   logoSrc?: string | null;
   logoAlt?: string;
+};
+
+type FooterLinkItem = {
+  label: string;
+  href: string;
+  isExternal?: boolean;
 };
 
 const footerLinks = {
@@ -25,13 +32,19 @@ const footerLinks = {
     { label: "Terms", href: "/terms" },
     { label: "Cookies", href: "/cookies" }
   ]
-};
+} satisfies Record<string, FooterLinkItem[]>;
 
-function FooterLink({ href, label }: { href: string; label: string }) {
+function FooterLink({ href, label, isExternal = false }: FooterLinkItem) {
   return (
     <li>
-      <Link className="site-footer__link" href={href}>
+      <Link
+        className={styles.link}
+        href={href}
+        target={isExternal ? "_blank" : undefined}
+        rel={isExternal ? "noreferrer" : undefined}
+      >
         {label}
+        {isExternal ? <span className="sr-only"> (opens in a new tab)</span> : null}
       </Link>
     </li>
   );
@@ -44,88 +57,94 @@ export function SiteFooter({
 }: SiteFooterProps) {
   const year = new Date().getFullYear();
   const sitemapLinks = navigation.primary.flatMap((item) => [
-    { label: item.label, href: item.href },
+    {
+      label: item.label,
+      href: item.href,
+      isExternal: item.isExternal
+    },
     ...item.children.map((child) => ({
       label: child.label,
-      href: child.href
+      href: child.href,
+      isExternal: child.isExternal
     }))
   ]);
 
   return (
-    <div className="site-footer">
-      <div className="site-footer__glow" aria-hidden="true" />
-      <div className="container site-footer__inner">
-        <section className="site-footer__lead" aria-labelledby="footer-heading">
-          <div className="site-footer__brand-block">
-            <Link className="site-footer__brand" href="/" aria-label="CostaPulse home">
+    <div className={styles.footer}>
+      <div className={styles.inner}>
+        <section className={styles.lead} aria-labelledby="footer-heading">
+          <div className={styles.brandBlock}>
+            <Link className={styles.brand} href="/" aria-label="CostaPulse home">
               {logoSrc ? (
-                <img src={logoSrc} alt={logoAlt} className="site-footer__logo" />
+                <img src={logoSrc} alt={logoAlt} className={styles.logo} />
               ) : (
-                <span>CostaPulse</span>
+                <span className={styles.brandFallback}>CostaPulse</span>
               )}
             </Link>
-            <p className="site-footer__eyebrow">Costa Blanca, thoughtfully curated</p>
-            <h2 id="footer-heading">Make your next Mediterranean day unforgettable.</h2>
-            <p className="site-footer__intro">
+            <p className={styles.eyebrow}>Costa Blanca, thoughtfully curated</p>
+            <h2 className={styles.heading} id="footer-heading">
+              Make your next Mediterranean day unforgettable.
+            </h2>
+            <p className={styles.intro}>
               Exceptional yacht, water and local experiences, selected with care and
               delivered by people who know the coast.
             </p>
           </div>
 
-          <div className="site-footer__cta-card">
-            <p className="site-footer__cta-kicker">Ready when you are</p>
+          <div className={styles.ctaCard}>
+            <p className={styles.ctaKicker}>Ready when you are</p>
             <h3>Find your Costa Blanca experience.</h3>
             <p>Browse live experiences, compare options and book with confidence.</p>
-            <Link className="button button-coral" href="/experiences">
+            <Link className={styles.cta} href="/experiences">
               Explore experiences
               <span aria-hidden="true">↗</span>
             </Link>
           </div>
         </section>
 
-        <div className="site-footer__rule" />
+        <div className={styles.rule} aria-hidden="true" />
 
-        <nav className="site-footer__sitemap" aria-label="Footer sitemap">
-          <div className="site-footer__column site-footer__column--wide">
-            <p className="site-footer__column-title">Sitemap</p>
-            <ul>
+        <nav className={styles.sitemap} aria-label="Footer sitemap">
+          <div className={styles.column}>
+            <p className={styles.columnTitle}>Sitemap</p>
+            <ul className={styles.list}>
               {sitemapLinks.map((link) => (
                 <FooterLink key={`${link.href}-${link.label}`} {...link} />
               ))}
             </ul>
           </div>
 
-          <div className="site-footer__column">
-            <p className="site-footer__column-title">Discover</p>
-            <ul>
+          <div className={styles.column}>
+            <p className={styles.columnTitle}>Discover</p>
+            <ul className={styles.list}>
               {footerLinks.discover.map((link) => (
                 <FooterLink key={link.href} {...link} />
               ))}
             </ul>
           </div>
 
-          <div className="site-footer__column">
-            <p className="site-footer__column-title">CostaPulse</p>
-            <ul>
+          <div className={styles.column}>
+            <p className={styles.columnTitle}>CostaPulse</p>
+            <ul className={styles.list}>
               {footerLinks.company.map((link) => (
                 <FooterLink key={link.href} {...link} />
               ))}
             </ul>
           </div>
 
-          <div className="site-footer__column site-footer__contact">
-            <p className="site-footer__column-title">Local support</p>
+          <div className={`${styles.column} ${styles.contact}`}>
+            <p className={styles.columnTitle}>Local support</p>
             <p>Planning something special or travelling with a group?</p>
-            <a className="site-footer__contact-link" href="mailto:hello@costapulse.club">
+            <a className={styles.contactLink} href="mailto:hello@costapulse.club">
               hello@costapulse.club
             </a>
-            <p className="site-footer__microcopy">Based on the Costa Blanca, Spain.</p>
+            <p className={styles.microcopy}>Based on the Costa Blanca, Spain.</p>
           </div>
         </nav>
 
-        <div className="site-footer__bottom">
+        <div className={styles.bottom}>
           <p>© {year} CostaPulse. The Mediterranean, thoughtfully curated.</p>
-          <ul aria-label="Legal links">
+          <ul className={styles.legalList} aria-label="Legal links">
             {footerLinks.legal.map((link) => (
               <FooterLink key={link.href} {...link} />
             ))}
