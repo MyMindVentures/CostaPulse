@@ -1,11 +1,10 @@
 import "server-only";
 import {
   BRAND_ASSETS_BUCKET,
-  SITE_LOGO_FALLBACK_SRC,
-  getPublicStorageUrl,
-  selectSiteLogoAsset
+  getPublicStorageUrl
 } from "@/lib/media/experience-media";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+const SITE_LOGO_STORAGE_PATH = "logos/CostaPulse Logo.png";
 
 export type SiteLogoAsset = {
   url: string;
@@ -16,70 +15,27 @@ export type SiteLogoAsset = {
 };
 
 /**
- * Resolves the CostaPulse site logo from media_assets (brand-assets/logos/*).
- * Falls back to the local SVG mark when the catalog has no logo.
+ * Resolves the canonical CostaPulse logo directly from the public
+ * Supabase brand-assets bucket. The website and favicon must use the
+ * same source asset to keep branding consistent.
  */
 export async function getSiteLogoAsset(): Promise<SiteLogoAsset> {
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) {
-    return {
-      url: SITE_LOGO_FALLBACK_SRC,
-      alt: "CostaPulse",
-      storagePath: SITE_LOGO_FALLBACK_SRC,
-      bucketId: "local",
-      isFallback: true
-    };
-  }
-
-  const { data, error } = await supabase
-    .from("media_assets")
-    .select("bucket_id, storage_path")
-    .eq("bucket_id", BRAND_ASSETS_BUCKET)
-    .like("storage_path", "logos/%");
-
-  if (error || !data) {
-    return {
-      url: SITE_LOGO_FALLBACK_SRC,
-      alt: "CostaPulse",
-      storagePath: SITE_LOGO_FALLBACK_SRC,
-      bucketId: "local",
-      isFallback: true
-    };
-  }
-
-  const selected = selectSiteLogoAsset(
-    data.map((row) => ({
-      bucketId: row.bucket_id,
-      storagePath: row.storage_path
-    }))
+  const url = getPublicStorageUrl(
+    BRAND_ASSETS_BUCKET,
+    SITE_LOGO_STORAGE_PATH
   );
 
-  if (!selected) {
-    return {
-      url: SITE_LOGO_FALLBACK_SRC,
-      alt: "CostaPulse",
-      storagePath: SITE_LOGO_FALLBACK_SRC,
-      bucketId: "local",
-      isFallback: true
-    };
-  }
-
-  const url = getPublicStorageUrl(selected.bucketId, selected.storagePath);
   if (!url) {
-    return {
-      url: SITE_LOGO_FALLBACK_SRC,
-      alt: "CostaPulse",
-      storagePath: SITE_LOGO_FALLBACK_SRC,
-      bucketId: "local",
-      isFallback: true
-    };
+    throw new Error(
+      "NEXT_PUBLIC_SUPABASE_URL is missing; the CostaPulse brand logo cannot be resolved."
+    );
   }
 
   return {
     url,
     alt: "CostaPulse",
-    storagePath: selected.storagePath,
-    bucketId: selected.bucketId,
+    storagePath: SITE_LOGO_STORAGE_PATH,
+    bucketId: BRAND_ASSETS_BUCKET,
     isFallback: false
   };
 }
