@@ -2,19 +2,18 @@ import {
   ArrowRight,
   Clock3,
   Compass,
-  Heart,
   MapPin,
   Menu,
   ShieldCheck,
   Sparkles,
-  Star,
   Users
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { BrandLink } from "@/components/shared/brand-link";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Container } from "@/components/ui/container";
-import { getPublishedExperienceHighlights } from "@/server/repositories/catalog";
+import { getPublishedExperienceCards } from "@/server/repositories/catalog";
+import { ExperienceSection } from "./experience-section";
 
 type CuratedCategory = {
   number: string;
@@ -48,7 +47,7 @@ export async function HomePageFeature() {
   const heroTrustPoints = t.raw("heroTrustPoints") as HeroTrustPoint[];
   const locationPills = t.raw("locationPills") as LocationPill[];
   const trustPoints = t.raw("trustPoints") as TrustPoint[];
-  const experiences = await getPublishedExperienceHighlights(3);
+  const experiences = await getPublishedExperienceCards(3);
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -146,117 +145,22 @@ export async function HomePageFeature() {
         </Container>
       </section>
 
-      <section
-        className="experiences"
-        id="experiences"
-        aria-labelledby="experiences-title"
-      >
-        <Container>
-          <div className="section-heading">
-            <SectionKicker light>{t("experiencesKicker")}</SectionKicker>
-            <div>
-              <h2 id="experiences-title">{t("experiencesTitle")}</h2>
-              <p>{t("experiencesDescription")}</p>
-            </div>
-            <a href="#cta" className="button button-light">
-              {t("viewAllExperiences")}
-              <ArrowRight size={18} aria-hidden />
-            </a>
-          </div>
-
-          {experiences.length > 0 ? (
-            <div className="experience-list">
-              {experiences.map((experience, index) => (
-                <article className="experience-card" key={experience.id}>
-                  <div
-                    className={`experience-card-media media-${(index % 3) + 1}`}
-                    aria-hidden
-                  >
-                    <span>{t("experienceBadge")}</span>
-                    <span className="favorite-button" aria-hidden>
-                      <Heart size={18} aria-hidden />
-                    </span>
-                  </div>
-                  <div className="experience-card-body">
-                    <div className="experience-card-heading">
-                    <h3>{experience.title}</h3>
-                      <span>
-                        <Star size={16} aria-hidden />
-                        {t("selectedHost")}
-                      </span>
-                    </div>
-                    <p>
-                      {experience.shortDescription ?? t("experienceFallback")}
-                    </p>
-                    <dl className="experience-meta">
-                      <div>
-                        <dt>{t("meta.duration")}</dt>
-                        <dd>
-                          <Clock3 size={16} aria-hidden />
-                          {t("meta.durationValue", {
-                            minutes: experience.durationMinutes
-                          })}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt>{t("meta.capacity")}</dt>
-                        <dd>
-                          <Users size={16} aria-hidden />
-                          {t("meta.capacityValue", {
-                            count: experience.baseCapacity
-                          })}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt>{t("meta.location")}</dt>
-                        <dd>
-                          <MapPin size={16} aria-hidden />
-                          {experience.locationName ??
-                            t("meta.locationPending")}
-                        </dd>
-                      </div>
-                    </dl>
-                    <a href="#cta" className="card-link">
-                      {t("viewDetails")}
-                      <ArrowRight size={16} aria-hidden />
-                    </a>
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <div className="curated-grid">
-              {curatedCategories.map((item) => (
-                <article key={item.number} className="curated-card">
-                  <div className="curated-card-media" aria-hidden>
-                    <span>{item.number}</span>
-                  </div>
-                  <div className="curated-card-body">
-                  <span>{item.number}</span>
-                    <h3>{item.title}</h3>
-                    <p>{item.copy}</p>
-                    <a href="#cta" className="card-link">
-                      {t("viewDetails")}
-                      <ArrowRight size={16} aria-hidden />
-                    </a>
-                  </div>
-                  <Compass aria-hidden />
-                </article>
-              ))}
-            </div>
-          )}
-        </Container>
-      </section>
+      <ExperienceSection
+        experiences={experiences}
+        curatedCategories={curatedCategories}
+        kicker={t("experiencesKicker")}
+        title={t("experiencesTitle")}
+        description={t("experiencesDescription")}
+        viewAllLabel={t("viewAllExperiences")}
+        fallbackBadge={t("experienceBadge")}
+        viewDetailsLabel={t("viewDetails")}
+      />
 
       <section className="trust" id="trust">
         <Container className="trust-grid">
           {trustPoints.map((item, index) => (
             <article key={item.title}>
-              {index === 0 ? (
-                <ShieldCheck aria-hidden />
-              ) : (
-                <Sparkles aria-hidden />
-              )}
+              {index === 0 ? <ShieldCheck aria-hidden /> : <Sparkles aria-hidden />}
               <h3>{item.title}</h3>
               <p>{item.description}</p>
             </article>
@@ -294,10 +198,7 @@ export async function HomePageFeature() {
         <Container>
           <SectionKicker>{t("ctaKicker")}</SectionKicker>
           <h2>{t("ctaTitle")}</h2>
-          <a
-            href="mailto:hello@costapulse.club"
-            className="inline-link cta-link"
-          >
+          <a href="mailto:hello@costapulse.club" className="inline-link cta-link">
             {t("ctaLink")}
             <ArrowRight size={18} aria-hidden />
           </a>
