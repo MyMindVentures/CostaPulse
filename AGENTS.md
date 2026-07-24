@@ -1,6 +1,14 @@
-# CostaPulse — Coding Agent Rules
+# CostaPulse — Coding Agent Guardrails
 
 Binding instructions for every coding agent working in this repository.
+
+## Role boundary
+
+The coding agent is responsible for frontend implementation only unless the task explicitly grants additional responsibility.
+
+Database architecture, SQL migrations, PostgreSQL functions, RLS policies, Storage buckets and policies, backend contracts, authorization rules, business logic and API design are defined outside the coding agent workflow.
+
+The coding agent must consume that architecture exactly as it exists. It may not redesign, replace, extend or bypass it without explicit written instructions in the current task.
 
 ## Stack
 
@@ -18,106 +26,86 @@ Use the established stack only:
 - Playwright
 - Vitest/Jest + React Testing Library
 
-Do not add major frameworks, infrastructure services, UI kits or duplicate libraries without a proven need.
+Do not add major frameworks, infrastructure services, UI kits or duplicate libraries without a proven need and explicit approval.
 
-## Mandatory workflow
+## Mandatory Supabase-first workflow
 
-For every functional feature, work in this order:
+Before writing, changing or deleting any frontend code, the coding agent must:
 
-```text
-Database → Storage → Backend → Frontend → Tests
-```
+1. Inspect the live Supabase project through MCP.
+2. Inspect the actual database schema, tables, columns, relationships, constraints, enums, views, functions and RPC contracts relevant to the task.
+3. Inspect the actual RLS policies, authentication requirements, Storage buckets, Storage policies and asset paths relevant to the task.
+4. Inspect existing migrations and generated Supabase TypeScript types.
+5. Inspect the existing backend contracts, server actions, route handlers, data-access modules, validation schemas, hooks, utilities and reusable components.
+6. Determine the exact existing contract the frontend must use.
+7. Only after completing that inspection, implement the frontend.
 
-Skip a layer only when it is genuinely unaffected.
+Supabase and the existing backend are the single source of truth.
 
-Before editing:
+The coding agent must never rely on assumptions, memory, guessed naming conventions or a previously observed schema. Every frontend task starts with a fresh inspection of the current implementation through MCP and the repository.
 
-1. Read the latest repository files through GitHub.
-2. Inspect the real Supabase schema, migrations, RLS and Storage when relevant.
-3. Never guess existing files, tables, columns, contracts or configuration.
+## Strictly forbidden
 
-## Hard guardrails
+The coding agent must never:
 
-### No hardcoding
+- Invent tables, columns, relationships, enums, RPC functions, bucket names, policies, routes, API responses or TypeScript shapes.
+- Create mock data, fake reviews, fake ratings, fake bookings, placeholder arrays, static JSON datasets or fabricated backend responses in production code.
+- Deliver static mockups, screenshots, prototypes or visual-only implementations when functional frontend work was requested.
+- Create buttons, links, forms, filters, menus, calendars, booking flows or interactions that do not work end-to-end.
+- Add placeholder handlers, TODO behavior, fake success states or hardcoded fallback records.
+- Create or modify migrations, tables, views, functions, RLS policies, Storage buckets, Storage policies, Edge Functions or backend business logic unless the current task explicitly instructs it.
+- Bypass RLS, expose privileged keys, move authorization to the browser or trust browser-calculated business state.
+- Duplicate existing components, queries, hooks, utilities, schemas, data-access modules or backend behavior.
+- Replace an existing working architecture with a preferred alternative.
+- Add unsolicited features, redesign flows or make independent product decisions.
+- Hardcode customer copy, prices, discounts, capacities, durations, locations, URLs, currencies, roles, statuses, locale lists or business rules.
+- Use Storage files as a content database.
+- Stop after the interface looks correct without verifying real functionality.
 
-- No hardcoded customer copy, prices, discounts, capacities, durations, locations, URLs, currencies, roles, statuses, locale lists or business rules.
-- No magic strings or numbers in production logic.
-- Business and editorial content comes from the database through typed backend contracts.
-- Secrets and environment-specific values belong in validated environment variables.
-- True technical constants must be centralized, named and typed.
+Empty database states must render truthful empty states. Missing backend support must be reported as a blocker rather than replaced with invented data or behavior.
 
-### Multilingual by default
+## Required implementation behavior
 
-- Every customer-facing feature and content model must support every enabled European locale.
-- Use one centralized locale registry.
-- Every public flow must have an accessible language switcher.
-- Switching language must preserve the current route, query parameters, referral attribution and booking context.
-- Copy, metadata, validation, emails, dates, times, numbers, currencies, pluralization, alt text and accessibility labels must be localized.
-- A feature is incomplete while an enabled locale is missing content.
+Every frontend implementation must:
 
-### No mock production data
+- Use real Supabase data through the verified existing backend contract.
+- Use generated Supabase types, validated RPC outputs or dedicated Zod schemas.
+- Map database responses into intentional typed view models at the backend boundary.
+- Keep Supabase clients, queries, authorization and business logic outside presentational components.
+- Reuse existing components, hooks, queries, utilities, tokens and design-system primitives.
+- Use Server Components by default and add `use client` only at the smallest interactive boundary.
+- Implement real loading, empty, error, success, validation, disabled and authorization states.
+- Be responsive, accessible and production-ready.
+- Preserve all enabled locales and existing route, query, referral and booking context.
+- Work correctly for zero, one or many records and missing optional media or metadata.
+- Produce no console errors, TypeScript errors, broken routes or dead interactions.
 
-- No fake reviews, ratings, bookings, placeholder arrays, static JSON content or runtime fixtures.
-- Never use files in Storage buckets as a content database.
-- Buckets are for binary assets; their metadata and relationships belong in PostgreSQL.
-- Test fixtures may exist only in test code and may never be imported by production code.
-- Empty database states must produce real empty states.
+## Design system
 
-### Database and backend are authoritative
+All frontend code must use the CostaPulse design system, tokens and reusable primitives.
 
-- Build frontend flows only against the verified database schema and typed backend contracts.
-- All input, authorization and business rules are enforced server-side.
-- Prices, availability, capacity, referrals, vouchers, permissions and payment state are recalculated or verified server-side.
-- Never trust browser-submitted totals or workflow state.
-- Use migrations for schema changes and keep generated types synchronized.
-- Never disable RLS or expose privileged keys to the client.
-
-### Storage integrity
-
-- Validate file type, size, ownership and authorization before upload.
-- Keep Storage objects and database metadata synchronized.
-- Use secure, collision-resistant paths.
-- Implement safe replacement, deletion and cleanup.
-- Never invent bucket names or policies; inspect them first.
-
-### Design system only
-
-- All frontend code must use the CostaPulse design system, tokens and reusable primitives.
-- No arbitrary Tailwind values, inline visual styling, duplicate UI components or one-off visual patterns when a token or primitive exists.
-- New patterns must become reusable, accessible design-system components.
+- No arbitrary Tailwind values when a token exists.
+- No inline visual styling when a reusable pattern exists.
+- No duplicate UI components or page-specific copies of shared patterns.
+- New reusable patterns belong in the appropriate shared or design-system layer.
 - Build mobile-first and target WCAG 2.2 AA.
-- Handle loading, empty, error, disabled, focus, validation and responsive states.
+- Include keyboard, focus, screen-reader and reduced-motion behavior where relevant.
 
-### Reusable and data-driven React architecture
+## Reusable React architecture
 
-- UI components must be reusable, composable and driven by typed props instead of page-specific database access.
-- Components render real backend data and must not contain embedded experience, location, team-member, availability or pricing records.
-- Fetch and normalize data in server components, route handlers, server actions or dedicated data-access modules; pass stable view models into presentational components.
-- Keep Supabase clients, queries, RPC calls, authorization and data transformation outside presentational UI components.
-- Prefer small primitives and domain components that can be composed across listing pages, detail pages, map popovers, calendars, booking flows and admin surfaces.
-- Use explicit typed variants for legitimate visual differences. Do not duplicate a component because one page needs a slightly different layout.
-- Prefer slots, children and narrowly scoped render props over large components with many unrelated boolean flags.
-- Repeated domain states must use shared components, including price displays, media, badges, capacity, availability, team-member summaries, location details, loading, empty and error states.
-- Server Components are the default. Add `use client` only at the smallest interactive boundary.
-- Client components may receive serializable view models and callbacks, but must not import server-only modules or privileged Supabase clients.
-- Lists require stable database identifiers as keys. Never use array indexes when a stable ID exists.
-- Components must remain correct for zero, one or many records and for missing optional media or metadata.
-- Never create generic abstractions before at least two real use cases exist, unless the pattern is a foundational design-system primitive.
+UI components must be reusable, composable and driven by typed props rather than page-specific database access.
 
-### Frontend data contracts
+- Presentational components may not directly query Supabase.
+- Fetch and normalize data in server components, route handlers, server actions or dedicated data-access modules.
+- Pass stable, serializable view models into UI components.
+- Prefer small primitives and domain components that compose across pages.
+- Use explicit typed variants for legitimate visual differences.
+- Do not duplicate a component because one page needs a small variation.
+- Use stable database identifiers as React keys.
+- Do not use array indexes when a stable identifier exists.
+- Do not create generic abstractions before at least two real use cases exist, unless the abstraction is a foundational design-system primitive.
 
-- Derive frontend types from generated Supabase types, validated RPC outputs or dedicated Zod schemas. Do not manually recreate database row shapes in multiple files.
-- Map raw database responses into intentional view models at the backend boundary.
-- View models must expose only what the UI needs and must use consistent names and nullability.
-- Centralize query keys, filters, pagination and URL-state parsing in typed modules.
-- Dynamic filters such as date range, experience type, location and team member must be represented in the URL when they affect shareable page state.
-- Public map and calendar components must consume the verified `get_experience_map` and `get_experience_calendar` contracts rather than rebuilding availability logic in React.
-- Media URLs must be resolved through one shared utility or media component using database storage paths and the verified bucket configuration.
-- Dates, times, currencies and localized labels must be formatted through shared locale-aware utilities, never ad hoc inside cards.
-
-### Recommended component layers
-
-Use this separation where relevant:
+Recommended separation, adapted to the current repository rather than recreated in parallel:
 
 ```text
 components/ui/          foundational design-system primitives
@@ -132,35 +120,39 @@ lib/view-models/        database-to-UI transformations
 lib/validation/         shared Zod schemas
 ```
 
-Adapt this structure to the existing repository rather than creating parallel folders or duplicate conventions.
+## Frontend data contracts
 
-### Premium implementation quality
+- Derive frontend types from generated Supabase types, validated RPC outputs or dedicated Zod schemas.
+- Never manually recreate database row shapes across multiple files.
+- View models expose only what the UI needs and use consistent naming and nullability.
+- Centralize query keys, filters, pagination and URL-state parsing.
+- Shareable filter state belongs in the URL.
+- Media URLs must be resolved through the existing shared media utility or component using verified Storage paths and bucket configuration.
+- Dates, times, currencies and localized labels must use shared locale-aware utilities.
+- Never rebuild server-authoritative pricing, availability, capacity, referral, voucher, permission or payment logic in React.
 
-- Prefer typed, secure, maintainable and server-authoritative implementations over shortcuts.
-- Keep business logic out of React components.
-- Keep server-only code out of client bundles.
-- Avoid `any`, dead code, broad utility files and unnecessary abstractions.
-- Preserve Railway compatibility and never depend on Vercel-only services.
+## Testing and verification
 
-## Testing
+The coding agent must test the complete requested frontend flow against the actual Supabase project and existing backend. Visual correctness alone is not completion.
 
 Every changed flow must be tested at the appropriate levels:
 
-- Unit tests for business logic and validation
-- Integration tests for database, RLS, authorization, Storage and webhooks
-- Component tests for UI states and interactions
-- Playwright tests for critical end-to-end journeys
+- Unit tests for frontend transformation and validation logic.
+- Component tests for UI states and interactions.
+- Integration tests for verified frontend/backend contracts where configured.
+- Playwright tests for critical end-to-end journeys.
 
-Test happy paths and relevant failures, including authorization, empty states, invalid input, unavailable data, concurrency, localization, mobile behavior, payment failure and duplicate events.
-
-Reusable components must be tested with representative variations, including:
+Test representative conditions, including:
 
 - zero, one and multiple records
 - missing optional media or metadata
 - long translated text
 - loading, empty and error states
+- invalid input and denied authorization
 - keyboard and screen-reader interaction
-- mobile and desktop layouts
+- mobile, tablet and desktop layouts
+- real navigation and route state
+- real form submission and server response
 
 Before completion, run the configured equivalents of:
 
@@ -177,16 +169,29 @@ Never remove, weaken or skip tests merely to make checks pass.
 
 ## Definition of done
 
-A task is complete only when:
+A frontend task is complete only when:
 
-- Database, Storage, Backend and Frontend form one coherent typed contract.
-- Relevant migrations, constraints, RLS and Storage policies are correct.
-- No hardcoded business content, production mocks or bucket-based content remain.
-- Every enabled locale is supported and the language switch works.
-- The UI follows the design system and works responsively and accessibly.
-- Repeated UI and domain states use shared components instead of copied page-specific implementations.
+- The live Supabase project was inspected through MCP before implementation.
+- The actual database, Storage and backend contracts were identified and followed exactly.
+- The frontend uses real data and real backend behavior.
+- No schema, contract, data or behavior was invented.
+- No production mocks, placeholder functionality or static mockups remain.
+- The requested user flow works end-to-end.
+- Loading, empty, error, validation, success and authorization states work.
+- The UI follows the CostaPulse design system and works responsively and accessibly.
+- Repeated UI and domain states use shared components instead of copied implementations.
 - Presentational components contain no direct database calls or duplicated business logic.
-- Relevant automated tests and build checks pass.
+- Relevant automated tests, type checks and build checks pass.
 - No secrets, unrelated changes, debug code or unsupported infrastructure entered the repository.
 
-In the final report, state what changed, which layers were inspected, which tests ran and what could not be verified.
+## Required final report
+
+The coding agent's final report must state:
+
+1. Which Supabase schema objects, RLS policies, Storage buckets and backend contracts were inspected through MCP.
+2. Which existing repository components, types, hooks, queries and utilities were reused.
+3. Which frontend files were created or changed.
+4. Which real end-to-end flows were verified.
+5. Which commands and tests were run and their results.
+6. Anything that could not be verified.
+7. Any missing backend capability that blocked implementation, without inventing a workaround.
