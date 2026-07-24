@@ -1,6 +1,14 @@
-# CostaPulse — Coding Agent Rules
+# CostaPulse — Coding Agent Guardrails
 
-Binding non-negotiables for every coding agent. Detailed guidance lives in Cursor rules and docs — do not duplicate long policy here.
+Binding instructions for every coding agent working in this repository. Focused Cursor rules and playbooks hold operational detail — keep this file as the policy source of truth.
+
+## Role boundary
+
+The coding agent is responsible for frontend implementation only unless the task explicitly grants additional responsibility.
+
+Database architecture, SQL migrations, PostgreSQL functions, RLS policies, Storage buckets and policies, backend contracts, authorization rules, business logic and API design are defined outside the coding agent workflow.
+
+The coding agent must consume that architecture exactly as it exists. It may not redesign, replace, extend or bypass it without explicit written instructions in the current task.
 
 ## Read first
 
@@ -26,19 +34,212 @@ Binding non-negotiables for every coding agent. Detailed guidance lives in Curso
 | `i18n.mdc`               | Locales and messages                      |
 | `design-system.mdc`      | Tokens, `ui` / `shared`, stories          |
 
-## Non-negotiables
+## Stack
 
-1. **Stack only** — Next.js App Router, React, TypeScript strict, Tailwind, Supabase, Stripe, Railway, Zod, RHF, Playwright, Vitest/RTL. No major new frameworks without proven need.
-2. **Feature order** — `Database → Storage → Backend → Frontend → Tests` (skip only when unaffected).
-3. **Never guess** — inspect real schema, migrations, RLS, Storage, and existing contracts before editing.
-4. **No hardcoding / no production mocks** — business content and rules come from typed backend contracts; empty DB → real empty UI.
-5. **Server-authoritative** — prices, availability, authz, and payments verified server-side; never disable RLS or expose privileged keys.
-6. **Multilingual** — every enabled locale via the central registry; language switch preserves route and booking context.
-7. **Design system** — CostaPulse tokens + reusable primitives; presentational UI takes view models, not Supabase.
-8. **Tests are gates** — never remove, weaken, or skip tests to make checks pass.
+Use the established stack only:
 
-## Definition of done (summary)
+- Next.js App Router
+- React
+- TypeScript strict mode
+- Tailwind CSS
+- Supabase: PostgreSQL, Auth, Storage and RLS
+- Stripe
+- Railway
+- Zod
+- React Hook Form
+- Playwright
+- Vitest/Jest + React Testing Library
 
-Coherent DB/Storage/Backend/Frontend contract · migrations/RLS correct · no production mocks · all enabled locales · design-system UI · no DB calls in presentational components · `npm run check` (and relevant e2e) green · no secrets or unrelated churn.
+Do not add major frameworks, infrastructure services, UI kits or duplicate libraries without a proven need and explicit approval.
 
-In the final report: what changed, which layers were inspected, which tests ran, and what could not be verified.
+## Mandatory Supabase-first workflow
+
+Before writing, changing or deleting any frontend code, the coding agent must:
+
+1. Inspect the live Supabase project through MCP.
+2. Inspect the actual database schema, tables, columns, relationships, constraints, enums, views, functions and RPC contracts relevant to the task.
+3. Inspect the actual RLS policies, authentication requirements, Storage buckets, Storage policies and asset paths relevant to the task.
+4. Inspect existing migrations and generated Supabase TypeScript types.
+5. Inspect the existing backend contracts, server actions, route handlers, data-access modules, validation schemas, hooks, utilities and reusable components.
+6. Determine the exact existing contract the frontend must use.
+7. Only after completing that inspection, implement the frontend.
+
+Supabase and the existing backend are the single source of truth.
+
+The coding agent must never rely on assumptions, memory, guessed naming conventions or a previously observed schema. Every frontend task starts with a fresh inspection of the current implementation through MCP and the repository.
+
+## Strictly forbidden
+
+The coding agent must never:
+
+- Invent tables, columns, relationships, enums, RPC functions, bucket names, policies, routes, API responses or TypeScript shapes.
+- Create mock data, fake reviews, fake ratings, fake bookings, placeholder arrays, static JSON datasets or fabricated backend responses in production code.
+- Deliver static mockups, screenshots, prototypes or visual-only implementations when functional frontend work was requested.
+- Create buttons, links, forms, filters, menus, calendars, booking flows or interactions that do not work end-to-end.
+- Add placeholder handlers, TODO behavior, fake success states or hardcoded fallback records.
+- Create or modify migrations, tables, views, functions, RLS policies, Storage buckets, Storage policies, Edge Functions or backend business logic unless the current task explicitly instructs it.
+- Bypass RLS, expose privileged keys, move authorization to the browser or trust browser-calculated business state.
+- Duplicate existing components, queries, hooks, utilities, schemas, data-access modules or backend behavior.
+- Replace an existing working architecture with a preferred alternative.
+- Add unsolicited features, redesign flows or make independent product decisions.
+- Hardcode customer copy, prices, discounts, capacities, durations, locations, URLs, currencies, roles, statuses, locale lists or business rules.
+- Use Storage files as a content database.
+- Stop after the interface looks correct without verifying real functionality.
+
+Empty database states must render truthful empty states. Missing backend support must be reported as a blocker rather than replaced with invented data or behavior.
+
+## Required implementation behavior
+
+Every frontend implementation must:
+
+- Use real Supabase data through the verified existing backend contract.
+- Use generated Supabase types, validated RPC outputs or dedicated Zod schemas.
+- Map database responses into intentional typed view models at the backend boundary.
+- Keep Supabase clients, queries, authorization and business logic outside presentational components.
+- Reuse existing components, hooks, queries, utilities, tokens and design-system primitives.
+- Use Server Components by default and add `use client` only at the smallest interactive boundary.
+- Implement real loading, empty, error, success, validation, disabled and authorization states.
+- Be responsive, accessible and production-ready.
+- Preserve all enabled locales and existing route, query, referral and booking context.
+- Work correctly for zero, one or many records and missing optional media or metadata.
+- Produce no console errors, TypeScript errors, broken routes or dead interactions.
+
+## Responsive by default
+
+Every frontend implementation must be fully responsive and production-ready across smartphone, tablet, laptop, desktop and large desktop viewports.
+
+Mandatory responsive requirements:
+
+- Build mobile-first.
+- Support portrait and landscape orientations where relevant.
+- Prevent horizontal scrolling, overflow, clipped content, broken layouts and unreadable text.
+- Use responsive typography, spacing, grids, containers, media and component composition.
+- Keep navigation, menus, forms, dialogs, drawers, calendars, maps, tables, galleries and booking flows fully usable at every breakpoint.
+- Use touch-friendly controls with a minimum target size of 44 × 44 CSS pixels where applicable.
+- Preserve keyboard navigation, focus states, screen-reader behavior and reduced-motion support at every breakpoint.
+- Do not hide essential functionality on smaller screens without providing an equivalent accessible interaction.
+- Do not treat desktop resizing as sufficient validation; verify actual mobile, tablet and laptop layouts.
+
+A frontend feature is incomplete until it has been verified and corrected on representative smartphone, tablet, laptop and desktop viewport sizes.
+
+## Design system
+
+All frontend code must use the CostaPulse design system, tokens and reusable primitives.
+
+- No arbitrary Tailwind values when a token exists.
+- No inline visual styling when a reusable pattern exists.
+- No duplicate UI components or page-specific copies of shared patterns.
+- New reusable patterns belong in the appropriate shared or design-system layer.
+- Build mobile-first and target WCAG 2.2 AA.
+- Include keyboard, focus, screen-reader and reduced-motion behavior where relevant.
+
+## Reusable React architecture
+
+UI components must be reusable, composable and driven by typed props rather than page-specific database access.
+
+- Presentational components may not directly query Supabase.
+- Fetch and normalize data in server components, route handlers, server actions or dedicated data-access modules.
+- Pass stable, serializable view models into UI components.
+- Prefer small primitives and domain components that compose across pages.
+- Use explicit typed variants for legitimate visual differences.
+- Do not duplicate a component because one page needs a small variation.
+- Use stable database identifiers as React keys.
+- Do not use array indexes when a stable identifier exists.
+- Do not create generic abstractions before at least two real use cases exist, unless the abstraction is a foundational design-system primitive.
+
+Recommended separation, adapted to the current repository rather than recreated in parallel:
+
+```text
+components/ui/          foundational design-system primitives
+components/shared/      cross-domain compositions and universal states
+components/experiences/ experience cards, galleries, pricing and detail sections
+components/map/         map shell, markers, popovers and map/list synchronization
+components/availability/calendar, slots, capacity and date filters
+components/team/        team-member cards, avatars and summaries
+components/booking/     booking form sections and checkout compositions
+lib/supabase/queries/   typed server-side database and RPC access
+lib/view-models/        database-to-UI transformations
+lib/validation/         shared Zod schemas
+```
+
+## Frontend data contracts
+
+- Derive frontend types from generated Supabase types, validated RPC outputs or dedicated Zod schemas.
+- Never manually recreate database row shapes across multiple files.
+- View models expose only what the UI needs and use consistent naming and nullability.
+- Centralize query keys, filters, pagination and URL-state parsing.
+- Shareable filter state belongs in the URL.
+- Media URLs must be resolved through the existing shared media utility or component using verified Storage paths and bucket configuration.
+- Dates, times, currencies and localized labels must use shared locale-aware utilities.
+- Never rebuild server-authoritative pricing, availability, capacity, referral, voucher, permission or payment logic in React.
+
+## Testing and verification
+
+The coding agent must test the complete requested frontend flow against the actual Supabase project and existing backend. Visual correctness alone is not completion.
+
+Every changed flow must be tested at the appropriate levels:
+
+- Unit tests for frontend transformation and validation logic.
+- Component tests for UI states and interactions.
+- Integration tests for verified frontend/backend contracts where configured.
+- Playwright tests for critical end-to-end journeys.
+
+Test representative conditions, including:
+
+- zero, one and multiple records
+- missing optional media or metadata
+- long translated text
+- loading, empty and error states
+- invalid input and denied authorization
+- keyboard and screen-reader interaction
+- smartphone, tablet, laptop, desktop and large desktop layouts
+- portrait and landscape orientations where relevant
+- no horizontal overflow or clipped content
+- touch interactions and minimum target sizes
+- real navigation and route state
+- real form submission and server response
+
+Before completion, run the configured equivalents of:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test
+npm run test:e2e
+npm run build
+npm run start
+```
+
+Never remove, weaken or skip tests merely to make checks pass.
+
+## Definition of done
+
+A frontend task is complete only when:
+
+- The live Supabase project was inspected through MCP before implementation.
+- The actual database, Storage and backend contracts were identified and followed exactly.
+- The frontend uses real data and real backend behavior.
+- No schema, contract, data or behavior was invented.
+- No production mocks, placeholder functionality or static mockups remain.
+- The requested user flow works end-to-end.
+- Loading, empty, error, validation, success and authorization states work.
+- The UI follows the CostaPulse design system and works responsively and accessibly.
+- The implementation was verified on representative smartphone, tablet, laptop and desktop viewports.
+- There is no horizontal overflow, clipped content, broken layout or unusable interaction at any supported viewport.
+- Repeated UI and domain states use shared components instead of copied implementations.
+- Presentational components contain no direct database calls or duplicated business logic.
+- Relevant automated tests, type checks and build checks pass.
+- No secrets, unrelated changes, debug code or unsupported infrastructure entered the repository.
+
+## Required final report
+
+The coding agent's final report must state:
+
+1. Which Supabase schema objects, RLS policies, Storage buckets and backend contracts were inspected through MCP.
+2. Which existing repository components, types, hooks, queries and utilities were reused.
+3. Which frontend files were created or changed.
+4. Which real end-to-end flows were verified.
+5. Which smartphone, tablet, laptop and desktop viewport sizes were tested and what responsive issues were fixed.
+6. Which commands and tests were run and their results.
+7. Anything that could not be verified.
+8. Any missing backend capability that blocked implementation, without inventing a workaround.
