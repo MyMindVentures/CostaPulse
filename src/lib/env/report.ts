@@ -16,11 +16,17 @@ const envChecks = [
   { name: "siteUrl", requiredKeys: ["NEXT_PUBLIC_SITE_URL"] as const },
   {
     name: "supabasePublic",
-    requiredKeys: ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"] as const
+    requiredKeys: [
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
+    ] as const
   },
   {
     name: "supabaseAdmin",
-    requiredKeys: ["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"] as const
+    requiredKeys: [
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "SUPABASE_SERVICE_ROLE_KEY"
+    ] as const
   },
   { name: "stripeServer", requiredKeys: ["STRIPE_SECRET_KEY"] as const },
   {
@@ -29,13 +35,24 @@ const envChecks = [
   },
   { name: "stripeWebhooks", requiredKeys: ["STRIPE_WEBHOOK_SECRET"] as const },
   { name: "resend", requiredKeys: ["RESEND_API_KEY"] as const },
-  { name: "sentry", requiredKeys: ["NEXT_PUBLIC_SENTRY_DSN", "SENTRY_AUTH_TOKEN"] as const },
-  { name: "posthog", requiredKeys: ["NEXT_PUBLIC_POSTHOG_KEY", "NEXT_PUBLIC_POSTHOG_HOST"] as const }
+  {
+    name: "sentry",
+    requiredKeys: ["NEXT_PUBLIC_SENTRY_DSN", "SENTRY_AUTH_TOKEN"] as const
+  },
+  {
+    name: "posthog",
+    requiredKeys: [
+      "NEXT_PUBLIC_POSTHOG_KEY",
+      "NEXT_PUBLIC_POSTHOG_HOST"
+    ] as const
+  }
 ] as const;
 
 function getEnvValue(name: string) {
   const value = process.env[name];
-  return typeof value === "string" && value.trim().length > 0 ? value.trim() : "";
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
+    : "";
 }
 
 function resolveCheck(name: string, requiredKeys: readonly string[]): EnvCheck {
@@ -43,7 +60,12 @@ function resolveCheck(name: string, requiredKeys: readonly string[]): EnvCheck {
   const missingKeys = requiredKeys.filter((key) => !getEnvValue(key));
 
   if (presentKeys.length === 0) {
-    return { name, status: "disabled", requiredKeys, missingKeys: [...requiredKeys] };
+    return {
+      name,
+      status: "disabled",
+      requiredKeys,
+      missingKeys: [...requiredKeys]
+    };
   }
 
   if (missingKeys.length > 0) {
@@ -54,7 +76,9 @@ function resolveCheck(name: string, requiredKeys: readonly string[]): EnvCheck {
 }
 
 export function getServerEnvReport(): EnvReport {
-  const checks = envChecks.map(({ name, requiredKeys }) => resolveCheck(name, requiredKeys));
+  const checks = envChecks.map(({ name, requiredKeys }) =>
+    resolveCheck(name, requiredKeys)
+  );
   const siteUrl = checks.find((check) => check.name === "siteUrl");
   const hasInvalidOptionalCheck = checks.some(
     (check) => check.name !== "siteUrl" && check.status === "invalid"

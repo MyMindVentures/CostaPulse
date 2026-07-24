@@ -43,11 +43,15 @@ describe("getServerEnvReport", () => {
     const report = getServerEnvReport();
 
     expect(report.ready).toBe(true);
-    expect(report.checks.find((check) => check.name === "siteUrl")).toMatchObject({
+    expect(
+      report.checks.find((check) => check.name === "siteUrl")
+    ).toMatchObject({
       status: "configured",
       missingKeys: []
     });
-    expect(report.checks.find((check) => check.name === "supabasePublic")).toMatchObject({
+    expect(
+      report.checks.find((check) => check.name === "supabasePublic")
+    ).toMatchObject({
       status: "disabled"
     });
   });
@@ -58,7 +62,9 @@ describe("getServerEnvReport", () => {
     const report = getServerEnvReport();
 
     expect(report.ready).toBe(false);
-    expect(report.checks.find((check) => check.name === "siteUrl")).toMatchObject({
+    expect(
+      report.checks.find((check) => check.name === "siteUrl")
+    ).toMatchObject({
       status: "disabled",
       missingKeys: ["NEXT_PUBLIC_SITE_URL"]
     });
@@ -72,7 +78,9 @@ describe("getServerEnvReport", () => {
     const report = getServerEnvReport();
 
     expect(report.ready).toBe(false);
-    expect(report.checks.find((check) => check.name === "supabasePublic")).toMatchObject({
+    expect(
+      report.checks.find((check) => check.name === "supabasePublic")
+    ).toMatchObject({
       status: "invalid",
       missingKeys: ["NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"]
     });

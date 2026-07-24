@@ -27,7 +27,9 @@ If the dashboard contains old Docker builder, Dockerfile path, build-command, or
 
 ## Runtime
 
-Next.js produces standalone output. The `start` script in `package.json` launches `.next/standalone/server.js`, and Railpack uses that script automatically. Railway injects `PORT`; do not define it manually. The standalone server reads Railway's `PORT` and defaults its hostname appropriately for the platform.
+Next.js produces standalone output. The `start` script in `package.json` launches `start-standalone.cjs`, and Railpack uses that script automatically. The wrapper starts `.next/standalone/server.js` and forces `HOSTNAME=0.0.0.0` so container-provided hostnames cannot break Railway health checks. Railway injects `PORT`; do not define it manually.
+
+If deploy logs show a `[startup] Overriding HOSTNAME=...` line, that is expected protection rather than a failure condition.
 
 Railway should continue probing `GET /api/health` as a liveness check. Use `GET /api/ready` as an operator-facing readiness check for required public variables and partially configured optional integrations; do not point the Railway health check at `/api/ready`.
 

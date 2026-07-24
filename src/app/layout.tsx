@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import "./globals.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.costapulse.club";
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.costapulse.club";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "CostaPulse | Exceptional Costa Blanca experiences",
-  description: "Discover a considered collection of authentic yacht, water and local experiences on Spain's Costa Blanca.",
+  description:
+    "Discover a considered collection of authentic yacht, water and local experiences on Spain's Costa Blanca.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -23,10 +25,14 @@ export const metadata: Metadata = {
   }
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body><NextIntlClientProvider>{children}</NextIntlClientProvider></body>
+      <body>
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      </body>
     </html>
   );
 }

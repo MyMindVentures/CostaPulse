@@ -3,12 +3,67 @@
     "title": "Feel the best of the Costa Blanca.",
     "description": "Book carefully selected yacht charters, watersports, local adventures and premium services through one trusted platform.",
     "browse": "Browse experiences",
-    "discover": "Discover CostaPulse",
-    "localTitle": "Local by design",
-    "localDescription": "Authentic experiences shaped by people who know the coast, the sea and the region.",
-    "trustedTitle": "Trusted operations",
-    "trustedDescription": "Clear booking, secure payment and dependable communication from discovery to check-in.",
-    "premiumTitle": "Premium without distance",
-    "premiumDescription": "High-quality experiences presented simply, personally and without unnecessary complexity."
+    "eyebrow": "Costa Blanca · Spain",
+    "introKicker": "The CostaPulse edit",
+    "introTitle": "Mediterranean days, beautifully considered.",
+    "introDescription": "We bring together remarkable local people and places, so every experience feels effortless, personal and unmistakably Costa Blanca.",
+    "experiencesKicker": "A first glimpse",
+    "experiencesTitle": "Ways to feel more alive.",
+    "experienceFallback": "Published experience details will appear here as inventory is added to CostaPulse.",
+    "meta": {
+      "duration": "Duration",
+      "durationValue": "{minutes} minutes",
+      "capacity": "Capacity",
+      "capacityValue": "Up to {count} guests",
+      "location": "Location",
+      "locationPending": "Costa Blanca location coming soon"
+    },
+    "curatedCategories": [
+      {
+        "number": "01",
+        "title": "Private charters",
+        "copy": "Unhurried days at sea, shaped around you and your guests."
+      },
+      {
+        "number": "02",
+        "title": "Coastal adventures",
+        "copy": "A different view of hidden coves, clear water and dramatic coastline."
+      },
+      {
+        "number": "03",
+        "title": "Local hospitality",
+        "copy": "Memorable tables, trusted hosts and the flavours of the Costa Blanca."
+      }
+    ],
+    "trustPoints": [
+      {
+        "title": "Chosen with care",
+        "description": "Every host and experience is selected for quality, character and genuine local knowledge."
+      },
+      {
+        "title": "Effortlessly personal",
+        "description": "Clear guidance and thoughtful service, from first inspiration to your day on the coast."
+      }
+    ],
+    "readinessTitle": "Platform readiness",
+    "readinessCards": {
+      "backend": {
+        "title": "Typed backend contracts",
+        "description": "Supabase-backed booking, webhook, and readiness endpoints are now initialized."
+      },
+      "operations": {
+        "title": "Protected admin area",
+        "description": "Admin access now requires authenticated Supabase roles instead of public placeholder pages."
+      },
+      "inventory": {
+        "title": "Ready for real experiences",
+        "description": "Published experiences will flow into the homepage automatically as inventory is added."
+      }
+    },
+    "ctaKicker": "Your Mediterranean story",
+    "ctaTitle": "Good days begin with a little curiosity.",
+    "ctaLink": "Start a conversation",
+    "footerTagline": "Curated on the Costa Blanca.",
+    "footerCopyright": "© {year} CostaPulse"
   }
 }

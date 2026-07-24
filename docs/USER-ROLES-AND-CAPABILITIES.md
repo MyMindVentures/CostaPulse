@@ -49,19 +49,19 @@ A single authenticated user may hold more than one role. For example, a provider
 
 ## Role Summary
 
-| Role | Primary Purpose | Access Scope |
-|---|---|---|
-| Guest | Browse and discover CostaPulse | Public content only |
-| Customer | Book and manage personal experiences | Own profile and bookings |
-| Experience Provider | Deliver and manage assigned experiences | Own provider profile, experiences, and bookings |
-| Team Member | Perform assigned operational work | Assigned experiences and bookings only |
-| Partner | Refer customers and track rewards | Own partner data and attributed bookings |
-| Operations Staff | Coordinate bookings and delivery | Operational records across the platform |
-| Customer Support | Assist customers and resolve issues | Customer and booking support data |
-| Finance Manager | Handle payments, refunds, and settlements | Financial and reconciliation data |
-| Content Manager | Manage public content and merchandising | Experiences, profiles, media, and SEO |
-| Administrator | Manage most platform operations and settings | Broad platform access |
-| Super Administrator | Control security-critical and platform-wide settings | Full access |
+| Role                | Primary Purpose                                      | Access Scope                                    |
+| ------------------- | ---------------------------------------------------- | ----------------------------------------------- |
+| Guest               | Browse and discover CostaPulse                       | Public content only                             |
+| Customer            | Book and manage personal experiences                 | Own profile and bookings                        |
+| Experience Provider | Deliver and manage assigned experiences              | Own provider profile, experiences, and bookings |
+| Team Member         | Perform assigned operational work                    | Assigned experiences and bookings only          |
+| Partner             | Refer customers and track rewards                    | Own partner data and attributed bookings        |
+| Operations Staff    | Coordinate bookings and delivery                     | Operational records across the platform         |
+| Customer Support    | Assist customers and resolve issues                  | Customer and booking support data               |
+| Finance Manager     | Handle payments, refunds, and settlements            | Financial and reconciliation data               |
+| Content Manager     | Manage public content and merchandising              | Experiences, profiles, media, and SEO           |
+| Administrator       | Manage most platform operations and settings         | Broad platform access                           |
+| Super Administrator | Control security-critical and platform-wide settings | Full access                                     |
 
 ## 1. Guest
 
@@ -429,24 +429,24 @@ Legend:
 - Limited: permitted under defined workflow or threshold
 - No: not permitted
 
-| Capability | Guest | Customer | Provider | Team Member | Partner | Operations | Support | Finance | Content | Admin | Super Admin |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| View published experiences | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
-| Manage own profile | No | Own | Own | Own | Own | Yes | Limited | Limited | Limited | Yes | Yes |
-| Create booking | Limited | Yes | No | No | No | Yes | Limited | No | No | Yes | Yes |
-| View bookings | No | Own | Own | Assigned | Attributed | Yes | Yes | Financial | Limited | Yes | Yes |
-| Manage availability | No | No | Own | Limited | No | Yes | No | No | Limited | Yes | Yes |
-| Assign team/resources | No | No | Own | No | No | Yes | No | No | No | Yes | Yes |
-| Change booking status | No | Limited | Own | Assigned | No | Yes | Limited | Limited | No | Yes | Yes |
-| Issue refunds | No | No | No | No | No | Limited | Request | Yes | No | Yes | Yes |
-| View payouts | No | No | Own | No | Own | Limited | No | Yes | No | Yes | Yes |
-| Manage partner rewards | No | No | No | No | Own view | Limited | No | Yes | No | Yes | Yes |
-| Publish experiences | No | No | Limited | No | No | No | No | No | Yes | Yes | Yes |
-| Moderate reviews | No | Own submission | No | No | No | No | Limited | No | Yes | Yes | Yes |
-| Manage users | No | No | Own team limited | No | No | Limited | Limited | No | No | Yes | Yes |
-| Assign admin roles | No | No | No | No | No | No | No | No | No | Limited | Yes |
-| View audit logs | No | No | Own limited | No | No | Limited | Limited | Finance limited | Content limited | Yes | Yes |
-| Manage security policy | No | No | No | No | No | No | No | No | No | No | Yes |
+| Capability                 |   Guest |       Customer |         Provider | Team Member |    Partner | Operations | Support |         Finance |         Content |   Admin | Super Admin |
+| -------------------------- | ------: | -------------: | ---------------: | ----------: | ---------: | ---------: | ------: | --------------: | --------------: | ------: | ----------: |
+| View published experiences |     Yes |            Yes |              Yes |         Yes |        Yes |        Yes |     Yes |             Yes |             Yes |     Yes |         Yes |
+| Manage own profile         |      No |            Own |              Own |         Own |        Own |        Yes | Limited |         Limited |         Limited |     Yes |         Yes |
+| Create booking             | Limited |            Yes |               No |          No |         No |        Yes | Limited |              No |              No |     Yes |         Yes |
+| View bookings              |      No |            Own |              Own |    Assigned | Attributed |        Yes |     Yes |       Financial |         Limited |     Yes |         Yes |
+| Manage availability        |      No |             No |              Own |     Limited |         No |        Yes |      No |              No |         Limited |     Yes |         Yes |
+| Assign team/resources      |      No |             No |              Own |          No |         No |        Yes |      No |              No |              No |     Yes |         Yes |
+| Change booking status      |      No |        Limited |              Own |    Assigned |         No |        Yes | Limited |         Limited |              No |     Yes |         Yes |
+| Issue refunds              |      No |             No |               No |          No |         No |    Limited | Request |             Yes |              No |     Yes |         Yes |
+| View payouts               |      No |             No |              Own |          No |        Own |    Limited |      No |             Yes |              No |     Yes |         Yes |
+| Manage partner rewards     |      No |             No |               No |          No |   Own view |    Limited |      No |             Yes |              No |     Yes |         Yes |
+| Publish experiences        |      No |             No |          Limited |          No |         No |         No |      No |              No |             Yes |     Yes |         Yes |
+| Moderate reviews           |      No | Own submission |               No |          No |         No |         No | Limited |              No |             Yes |     Yes |         Yes |
+| Manage users               |      No |             No | Own team limited |          No |         No |    Limited | Limited |              No |              No |     Yes |         Yes |
+| Assign admin roles         |      No |             No |               No |          No |         No |         No |      No |              No |              No | Limited |         Yes |
+| View audit logs            |      No |             No |      Own limited |          No |         No |    Limited | Limited | Finance limited | Content limited |     Yes |         Yes |
+| Manage security policy     |      No |             No |               No |          No |         No |         No |      No |              No |              No |      No |         Yes |
 
 ## Ownership Rules
 

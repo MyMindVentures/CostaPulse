@@ -1,19 +1,27 @@
 import { NextResponse } from "next/server";
 import { getServerEnvReport } from "@/lib/env/server";
+import { getSupabaseDependencyCheck } from "@/server/repositories/readiness";
+import { buildOperatorReadiness } from "@/server/readiness/report";
 
 export const dynamic = "force-dynamic";
 
-export function GET() {
-  const report = getServerEnvReport();
+export async function GET() {
+  const envReport = getServerEnvReport();
+  const supabase = await getSupabaseDependencyCheck();
+  const readiness = buildOperatorReadiness({
+    envReady: envReport.ready,
+    envChecks: envReport.checks,
+    dependencyChecks: [supabase]
+  });
 
   return NextResponse.json(
     {
-      status: report.ready ? "ready" : "not_ready",
+      status: readiness.status,
       check: "readiness",
       service: "costapulse",
       timestamp: new Date().toISOString(),
-      checks: report.checks
+      checks: readiness.checks
     },
-    { status: report.ready ? 200 : 503 }
+    { status: readiness.ready ? 200 : 503 }
   );
 }

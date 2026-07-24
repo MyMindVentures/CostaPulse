@@ -30,7 +30,7 @@ Do not set a Dockerfile builder or Dockerfile path in the Railway dashboard.
 3. Railpack detects Node.js and installs dependencies with npm.
 4. Railpack detects the Node build script and runs the Next.js build.
 5. Railpack detects the `start` script in `package.json`.
-6. Next.js runs the standalone server and listens on Railway's injected `PORT`.
+6. The repo-controlled `start-standalone.cjs` wrapper forces `HOSTNAME=0.0.0.0` and then launches the Next.js standalone server on Railway's injected `PORT`.
 7. Railway waits for `GET /api/health` to return HTTP 200 before switching traffic.
 8. Verify `/`, `/admin`, `/api/health`, `/api/ready`, `/sitemap.xml`, and `/robots.txt`.
 
@@ -66,7 +66,7 @@ In a second PowerShell session:
 (Invoke-WebRequest -UseBasicParsing http://localhost:3000/api/ready).StatusCode
 ```
 
-Expected result: `200` for both endpoints when required public variables are present and no optional integration is partially configured.
+Expected result: `200` for both endpoints when required public variables are present and no optional integration is partially configured. If the wrapper logs `[startup] Overriding HOSTNAME=...`, that is expected and confirms the Railway-safe bind was applied.
 
 After stopping the local server, clear the temporary variable:
 
