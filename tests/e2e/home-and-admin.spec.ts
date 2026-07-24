@@ -14,6 +14,15 @@ test("homepage renders and readiness endpoints respond", async ({
     .resolves.toMatchObject({ status: "ready" });
 
   await page.goto("/");
+  const stylesheetPath = await page
+    .locator('link[rel="stylesheet"]')
+    .first()
+    .getAttribute("href");
+  expect(stylesheetPath).toBeTruthy();
+  expect((await request.get(stylesheetPath!)).status()).toBe(200);
+  expect((await request.get("/illustrations/hero-horizon.svg")).status()).toBe(
+    200
+  );
   await expect(
     page.getByRole("heading", {
       level: 1,
