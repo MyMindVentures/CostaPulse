@@ -27,4 +27,6 @@ The landing page and health endpoint work without integration credentials. Add o
 
 CostaPulse is hosted exclusively on **Railway**. Railway builds the repository `Dockerfile`, runs the Next.js standalone server, injects `PORT`, performs the `/api/health` deployment check, and terminates public TLS.
 
+The repository default branch and Railway production deployment branch are both `main`.
+
 See [DEPLOYMENT.md](DEPLOYMENT.md), [RAILWAY.md](RAILWAY.md), [ENVIRONMENT.md](ENVIRONMENT.md), and [SUPABASE.md](SUPABASE.md).
