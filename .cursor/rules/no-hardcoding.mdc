@@ -1,0 +1,23 @@
+---
+description: Ban hardcoded business content, mocks, and magic values in production
+alwaysApply: true
+---
+
+# No hardcoding / no production mocks
+
+## Forbidden in production code
+
+- Hardcoded customer copy, prices, discounts, capacities, durations, locations, URLs, currencies, roles, statuses, locale lists, or business rules
+- Magic strings/numbers in production logic (centralize true technical constants as named typed values)
+- Fake reviews, ratings, bookings, placeholder arrays, static JSON content, or runtime fixtures
+- Using Storage buckets as a content database
+
+## Required sources
+
+- Business and editorial content → database via typed backend contracts
+- Secrets and environment-specific values → validated env vars (`src/lib/env`)
+- Empty DB states → real empty UI (never fabricate inventory)
+
+## Tests only
+
+Test fixtures may live only in test code and must never be imported by production modules.

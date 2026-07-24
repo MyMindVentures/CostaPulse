@@ -34,7 +34,7 @@ test("homepage renders and readiness endpoints respond", async ({
     page.getByRole("navigation", { name: /Primary navigation/i }).first()
   ).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /Explore experiences/i }).first()
+    page.getByRole("link", { name: /Book Experience/i }).first()
   ).toBeVisible();
 });
 

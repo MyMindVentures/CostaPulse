@@ -1849,6 +1849,82 @@ export type Database = {
           }
         ];
       };
+      site_navigation_item_translations: {
+        Row: {
+          id: string;
+          label: string;
+          locale: string;
+          navigation_item_id: string;
+        };
+        Insert: {
+          id?: string;
+          label: string;
+          locale: string;
+          navigation_item_id: string;
+        };
+        Update: {
+          id?: string;
+          label?: string;
+          locale?: string;
+          navigation_item_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "site_navigation_item_translations_navigation_item_id_fkey";
+            columns: ["navigation_item_id"];
+            isOneToOne: false;
+            referencedRelation: "site_navigation_items";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      site_navigation_items: {
+        Row: {
+          created_at: string;
+          href: string;
+          id: string;
+          is_external: boolean;
+          is_published: boolean;
+          item_key: string;
+          parent_id: string | null;
+          placement: string;
+          sort_order: number;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          href: string;
+          id?: string;
+          is_external?: boolean;
+          is_published?: boolean;
+          item_key: string;
+          parent_id?: string | null;
+          placement: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          href?: string;
+          id?: string;
+          is_external?: boolean;
+          is_published?: boolean;
+          item_key?: string;
+          parent_id?: string | null;
+          placement?: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "site_navigation_items_parent_id_fkey";
+            columns: ["parent_id"];
+            isOneToOne: false;
+            referencedRelation: "site_navigation_items";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       reviews: {
         Row: {
           booking_id: string;

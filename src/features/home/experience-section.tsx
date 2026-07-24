@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Compass } from "lucide-react";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Container } from "@/components/ui/container";
-import type { ExperienceCardViewModel } from "@/server/repositories/catalog";
+import type { ExperienceCardViewModel } from "@/lib/view-models/experience-card";
 import { ExperienceCard } from "@/features/experiences/components/experience-card";
 
 type CuratedCategory = {

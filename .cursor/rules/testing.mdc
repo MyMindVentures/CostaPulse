@@ -1,0 +1,34 @@
+---
+description: Testing expectations for unit, component, and e2e changes
+globs: "**/*.{test,spec}.{ts,tsx}"
+alwaysApply: false
+---
+
+# Testing
+
+## Levels
+
+- Unit: business logic, validation, mappers, URL/filter parsers
+- Component: UI states and interactions (RTL)
+- E2E: critical journeys in `tests/e2e` (Playwright)
+
+## Must cover when relevant
+
+Happy path + failures: authz, empty states, invalid input, unavailable data, localization, mobile, payment failure, duplicate events.
+
+Reusable UI: zero / one / many records, missing media, long translated text, loading/empty/error, keyboard/a11y.
+
+## Hard rules
+
+- Never remove, weaken, skip, or `--passWithNoTests` to make CI green.
+- Test fixtures stay in test code only.
+- Prefer behavior assertions over implementation details.
+
+## Commands
+
+```bash
+npm run test
+npm run test:coverage
+npm run test:e2e
+npm run check
+```

@@ -1,0 +1,33 @@
+---
+description: Supabase, RLS, repositories, and server-authoritative backend rules
+globs: src/server/**/*,supabase/**/*,src/lib/supabase/**/*,src/types/database.ts
+alwaysApply: false
+---
+
+# Supabase and backend
+
+## Authority
+
+- PostgreSQL + typed contracts are the source of truth.
+- Enforce input, authz, and business rules server-side.
+- Recalculate/verify prices, availability, capacity, referrals, vouchers, permissions, and payment state on the server.
+- Never trust browser-submitted totals or workflow state.
+- Never disable RLS or expose service-role / privileged keys to the client.
+
+## Clients
+
+- `src/lib/supabase/server.ts` — cookie-aware user-scoped client; never reads service key.
+- `src/lib/supabase/admin.ts` — server-only privileged client; call explicitly only when required.
+- Repositories live in `src/server/repositories`; validate with Zod; map to view models.
+
+## Schema changes
+
+- Use migrations under `supabase/migrations`.
+- Keep generated types in sync (`src/types/database.ts`).
+- Do not hand-copy row shapes across files; derive from generated types or Zod RPC schemas.
+
+## Storage
+
+- Validate type, size, ownership, and authorization before upload.
+- Keep Storage objects and DB metadata synchronized.
+- Never invent bucket names or policies; inspect existing ones first.

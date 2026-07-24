@@ -1,0 +1,32 @@
+---
+description: React layers, view-models, and design-system rules for UI code
+globs: src/components/**/*,src/features/**/*,src/app/**/*
+alwaysApply: false
+---
+
+# React architecture
+
+## Layers (existing repo paths)
+
+```text
+src/components/ui/       design-system primitives (no business data)
+src/components/shared/   cross-domain compositions + empty/loading/error
+src/components/layout/   shell, nav, page chrome
+src/features/            page compositions (home, experiences, booking, map, admin)
+src/server/repositories/ Supabase access + Zod + view-model mapping
+src/lib/view-models/     pure DB/RPC → UI mappers
+```
+
+Adapt to these folders; do not invent parallel conventions.
+
+## Rules
+
+- Server Components by default; `use client` only at the smallest interactive boundary.
+- Presentational components: typed props / view models only — no Supabase, no privileged clients, no embedded experience/pricing records.
+- Fetch in server components, route handlers, server actions, or repositories; map at the backend boundary.
+- Lists: stable database IDs as keys (never indexes when an ID exists).
+- Correct for zero, one, many records and missing optional media.
+- Reuse shared states (price, duration, empty, loading, error) instead of copying page-specific UI.
+- Design system only: CostaPulse tokens in `src/app/globals.css`; no arbitrary one-off styling when a token/primitive exists.
+- New UI patterns need ≥2 real use cases (or are foundational primitives) before abstracting.
+- Map/calendar must use `get_experience_map` / `get_experience_calendar` contracts; media via shared media utilities.

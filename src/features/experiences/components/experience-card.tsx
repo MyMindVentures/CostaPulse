@@ -23,7 +23,7 @@ import { FavoriteToggle } from "@/features/experiences/favorite-toggle";
 import { formatDurationLabel } from "@/components/shared/duration-display";
 import { formatPriceLabel } from "@/components/shared/price-display";
 import { getExperienceHeroImageSrc } from "@/lib/media/experience-media";
-import type { ExperienceCardViewModel } from "@/server/repositories/catalog";
+import type { ExperienceCardViewModel } from "@/lib/view-models/experience-card";
 
 type ExperienceCardProps = {
   experience: ExperienceCardViewModel;

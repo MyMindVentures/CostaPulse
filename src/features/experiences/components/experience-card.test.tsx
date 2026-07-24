@@ -3,7 +3,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ExperienceCard } from "./experience-card";
-import type { ExperienceCardViewModel } from "@/server/repositories/catalog";
+import type { ExperienceCardViewModel } from "@/lib/view-models/experience-card";
 
 vi.mock("./experience-card-image", () => ({
   ExperienceCardImage: ({ alt, src }: { alt: string; src: string }) => (

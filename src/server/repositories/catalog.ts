@@ -1,38 +1,17 @@
 import "server-only";
-import { z } from "zod";
 import { resolveExperienceMediaUrl } from "@/lib/media/experience-media";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   aggregatePublishedRatings,
   resolveHeroMedia
 } from "@/features/experiences/card-data";
+import {
+  experienceCardSchema,
+  type ExperienceCardViewModel
+} from "@/lib/view-models/experience-card";
 import { summarizeAvailabilityFromSlots } from "@/server/availability/summarize";
 
-const pricingModelSchema = z.enum(["per_person", "per_group"]);
-
-const experienceCardSchema = z.object({
-  id: z.string().uuid(),
-  slug: z.string().min(1),
-  title: z.string().min(1),
-  shortDescription: z.string().nullable(),
-  description: z.string().nullable(),
-  durationMinutes: z.number().int().positive(),
-  baseCapacity: z.number().int().positive(),
-  locationName: z.string().nullable(),
-  heroImagePath: z.string().nullable(),
-  heroImageAlt: z.string().nullable(),
-  categoryLabel: z.string().nullable(),
-  providerName: z.string().nullable(),
-  experienceType: z.string().nullable(),
-  highlights: z.array(z.string()),
-  startingPriceMinor: z.number().int().nonnegative().nullable(),
-  currency: z.string().length(3).nullable(),
-  pricingModel: pricingModelSchema.nullable(),
-  averageRating: z.number().nullable(),
-  reviewCount: z.number().int().nonnegative()
-});
-
-export type ExperienceCardViewModel = z.infer<typeof experienceCardSchema>;
+export type { ExperienceCardViewModel };
 
 export type ExperienceDetailVariant = {
   id: string;

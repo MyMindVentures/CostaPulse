@@ -1,0 +1,14 @@
+---
+description: Multilingual and locale requirements for customer-facing work
+globs: messages/**/*,src/i18n/**/*,**/locale*,**/language*
+alwaysApply: false
+---
+
+# Multilingual by default
+
+- Support every enabled European locale from the centralized locale registry (`src/i18n`).
+- Every public flow needs an accessible language switcher.
+- Language switches must preserve route, query params, referral attribution, and booking context.
+- Localize copy, metadata, validation, emails, dates, times, numbers, currencies, pluralization, alt text, and a11y labels.
+- A feature is incomplete while an enabled locale is missing content.
+- Format dates/money through shared locale-aware utilities (`src/lib/datetime`, `src/lib/pricing`) — never ad hoc in cards.

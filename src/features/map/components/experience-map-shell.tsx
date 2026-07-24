@@ -12,7 +12,7 @@ import {
   type CatalogViewMode
 } from "@/lib/url/catalog-filters";
 import type { ExperienceMapItem } from "@/lib/view-models/experience-map";
-import type { MapFilterOptions } from "@/server/repositories/map";
+import type { MapFilterOptions } from "@/lib/view-models/experience-map";
 import { ExperienceMapFilters } from "./experience-map-filters";
 import { ExperienceMapList } from "./experience-map-list";
 import { ExperienceMapSelectedCard } from "./experience-map-selected-card";
