@@ -82,12 +82,30 @@
 }
 html {
   scroll-behavior: smooth;
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 body {
   margin: 0;
+  min-width: 20rem;
+  max-width: 100%;
+  overflow-x: hidden;
   background: var(--sand);
   color: var(--ink);
   font-family: Manrope, Inter, "Helvetica Neue", Arial, sans-serif;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+[role="button"],
+a {
+  touch-action: manipulation;
 }
 a {
   color: inherit;
@@ -135,6 +153,7 @@ em {
 .hero {
   position: relative;
   overflow: hidden;
+  min-height: 100vh;
   min-height: 100svh;
   background: var(--navy-deep);
   color: var(--white);
@@ -206,6 +225,7 @@ em {
   position: relative;
   z-index: 1;
   display: grid;
+  min-height: 100vh;
   min-height: 100svh;
   grid-template-rows: 1fr auto auto;
   padding-block: 1.5rem 2.5rem;
@@ -1486,7 +1506,7 @@ em {
   position: fixed;
   z-index: 40;
   inset-inline: 1rem;
-  bottom: 1rem;
+  bottom: max(1rem, env(safe-area-inset-bottom));
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1603,7 +1623,7 @@ em {
   }
   .consent-banner {
     inset-inline: 0.75rem;
-    bottom: 0.75rem;
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
     flex-direction: column;
     align-items: stretch;
   }
@@ -1618,6 +1638,7 @@ em {
 /* Booking wizard */
 .bk-page {
   min-height: 100vh;
+  min-height: 100svh;
   background:
     radial-gradient(
       circle at top left,
@@ -1960,6 +1981,7 @@ em {
 }
 .bk-result-page {
   min-height: 100vh;
+  min-height: 100svh;
   display: grid;
   place-items: center;
   padding: 2rem 1rem;
@@ -2069,7 +2091,9 @@ em {
 .app-shell {
   position: relative;
   isolation: isolate;
+  min-height: 100vh;
   min-height: 100svh;
+  overflow-x: hidden;
   overflow-x: clip;
 }
 .app-shell--padded-nav {
@@ -2197,6 +2221,15 @@ em {
     box-shadow 180ms ease,
     color 180ms ease;
   color: var(--ink);
+}
+@supports (padding-top: env(safe-area-inset-top)) {
+  .shell-navbar {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .app-shell--padded-nav {
+    padding-top: calc(var(--shell-nav-height, 4.5rem) + env(safe-area-inset-top));
+  }
 }
 .shell-navbar.is-scrolled {
   border-bottom-color: rgba(6, 27, 44, 0.08);
@@ -2357,7 +2390,8 @@ em {
 .shell-menu-button {
   display: inline-grid;
   place-items: center;
-  width: 2.6rem;
+  width: 2.75rem;
+  min-height: 2.75rem;
   aspect-ratio: 1;
   border: 1px solid rgba(6, 27, 44, 0.12);
   border-radius: 999px;
@@ -2395,7 +2429,13 @@ em {
   flex-direction: column;
   gap: 1.5rem;
   width: min(100%, 22rem);
-  padding: 1.25rem 1.25rem 2rem;
+  padding: max(1.25rem, env(safe-area-inset-top))
+    max(1.25rem, env(safe-area-inset-right))
+    max(2rem, env(safe-area-inset-bottom))
+    max(1.25rem, env(safe-area-inset-left));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   background: var(--white);
   color: var(--ink);
   box-shadow: -1rem 0 3rem rgba(7, 31, 47, 0.18);
@@ -2413,6 +2453,32 @@ em {
     transition: none;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid CanvasText;
+    outline-offset: 3px;
+  }
+}
 .mobile-nav__header {
   display: flex;
   align-items: center;
@@ -2422,7 +2488,8 @@ em {
 .mobile-nav__close {
   display: inline-grid;
   place-items: center;
-  width: 2.5rem;
+  width: 2.75rem;
+  min-height: 2.75rem;
   aspect-ratio: 1;
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -2518,6 +2585,7 @@ em {
 
 /* —— Map View —— */
 .map-page {
+  min-height: 100vh;
   min-height: 100svh;
   background: transparent;
   color: var(--ink);
