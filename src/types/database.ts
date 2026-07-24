@@ -7,6 +7,8 @@ export type Json =
   | Json[];
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5";
   };
@@ -32,6 +34,50 @@ export type Database = {
           name?: string;
         };
         Relationships: [];
+      };
+      availability_exceptions: {
+        Row: {
+          created_at: string;
+          ends_at: string | null;
+          exception_date: string;
+          experience_id: string;
+          id: string;
+          reason: string | null;
+          starts_at: string | null;
+          status: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          ends_at?: string | null;
+          exception_date: string;
+          experience_id: string;
+          id?: string;
+          reason?: string | null;
+          starts_at?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          ends_at?: string | null;
+          exception_date?: string;
+          experience_id?: string;
+          id?: string;
+          reason?: string | null;
+          starts_at?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "availability_exceptions_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experiences";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       availability_slots: {
         Row: {
@@ -89,6 +135,156 @@ export type Database = {
           }
         ];
       };
+      booking_addons: {
+        Row: {
+          addon_id: string;
+          booking_id: string;
+          created_at: string;
+          id: string;
+          quantity: number;
+          total_amount_minor: number | null;
+          unit_amount_minor: number;
+        };
+        Insert: {
+          addon_id: string;
+          booking_id: string;
+          created_at?: string;
+          id?: string;
+          quantity?: number;
+          total_amount_minor?: number | null;
+          unit_amount_minor: number;
+        };
+        Update: {
+          addon_id?: string;
+          booking_id?: string;
+          created_at?: string;
+          id?: string;
+          quantity?: number;
+          total_amount_minor?: number | null;
+          unit_amount_minor?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "booking_addons_addon_id_fkey";
+            columns: ["addon_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_addons";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_addons_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: false;
+            referencedRelation: "bookings";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      booking_participants: {
+        Row: {
+          booking_id: string;
+          created_at: string;
+          date_of_birth: string | null;
+          email: string | null;
+          emergency_contact_name: string | null;
+          emergency_contact_phone: string | null;
+          first_name: string;
+          id: string;
+          last_name: string | null;
+          medical_notes: string | null;
+          phone: string | null;
+          updated_at: string;
+          waiver_status: string;
+        };
+        Insert: {
+          booking_id: string;
+          created_at?: string;
+          date_of_birth?: string | null;
+          email?: string | null;
+          emergency_contact_name?: string | null;
+          emergency_contact_phone?: string | null;
+          first_name: string;
+          id?: string;
+          last_name?: string | null;
+          medical_notes?: string | null;
+          phone?: string | null;
+          updated_at?: string;
+          waiver_status?: string;
+        };
+        Update: {
+          booking_id?: string;
+          created_at?: string;
+          date_of_birth?: string | null;
+          email?: string | null;
+          emergency_contact_name?: string | null;
+          emergency_contact_phone?: string | null;
+          first_name?: string;
+          id?: string;
+          last_name?: string | null;
+          medical_notes?: string | null;
+          phone?: string | null;
+          updated_at?: string;
+          waiver_status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "booking_participants_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: false;
+            referencedRelation: "bookings";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      booking_status_history: {
+        Row: {
+          booking_id: string;
+          changed_by: string | null;
+          created_at: string;
+          id: string;
+          new_status: Database["public"]["Enums"]["booking_status"];
+          previous_status: Database["public"]["Enums"]["booking_status"] | null;
+          reason: string | null;
+        };
+        Insert: {
+          booking_id: string;
+          changed_by?: string | null;
+          created_at?: string;
+          id?: string;
+          new_status: Database["public"]["Enums"]["booking_status"];
+          previous_status?:
+            | Database["public"]["Enums"]["booking_status"]
+            | null;
+          reason?: string | null;
+        };
+        Update: {
+          booking_id?: string;
+          changed_by?: string | null;
+          created_at?: string;
+          id?: string;
+          new_status?: Database["public"]["Enums"]["booking_status"];
+          previous_status?:
+            | Database["public"]["Enums"]["booking_status"]
+            | null;
+          reason?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "booking_status_history_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: false;
+            referencedRelation: "bookings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_status_history_changed_by_fkey";
+            columns: ["changed_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       bookings: {
         Row: {
           availability_slot_id: string | null;
@@ -100,6 +296,7 @@ export type Database = {
           created_at: string;
           currency: string;
           customer_email: string;
+          customer_id: string | null;
           customer_profile_id: string | null;
           experience_id: string;
           experience_variant_id: string;
@@ -127,6 +324,7 @@ export type Database = {
           created_at?: string;
           currency: string;
           customer_email: string;
+          customer_id?: string | null;
           customer_profile_id?: string | null;
           experience_id: string;
           experience_variant_id: string;
@@ -154,6 +352,7 @@ export type Database = {
           created_at?: string;
           currency?: string;
           customer_email?: string;
+          customer_id?: string | null;
           customer_profile_id?: string | null;
           experience_id?: string;
           experience_variant_id?: string;
@@ -178,6 +377,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "availability_slots";
             referencedColumns: ["id", "experience_variant_id"];
+          },
+          {
+            foreignKeyName: "bookings_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
+            referencedColumns: ["id"];
           },
           {
             foreignKeyName: "bookings_customer_profile_id_fkey";
@@ -212,6 +418,278 @@ export type Database = {
             columns: ["referral_id"];
             isOneToOne: false;
             referencedRelation: "referrals";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      customers: {
+        Row: {
+          city: string | null;
+          country: string | null;
+          created_at: string;
+          date_of_birth: string | null;
+          email: string;
+          emergency_contact_name: string | null;
+          emergency_contact_phone: string | null;
+          first_name: string | null;
+          id: string;
+          last_booking_at: string | null;
+          last_name: string | null;
+          lifetime_bookings: number;
+          lifetime_spent_minor: number;
+          marketing_consent: boolean;
+          marketing_consent_at: string | null;
+          notes: string | null;
+          phone: string | null;
+          preferred_language: string;
+          profile_id: string | null;
+          updated_at: string;
+          whatsapp_opt_in: boolean;
+          whatsapp_opt_in_at: string | null;
+        };
+        Insert: {
+          city?: string | null;
+          country?: string | null;
+          created_at?: string;
+          date_of_birth?: string | null;
+          email: string;
+          emergency_contact_name?: string | null;
+          emergency_contact_phone?: string | null;
+          first_name?: string | null;
+          id?: string;
+          last_booking_at?: string | null;
+          last_name?: string | null;
+          lifetime_bookings?: number;
+          lifetime_spent_minor?: number;
+          marketing_consent?: boolean;
+          marketing_consent_at?: string | null;
+          notes?: string | null;
+          phone?: string | null;
+          preferred_language?: string;
+          profile_id?: string | null;
+          updated_at?: string;
+          whatsapp_opt_in?: boolean;
+          whatsapp_opt_in_at?: string | null;
+        };
+        Update: {
+          city?: string | null;
+          country?: string | null;
+          created_at?: string;
+          date_of_birth?: string | null;
+          email?: string;
+          emergency_contact_name?: string | null;
+          emergency_contact_phone?: string | null;
+          first_name?: string | null;
+          id?: string;
+          last_booking_at?: string | null;
+          last_name?: string | null;
+          lifetime_bookings?: number;
+          lifetime_spent_minor?: number;
+          marketing_consent?: boolean;
+          marketing_consent_at?: string | null;
+          notes?: string | null;
+          phone?: string | null;
+          preferred_language?: string;
+          profile_id?: string | null;
+          updated_at?: string;
+          whatsapp_opt_in?: boolean;
+          whatsapp_opt_in_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "customers_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      experience_addons: {
+        Row: {
+          created_at: string;
+          currency: string;
+          description: string | null;
+          display_order: number;
+          experience_id: string;
+          id: string;
+          is_active: boolean;
+          max_quantity: number | null;
+          name: string;
+          pricing_model: Database["public"]["Enums"]["variant_pricing_model"];
+          slug: string;
+          unit_amount_minor: number;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          currency?: string;
+          description?: string | null;
+          display_order?: number;
+          experience_id: string;
+          id?: string;
+          is_active?: boolean;
+          max_quantity?: number | null;
+          name: string;
+          pricing_model?: Database["public"]["Enums"]["variant_pricing_model"];
+          slug: string;
+          unit_amount_minor: number;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          currency?: string;
+          description?: string | null;
+          display_order?: number;
+          experience_id?: string;
+          id?: string;
+          is_active?: boolean;
+          max_quantity?: number | null;
+          name?: string;
+          pricing_model?: Database["public"]["Enums"]["variant_pricing_model"];
+          slug?: string;
+          unit_amount_minor?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "experience_addons_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experiences";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      experience_hosts: {
+        Row: {
+          created_at: string;
+          display_order: number;
+          experience_id: string;
+          is_primary: boolean;
+          profile_id: string;
+          role: string;
+        };
+        Insert: {
+          created_at?: string;
+          display_order?: number;
+          experience_id: string;
+          is_primary?: boolean;
+          profile_id: string;
+          role?: string;
+        };
+        Update: {
+          created_at?: string;
+          display_order?: number;
+          experience_id?: string;
+          is_primary?: boolean;
+          profile_id?: string;
+          role?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "experience_hosts_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experiences";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "experience_hosts_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      experience_media: {
+        Row: {
+          alt_text: string | null;
+          caption: string | null;
+          created_at: string;
+          display_order: number;
+          experience_id: string;
+          id: string;
+          is_hero: boolean;
+          media_type: string;
+          storage_path: string;
+          updated_at: string;
+        };
+        Insert: {
+          alt_text?: string | null;
+          caption?: string | null;
+          created_at?: string;
+          display_order?: number;
+          experience_id: string;
+          id?: string;
+          is_hero?: boolean;
+          media_type?: string;
+          storage_path: string;
+          updated_at?: string;
+        };
+        Update: {
+          alt_text?: string | null;
+          caption?: string | null;
+          created_at?: string;
+          display_order?: number;
+          experience_id?: string;
+          id?: string;
+          is_hero?: boolean;
+          media_type?: string;
+          storage_path?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "experience_media_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experiences";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      experience_requirements: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          display_order: number;
+          experience_id: string;
+          id: string;
+          is_mandatory: boolean;
+          requirement_type: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          display_order?: number;
+          experience_id: string;
+          id?: string;
+          is_mandatory?: boolean;
+          requirement_type?: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          display_order?: number;
+          experience_id?: string;
+          id?: string;
+          is_mandatory?: boolean;
+          requirement_type?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "experience_requirements_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experiences";
             referencedColumns: ["id"];
           }
         ];
@@ -279,16 +757,24 @@ export type Database = {
         Row: {
           base_capacity: number;
           base_currency: string;
+          category_label: string | null;
           created_at: string;
           description: string | null;
           duration_minutes: number;
+          experience_type: string | null;
           hero_image_path: string | null;
+          highlights: Json;
           id: string;
+          inclusions: Json;
+          is_featured: boolean;
           location_name: string | null;
           manual_confirmation_required: boolean;
+          media_folder: string | null;
+          mentor_required: boolean;
           provider_profile_id: string | null;
           short_description: string | null;
           slug: string;
+          sort_order: number;
           status: Database["public"]["Enums"]["publication_status"];
           timezone: string;
           title: string;
@@ -297,16 +783,24 @@ export type Database = {
         Insert: {
           base_capacity: number;
           base_currency: string;
+          category_label?: string | null;
           created_at?: string;
           description?: string | null;
           duration_minutes: number;
+          experience_type?: string | null;
           hero_image_path?: string | null;
+          highlights?: Json;
           id?: string;
+          inclusions?: Json;
+          is_featured?: boolean;
           location_name?: string | null;
           manual_confirmation_required?: boolean;
+          media_folder?: string | null;
+          mentor_required?: boolean;
           provider_profile_id?: string | null;
           short_description?: string | null;
           slug: string;
+          sort_order?: number;
           status?: Database["public"]["Enums"]["publication_status"];
           timezone?: string;
           title: string;
@@ -315,16 +809,24 @@ export type Database = {
         Update: {
           base_capacity?: number;
           base_currency?: string;
+          category_label?: string | null;
           created_at?: string;
           description?: string | null;
           duration_minutes?: number;
+          experience_type?: string | null;
           hero_image_path?: string | null;
+          highlights?: Json;
           id?: string;
+          inclusions?: Json;
+          is_featured?: boolean;
           location_name?: string | null;
           manual_confirmation_required?: boolean;
+          media_folder?: string | null;
+          mentor_required?: boolean;
           provider_profile_id?: string | null;
           short_description?: string | null;
           slug?: string;
+          sort_order?: number;
           status?: Database["public"]["Enums"]["publication_status"];
           timezone?: string;
           title?: string;
@@ -511,6 +1013,70 @@ export type Database = {
           }
         ];
       };
+      reviews: {
+        Row: {
+          booking_id: string;
+          comment: string | null;
+          created_at: string;
+          customer_id: string | null;
+          experience_id: string;
+          id: string;
+          published_at: string | null;
+          rating: number;
+          status: string;
+          title: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          booking_id: string;
+          comment?: string | null;
+          created_at?: string;
+          customer_id?: string | null;
+          experience_id: string;
+          id?: string;
+          published_at?: string | null;
+          rating: number;
+          status?: string;
+          title?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          booking_id?: string;
+          comment?: string | null;
+          created_at?: string;
+          customer_id?: string | null;
+          experience_id?: string;
+          id?: string;
+          published_at?: string | null;
+          rating?: number;
+          status?: string;
+          title?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: true;
+            referencedRelation: "bookings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reviews_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reviews_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experiences";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       user_roles: {
         Row: {
           granted_at: string;
@@ -554,6 +1120,7 @@ export type Database = {
           created_at: string;
           currency: string;
           customer_email: string;
+          customer_id: string | null;
           customer_profile_id: string | null;
           expires_at: string | null;
           id: string;
@@ -573,6 +1140,7 @@ export type Database = {
           created_at?: string;
           currency: string;
           customer_email: string;
+          customer_id?: string | null;
           customer_profile_id?: string | null;
           expires_at?: string | null;
           id?: string;
@@ -592,6 +1160,7 @@ export type Database = {
           created_at?: string;
           currency?: string;
           customer_email?: string;
+          customer_id?: string | null;
           customer_profile_id?: string | null;
           expires_at?: string | null;
           id?: string;
@@ -614,6 +1183,13 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
+            foreignKeyName: "vouchers_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "vouchers_customer_profile_id_fkey";
             columns: ["customer_profile_id"];
             isOneToOne: false;
@@ -625,6 +1201,63 @@ export type Database = {
             columns: ["partner_id"];
             isOneToOne: false;
             referencedRelation: "partners";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      waivers: {
+        Row: {
+          booking_id: string;
+          created_at: string;
+          document_version: string;
+          id: string;
+          ip_address: unknown;
+          participant_id: string | null;
+          signature_data: Json;
+          signed_at: string | null;
+          signed_name: string | null;
+          status: string;
+          updated_at: string;
+        };
+        Insert: {
+          booking_id: string;
+          created_at?: string;
+          document_version: string;
+          id?: string;
+          ip_address?: unknown;
+          participant_id?: string | null;
+          signature_data?: Json;
+          signed_at?: string | null;
+          signed_name?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          booking_id?: string;
+          created_at?: string;
+          document_version?: string;
+          id?: string;
+          ip_address?: unknown;
+          participant_id?: string | null;
+          signature_data?: Json;
+          signed_at?: string | null;
+          signed_name?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "waivers_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: false;
+            referencedRelation: "bookings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "waivers_participant_id_fkey";
+            columns: ["participant_id"];
+            isOneToOne: false;
+            referencedRelation: "booking_participants";
             referencedColumns: ["id"];
           }
         ];

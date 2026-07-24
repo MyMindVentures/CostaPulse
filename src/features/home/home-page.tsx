@@ -2,22 +2,34 @@ import {
   ArrowRight,
   Clock3,
   Compass,
-  Heart,
   MapPin,
   Menu,
   ShieldCheck,
   Sparkles,
-  Star,
   Users
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { BrandLink } from "@/components/shared/brand-link";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Container } from "@/components/ui/container";
-import { getPublishedExperienceHighlights } from "@/server/repositories/catalog";
+import {
+  CURATED_MEDIA_BY_SLUG,
+  type CuratedMediaSlug
+} from "@/features/experiences/curated-media";
+import {
+  ExperienceTile,
+  categoryIconForExperienceType
+} from "@/features/experiences/experience-tile";
+import {
+  formatDurationHours,
+  formatMinorUnitAmount
+} from "@/lib/pricing/format-money";
+import { resolvePublicImageSrc } from "@/lib/media/experience-media";
+import { getPublishedExperienceCards } from "@/server/repositories/catalog";
 
 type CuratedCategory = {
   number: string;
+  slug: CuratedMediaSlug;
   title: string;
   copy: string;
 };
@@ -48,7 +60,22 @@ export async function HomePageFeature() {
   const heroTrustPoints = t.raw("heroTrustPoints") as HeroTrustPoint[];
   const locationPills = t.raw("locationPills") as LocationPill[];
   const trustPoints = t.raw("trustPoints") as TrustPoint[];
-  const experiences = await getPublishedExperienceHighlights(3);
+  const experiences = await getPublishedExperienceCards(12);
+  const curatedTiles = await Promise.all(
+    curatedCategories.map(async (item) => {
+      const media = CURATED_MEDIA_BY_SLUG[item.slug];
+      const imageSrc = media
+        ? await resolvePublicImageSrc(media.imagePath, media.interimImageSrc)
+        : null;
+      return { ...item, imageSrc };
+    })
+  );
+  const experienceTiles = await Promise.all(
+    experiences.map(async (experience) => ({
+      ...experience,
+      imageSrc: await resolvePublicImageSrc(experience.heroImagePath)
+    }))
+  );
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -164,87 +191,94 @@ export async function HomePageFeature() {
             </a>
           </div>
 
-          {experiences.length > 0 ? (
-            <div className="experience-list">
-              {experiences.map((experience, index) => (
-                <article className="experience-card" key={experience.id}>
-                  <div
-                    className={`experience-card-media media-${(index % 3) + 1}`}
-                    aria-hidden
-                  >
-                    <span>{t("experienceBadge")}</span>
-                    <span className="favorite-button" aria-hidden>
-                      <Heart size={18} aria-hidden />
-                    </span>
-                  </div>
-                  <div className="experience-card-body">
-                    <div className="experience-card-heading">
-                    <h3>{experience.title}</h3>
-                      <span>
-                        <Star size={16} aria-hidden />
-                        {t("selectedHost")}
-                      </span>
-                    </div>
-                    <p>
-                      {experience.shortDescription ?? t("experienceFallback")}
-                    </p>
-                    <dl className="experience-meta">
-                      <div>
-                        <dt>{t("meta.duration")}</dt>
-                        <dd>
-                          <Clock3 size={16} aria-hidden />
-                          {t("meta.durationValue", {
-                            minutes: experience.durationMinutes
-                          })}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt>{t("meta.capacity")}</dt>
-                        <dd>
-                          <Users size={16} aria-hidden />
-                          {t("meta.capacityValue", {
-                            count: experience.baseCapacity
-                          })}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt>{t("meta.location")}</dt>
-                        <dd>
-                          <MapPin size={16} aria-hidden />
-                          {experience.locationName ??
-                            t("meta.locationPending")}
-                        </dd>
-                      </div>
-                    </dl>
-                    <a href="#cta" className="card-link">
-                      {t("viewDetails")}
-                      <ArrowRight size={16} aria-hidden />
-                    </a>
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <div className="curated-grid">
-              {curatedCategories.map((item) => (
-                <article key={item.number} className="curated-card">
-                  <div className="curated-card-media" aria-hidden>
-                    <span>{item.number}</span>
-                  </div>
-                  <div className="curated-card-body">
-                  <span>{item.number}</span>
-                    <h3>{item.title}</h3>
-                    <p>{item.copy}</p>
-                    <a href="#cta" className="card-link">
-                      {t("viewDetails")}
-                      <ArrowRight size={16} aria-hidden />
-                    </a>
-                  </div>
-                  <Compass aria-hidden />
-                </article>
-              ))}
-            </div>
-          )}
+          <div className="experience-grid">
+            {experienceTiles.length > 0
+              ? experienceTiles.map((experience) => {
+                  const duration = formatDurationHours(
+                    experience.durationMinutes
+                  );
+                  const metaItems = [
+                    {
+                      icon: "duration" as const,
+                      label:
+                        duration.labelKey === "hour"
+                          ? t("meta.durationHour", { hours: duration.hours })
+                          : t("meta.durationHours", { hours: duration.hours })
+                    },
+                    {
+                      icon: "capacity" as const,
+                      label: t("meta.capacityValue", {
+                        count: experience.baseCapacity
+                      })
+                    },
+                    ...experience.highlightFeatures.map((feature) => ({
+                      icon: "feature" as const,
+                      label: feature
+                    }))
+                  ];
+
+                  return (
+                    <ExperienceTile
+                      key={experience.id}
+                      experienceId={experience.id}
+                      title={experience.title}
+                      description={
+                        experience.shortDescription ?? t("experienceFallback")
+                      }
+                      href={`/experiences/${experience.slug}`}
+                      ctaLabel={t("viewDetails")}
+                      imageSrc={experience.imageSrc}
+                      imageAlt={
+                        experience.heroImageAlt?.trim() || experience.title
+                      }
+                      tone={experience.tone}
+                      categoryLabel={experience.categoryLabel}
+                      categoryIcon={categoryIconForExperienceType(
+                        experience.experienceType
+                      )}
+                      favoriteLabel={t("favoriteLabel")}
+                      fromLabel={t("fromPrice")}
+                      priceAmount={
+                        experience.fromPrice
+                          ? formatMinorUnitAmount(
+                              experience.fromPrice.amountMinor,
+                              experience.fromPrice.currency
+                            )
+                          : null
+                      }
+                      priceUnit={
+                        experience.fromPrice
+                          ? experience.fromPrice.pricingModel === "per_person"
+                            ? t("priceUnitPerPerson")
+                            : t("priceUnitPerGroup")
+                          : null
+                      }
+                      averageRating={experience.averageRating}
+                      reviewCount={experience.reviewCount}
+                      reviewCountLabel={
+                        experience.reviewCount > 0
+                          ? t("reviewCountLabel", {
+                              count: experience.reviewCount
+                            })
+                          : null
+                      }
+                      metaItems={metaItems}
+                    />
+                  );
+                })
+              : curatedTiles.map((item, index) => (
+                  <ExperienceTile
+                    key={item.slug}
+                    title={item.title}
+                    description={item.copy}
+                    href="#cta"
+                    ctaLabel={t("viewDetails")}
+                    imageSrc={item.imageSrc}
+                    imageAlt={item.title}
+                    tone={((index % 3) + 1) as 1 | 2 | 3}
+                  />
+                ))}
+          </div>
         </Container>
       </section>
 

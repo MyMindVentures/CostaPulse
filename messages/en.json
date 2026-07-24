@@ -85,10 +85,16 @@
     "favoriteLabel": "Save this experience",
     "selectedHost": "Selected host",
     "viewDetails": "View details",
+    "fromPrice": "From",
+    "priceUnitPerPerson": "per person",
+    "priceUnitPerGroup": "per experience",
+    "reviewCountLabel": "({count, plural, one {# review} other {# reviews}})",
     "experienceFallback": "Published experience details will appear here as inventory is added to CostaPulse.",
     "meta": {
       "duration": "Duration",
       "durationValue": "{minutes} minutes",
+      "durationHours": "{hours} hours",
+      "durationHour": "{hours} hour",
       "capacity": "Capacity",
       "capacityValue": "Up to {count} guests",
       "location": "Location",
@@ -97,16 +103,19 @@
     "curatedCategories": [
       {
         "number": "01",
+        "slug": "private-charters",
         "title": "Private charters",
         "copy": "Unhurried days at sea, shaped around you and your guests."
       },
       {
         "number": "02",
+        "slug": "coastal-adventures",
         "title": "Coastal adventures",
         "copy": "A different view of hidden coves, clear water and dramatic coastline."
       },
       {
         "number": "03",
+        "slug": "local-hospitality",
         "title": "Local hospitality",
         "copy": "Memorable tables, trusted hosts and the flavours of the Costa Blanca."
       }
