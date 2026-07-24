@@ -1,13 +1,15 @@
 import {
-  ArrowDownRight,
   ArrowRight,
   Clock3,
   Compass,
+  Heart,
+  MapPin,
+  Menu,
   ShieldCheck,
   Sparkles,
+  Star,
   Users
 } from "lucide-react";
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { BrandLink } from "@/components/shared/brand-link";
 import { SectionKicker } from "@/components/shared/section-kicker";
@@ -25,9 +27,26 @@ type TrustPoint = {
   description: string;
 };
 
+type HeroTrustPoint = {
+  title: string;
+  label: string;
+};
+
+type LocationPill = {
+  label: string;
+};
+
+type NavItem = {
+  label: string;
+  href: string;
+};
+
 export async function HomePageFeature() {
   const t = await getTranslations("HomePage");
+  const navItems = t.raw("nav") as NavItem[];
   const curatedCategories = t.raw("curatedCategories") as CuratedCategory[];
+  const heroTrustPoints = t.raw("heroTrustPoints") as HeroTrustPoint[];
+  const locationPills = t.raw("locationPills") as LocationPill[];
   const trustPoints = t.raw("trustPoints") as TrustPoint[];
   const experiences = await getPublishedExperienceHighlights(3);
   const structuredData = {
@@ -41,49 +60,83 @@ export async function HomePageFeature() {
   return (
     <main className="home-page">
       <section className="hero" id="top">
-        <Container>
+        <div className="hero-seascape" aria-hidden />
+        <Container className="hero-shell">
           <nav className="hero-nav" aria-label="Primary navigation">
             <BrandLink href="#top" />
-            <a href="#experiences" className="inline-link">
-              {t("browse")}
-              <ArrowDownRight size={16} aria-hidden />
-            </a>
-          </nav>
-        </Container>
-
-        <div className="hero-orb" aria-hidden />
-        <Container className="hero-grid">
-          <div className="hero-copy">
-            <p className="eyebrow">
-              <span />
-              {t("eyebrow")}
-            </p>
-            <h1>{t("title")}</h1>
-            <div className="hero-bottom">
-              <p>{t("description")}</p>
-              <a
-                href="#experiences"
-                className="circle-button"
-                aria-label={t("browse")}
-              >
-                <ArrowDownRight aria-hidden />
+            <div className="hero-nav-links">
+              {navItems.map((item) => (
+                <a href={item.href} key={item.href}>
+                  {item.label}
+                </a>
+              ))}
+            </div>
+            <div className="hero-nav-actions">
+              <a href="#experiences" className="button button-coral">
+                {t("bookCta")}
               </a>
+              <span className="menu-button" aria-hidden>
+                <Menu size={22} aria-hidden />
+              </span>
+            </div>
+          </nav>
+
+          <div className="hero-grid">
+            <div className="hero-copy">
+              <p className="eyebrow">
+                <span />
+                {t("eyebrow")}
+              </p>
+              <h1>{t("title")}</h1>
+              <p className="hero-description">{t("description")}</p>
+              <div className="hero-actions">
+                <a href="#experiences" className="button button-coral">
+                  {t("browse")}
+                  <ArrowRight size={18} aria-hidden />
+                </a>
+                <a href="#cta" className="button button-outline">
+                  {t("privateDayCta")}
+                  <ArrowRight size={18} aria-hidden />
+                </a>
+              </div>
+            </div>
+
+            <div className="hero-feature-panel" aria-hidden>
+              <div className="hero-card">
+                <span>{t("heroCardKicker")}</span>
+                <strong>{t("heroCardTitle")}</strong>
+              </div>
             </div>
           </div>
 
-          <div className="hero-art" aria-hidden>
-            <Image
-              src="/illustrations/hero-horizon.svg"
-              alt=""
-              width={480}
-              height={480}
-              priority
-            />
+          <div className="hero-trust-grid" aria-label={t("heroTrustLabel")}>
+            {heroTrustPoints.map((item, index) => (
+              <article key={item.title}>
+                {index === 0 ? (
+                  <ShieldCheck aria-hidden />
+                ) : index === 1 ? (
+                  <Users aria-hidden />
+                ) : index === 2 ? (
+                  <Sparkles aria-hidden />
+                ) : (
+                  <Compass aria-hidden />
+                )}
+                <strong>{item.title}</strong>
+                <span>{item.label}</span>
+              </article>
+            ))}
+          </div>
+
+          <div className="location-pill-bar" id="locations">
+            <MapPin size={16} aria-hidden />
+            {locationPills.map((item) => (
+              <span key={item.label}>{item.label}</span>
+            ))}
           </div>
         </Container>
       </section>
 
-      <section className="intro">
+      <section className="intro" id="intro">
         <Container className="intro-grid">
           <SectionKicker>{t("introKicker")}</SectionKicker>
           <div className="intro-copy">
@@ -101,43 +154,73 @@ export async function HomePageFeature() {
         <Container>
           <div className="section-heading">
             <SectionKicker light>{t("experiencesKicker")}</SectionKicker>
-            <h2 id="experiences-title">{t("experiencesTitle")}</h2>
+            <div>
+              <h2 id="experiences-title">{t("experiencesTitle")}</h2>
+              <p>{t("experiencesDescription")}</p>
+            </div>
+            <a href="#cta" className="button button-light">
+              {t("viewAllExperiences")}
+              <ArrowRight size={18} aria-hidden />
+            </a>
           </div>
 
           {experiences.length > 0 ? (
             <div className="experience-list">
-              {experiences.map((experience) => (
-                <article key={experience.id}>
-                  <div>
+              {experiences.map((experience, index) => (
+                <article className="experience-card" key={experience.id}>
+                  <div
+                    className={`experience-card-media media-${(index % 3) + 1}`}
+                    aria-hidden
+                  >
+                    <span>{t("experienceBadge")}</span>
+                    <span className="favorite-button" aria-hidden>
+                      <Heart size={18} aria-hidden />
+                    </span>
+                  </div>
+                  <div className="experience-card-body">
+                    <div className="experience-card-heading">
                     <h3>{experience.title}</h3>
+                      <span>
+                        <Star size={16} aria-hidden />
+                        {t("selectedHost")}
+                      </span>
+                    </div>
                     <p>
                       {experience.shortDescription ?? t("experienceFallback")}
                     </p>
+                    <dl className="experience-meta">
+                      <div>
+                        <dt>{t("meta.duration")}</dt>
+                        <dd>
+                          <Clock3 size={16} aria-hidden />
+                          {t("meta.durationValue", {
+                            minutes: experience.durationMinutes
+                          })}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>{t("meta.capacity")}</dt>
+                        <dd>
+                          <Users size={16} aria-hidden />
+                          {t("meta.capacityValue", {
+                            count: experience.baseCapacity
+                          })}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>{t("meta.location")}</dt>
+                        <dd>
+                          <MapPin size={16} aria-hidden />
+                          {experience.locationName ??
+                            t("meta.locationPending")}
+                        </dd>
+                      </div>
+                    </dl>
+                    <a href="#cta" className="card-link">
+                      {t("viewDetails")}
+                      <ArrowRight size={16} aria-hidden />
+                    </a>
                   </div>
-                  <dl className="experience-meta">
-                    <div>
-                      <dt>{t("meta.duration")}</dt>
-                      <dd>
-                        {t("meta.durationValue", {
-                          minutes: experience.durationMinutes
-                        })}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>{t("meta.capacity")}</dt>
-                      <dd>
-                        {t("meta.capacityValue", {
-                          count: experience.baseCapacity
-                        })}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>{t("meta.location")}</dt>
-                      <dd>
-                        {experience.locationName ?? t("meta.locationPending")}
-                      </dd>
-                    </div>
-                  </dl>
                 </article>
               ))}
             </div>
@@ -145,10 +228,17 @@ export async function HomePageFeature() {
             <div className="curated-grid">
               {curatedCategories.map((item) => (
                 <article key={item.number} className="curated-card">
+                  <div className="curated-card-media" aria-hidden>
+                    <span>{item.number}</span>
+                  </div>
+                  <div className="curated-card-body">
                   <span>{item.number}</span>
-                  <div>
                     <h3>{item.title}</h3>
                     <p>{item.copy}</p>
+                    <a href="#cta" className="card-link">
+                      {t("viewDetails")}
+                      <ArrowRight size={16} aria-hidden />
+                    </a>
                   </div>
                   <Compass aria-hidden />
                 </article>
@@ -158,7 +248,7 @@ export async function HomePageFeature() {
         </Container>
       </section>
 
-      <section className="trust">
+      <section className="trust" id="trust">
         <Container className="trust-grid">
           {trustPoints.map((item, index) => (
             <article key={item.title}>
@@ -200,7 +290,7 @@ export async function HomePageFeature() {
         </Container>
       </section>
 
-      <section className="cta">
+      <section className="cta" id="cta">
         <Container>
           <SectionKicker>{t("ctaKicker")}</SectionKicker>
           <h2>{t("ctaTitle")}</h2>

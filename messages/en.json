@@ -1,14 +1,90 @@
 {
   "HomePage": {
-    "title": "Feel the best of the Costa Blanca.",
-    "description": "Book carefully selected yacht charters, watersports, local adventures and premium services through one trusted platform.",
+    "title": "Your Costa Blanca. From the water.",
+    "description": "Private yacht trips, paddle adventures, sunset BBQs and personally hosted Mediterranean experiences.",
     "browse": "Browse experiences",
+    "bookCta": "Book your experience",
+    "privateDayCta": "Plan a private day",
+    "menuLabel": "Open navigation menu",
     "eyebrow": "Costa Blanca · Spain",
+    "heroCardKicker": "Sunset-ready",
+    "heroCardTitle": "Hosted days at sea with local Costa Blanca crews.",
+    "heroTrustLabel": "CostaPulse trust signals",
+    "nav": [
+      {
+        "label": "Experiences",
+        "href": "#experiences"
+      },
+      {
+        "label": "About",
+        "href": "#intro"
+      },
+      {
+        "label": "Locations",
+        "href": "#locations"
+      },
+      {
+        "label": "For Groups",
+        "href": "#cta"
+      },
+      {
+        "label": "Why CostaPulse",
+        "href": "#trust"
+      },
+      {
+        "label": "Contact",
+        "href": "mailto:hello@costapulse.club"
+      }
+    ],
+    "heroTrustPoints": [
+      {
+        "title": "Licensed",
+        "label": "Skipper-led"
+      },
+      {
+        "title": "Local host",
+        "label": "Personal service"
+      },
+      {
+        "title": "Safe & reliable",
+        "label": "Always"
+      },
+      {
+        "title": "Costa Blanca",
+        "label": "Experiences"
+      }
+    ],
+    "locationPills": [
+      {
+        "label": "Santa Pola"
+      },
+      {
+        "label": "Alicante"
+      },
+      {
+        "label": "Villajoyosa"
+      },
+      {
+        "label": "Altea"
+      },
+      {
+        "label": "Calpe"
+      },
+      {
+        "label": "And more"
+      }
+    ],
     "introKicker": "The CostaPulse edit",
     "introTitle": "Mediterranean days, beautifully considered.",
     "introDescription": "We bring together remarkable local people and places, so every experience feels effortless, personal and unmistakably Costa Blanca.",
-    "experiencesKicker": "A first glimpse",
-    "experiencesTitle": "Ways to feel more alive.",
+    "experiencesKicker": "Our experiences",
+    "experiencesTitle": "Handpicked days on and around the Costa Blanca.",
+    "experiencesDescription": "Choose from yacht experiences, paddle adventures and sunset hospitality with trusted local hosts.",
+    "viewAllExperiences": "View all experiences",
+    "experienceBadge": "CostaPulse pick",
+    "favoriteLabel": "Save this experience",
+    "selectedHost": "Selected host",
+    "viewDetails": "View details",
     "experienceFallback": "Published experience details will appear here as inventory is added to CostaPulse.",
     "meta": {
       "duration": "Duration",
