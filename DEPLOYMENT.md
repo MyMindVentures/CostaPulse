@@ -13,8 +13,8 @@ Use these Railway service settings:
 - Root directory: `/`
 - Config file path: `/railway.json`
 - Builder: Railpack
-- Build command: `npm run build`
-- Start command: `npm run start`
+- Build command: empty; let Railpack detect `npm run build`
+- Start command: empty; let Railpack detect the `start` script in `package.json`
 - Health-check path: `/api/health`
 - Health-check timeout: `300`
 - Restart policy: on failure, maximum 5 retries
@@ -28,8 +28,8 @@ Do not set a Dockerfile builder or Dockerfile path in the Railway dashboard.
 1. Merge a reviewed pull request into `main`.
 2. Railway detects the GitHub change.
 3. Railpack detects Node.js and installs dependencies with npm.
-4. Railway runs `npm run build`.
-5. Railway starts the application with `npm run start`.
+4. Railpack detects the Node build script and runs the Next.js build.
+5. Railpack detects the `start` script in `package.json`.
 6. Next.js runs the standalone server and listens on Railway's injected `PORT`.
 7. Railway waits for `GET /api/health` to return HTTP 200 before switching traffic.
 8. Verify `/`, `/admin`, `/api/health`, `/sitemap.xml`, and `/robots.txt`.
@@ -55,7 +55,7 @@ PORT=3000 npm run start
 curl --fail http://localhost:3000/api/health
 ```
 
-The project currently has no committed npm lockfile, so Railpack cannot use `npm ci`. Add and commit `package-lock.json` from a trusted development environment; after that, use `npm ci` consistently.
+The repository now includes a committed `package-lock.json`, so use `npm ci` consistently where reproducible installs are required.
 
 ## Security gate
 

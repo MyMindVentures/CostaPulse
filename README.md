@@ -23,11 +23,11 @@ npm run dev
 
 The landing page and health endpoint work without integration credentials. Add only the values needed for integrations being developed. Run the complete local gate with `npm run check`.
 
-The repository currently has no committed npm lockfile. Generate and commit `package-lock.json` from a trusted development environment, then use `npm ci` for reproducible installs.
+The repository includes a committed `package-lock.json`, so use `npm ci` where reproducible installs are required.
 
 ## Production
 
-CostaPulse is hosted exclusively on **Railway** using **Railpack**, not Docker. Railway reads `railway.json`, runs `npm run build`, starts the standalone Next.js server with `npm run start`, injects `PORT`, checks `/api/health`, and terminates public TLS.
+CostaPulse is hosted exclusively on **Railway** using **Railpack**, not Docker. Railway reads `railway.json`, uses Railpack's Node detection with the `package.json` scripts, injects `PORT`, checks `/api/health`, and terminates public TLS.
 
 The repository default branch and Railway production deployment branch are both `main`.
 

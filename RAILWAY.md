@@ -4,7 +4,7 @@ Railway is the production host for CostaPulse. Production deployments track the 
 
 ## Repository contract
 
-Railway reads `railway.json` from the repository root. The committed configuration explicitly selects `RAILPACK`, runs `npm run build`, starts with `npm run start`, checks `/api/health`, and applies bounded restart and deployment teardown settings.
+Railway reads `railway.json` from the repository root. The committed configuration explicitly selects `RAILPACK`, keeps health and restart policy in config-as-code, and relies on Railpack's Node detection plus the `package.json` scripts for build and start behavior.
 
 Because Railway automatically uses a root `Dockerfile` when one exists, this repository must not contain a deployment Dockerfile.
 
@@ -18,8 +18,8 @@ Configure the CostaPulse service as follows:
 - Config file path: `/railway.json`
 - Builder: Railpack
 - Dockerfile path: empty
-- Build command: allow `railway.json` to provide `npm run build`
-- Start command: allow `railway.json` to provide `npm run start`
+- Build command: empty; let Railpack detect `npm run build`
+- Start command: empty; let Railpack detect the `start` script from `package.json`
 - Health-check path: `/api/health`
 - Serverless mode: disabled for the persistent Next.js web service
 
@@ -27,7 +27,7 @@ If the dashboard contains old Docker builder, Dockerfile path, build-command, or
 
 ## Runtime
 
-Next.js produces standalone output. `npm run start` launches `.next/standalone/server.js`. Railway injects `PORT`; do not define it manually. The standalone server reads Railway's `PORT` and defaults its hostname appropriately for the platform.
+Next.js produces standalone output. The `start` script in `package.json` launches `.next/standalone/server.js`, and Railpack uses that script automatically. Railway injects `PORT`; do not define it manually. The standalone server reads Railway's `PORT` and defaults its hostname appropriately for the platform.
 
 The service is stateless. Do not store uploads or operational data on the application filesystem. Use Supabase Database and Supabase Storage.
 
