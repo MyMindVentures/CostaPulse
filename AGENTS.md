@@ -40,7 +40,7 @@ Until the repository establishes a different stack, prefer:
 - Tailwind CSS
 - Supabase for PostgreSQL, authentication, storage, and server-side data access
 - Stripe for payments, refunds, and webhook-driven payment state
-- Vercel for deployment
+- Railway for production hosting and deployment
 - Zod for runtime validation
 - React Hook Form for complex forms
 - Playwright for critical end-to-end flows
@@ -48,7 +48,46 @@ Until the repository establishes a different stack, prefer:
 
 Do not introduce a major framework, state-management library, UI kit, ORM, or infrastructure dependency without a clear need and a documented trade-off.
 
-## 4. Repository structure
+## 4. Railway hosting and deployment
+
+CostaPulse is hosted on **Railway**. Railway is the production deployment target and all infrastructure, build, runtime, logging, health-check, and environment-variable decisions must be compatible with Railway.
+
+### Deployment rules
+
+- Treat the application as a long-running Node.js service or container deployed on Railway.
+- Ensure the production build and start commands work without Vercel-specific tooling.
+- The application must listen on the `PORT` environment variable provided by Railway and bind to `0.0.0.0` when required by the runtime.
+- Keep the runtime stateless. Do not rely on the local filesystem for persistent uploads, sessions, generated assets, or operational data.
+- Store persistent application data in Supabase or another explicitly approved managed service.
+- Store uploaded media in Supabase Storage or another explicitly approved object-storage service, not on Railway's ephemeral application filesystem.
+- Use Railway-managed environment variables for production secrets and configuration.
+- Emit logs to standard output and standard error so Railway can collect them.
+- Add a lightweight health endpoint such as `/api/health` when the app requires deployment health checks.
+- Health checks must not expose secrets or detailed internal diagnostics.
+- Support graceful shutdown where background work, open connections, or in-flight requests require it.
+- Keep deploys reproducible from the repository and lockfile.
+- Prefer Railway's native build system unless a Dockerfile is necessary for deterministic builds or system dependencies.
+- When a Dockerfile is used, keep it production-focused, minimal, non-root where practical, and compatible with Railway's injected `PORT`.
+- Database migrations must run through an explicit, controlled deployment step. Do not make every web process race to execute migrations on startup.
+- Stripe webhook routes must use the public Railway production domain or the configured CostaPulse custom domain.
+- Configure trusted application URLs through environment variables; never hard-code a temporary Railway deployment URL into business logic.
+
+### Platform restrictions
+
+Do not add or depend on Vercel-specific services or assumptions unless the owner explicitly requests them. This includes:
+
+- Vercel KV
+- Vercel Postgres
+- Vercel Blob
+- Edge Config
+- Vercel Cron
+- Vercel Analytics as a required operational dependency
+- Vercel-specific middleware, routing, deployment APIs, or environment assumptions
+- A `vercel.json` file without an explicit requirement
+
+Keep application code platform-agnostic where practical, while treating Railway compatibility as mandatory.
+
+## 5. Repository structure
 
 Prefer a feature-oriented structure that keeps domain logic out of presentation components.
 
@@ -90,7 +129,7 @@ Rules:
 - Co-locate feature-specific tests and types where practical.
 - Add a short local `AGENTS.md` only when a subdirectory genuinely needs different rules.
 
-## 5. Core domain model
+## 6. Core domain model
 
 Use clear domain terminology consistently.
 
@@ -155,7 +194,7 @@ Voucher records should include:
 
 Voucher issuance and redemption must be idempotent and auditable.
 
-## 6. Booking and payment invariants
+## 7. Booking and payment invariants
 
 These rules are non-negotiable:
 
@@ -173,7 +212,7 @@ These rules are non-negotiable:
 - Define cancellation deadlines using exact date-time rules, not vague day calculations.
 - Do not expose Stripe secret keys, Supabase service-role keys, webhook secrets, or other privileged credentials to the client.
 
-## 7. Partner QR referral flow
+## 8. Partner QR referral flow
 
 The QR partner system is a core CostaPulse growth loop.
 
@@ -199,7 +238,7 @@ Requirements:
 - Provide partner-facing reporting from trusted server-side data.
 - Avoid exposing customer personal data to partners unless operationally necessary and legally justified.
 
-## 8. UX and visual system
+## 9. UX and visual system
 
 CostaPulse should feel like a premium Mediterranean experience brand.
 
@@ -242,7 +281,7 @@ Validate at minimum:
 
 There must be no horizontal scrolling in normal page content.
 
-## 9. Accessibility
+## 10. Accessibility
 
 Target WCAG 2.2 AA.
 
@@ -260,7 +299,7 @@ Required practices:
 - Announce asynchronous booking and payment errors accessibly.
 - Ensure dialogs, date pickers, menus, and carousels have correct focus behavior.
 
-## 10. Internationalization and localization
+## 11. Internationalization and localization
 
 Design for multilingual support from the beginning, even when the first release uses one language.
 
@@ -275,7 +314,7 @@ Rules:
 - Keep route strategy and SEO metadata compatible with localized pages.
 - Store canonical content independently from translated content where appropriate.
 
-## 11. SEO and discoverability
+## 12. SEO and discoverability
 
 For public pages:
 
@@ -289,7 +328,7 @@ For public pages:
 - Use descriptive URLs and heading structure.
 - Include sitemap and robots configuration.
 
-## 12. Data, validation, and API design
+## 13. Data, validation, and API design
 
 - Validate every external input at the server boundary.
 - Prefer explicit schemas over loose objects.
@@ -302,7 +341,7 @@ For public pages:
 - Use row-level security where Supabase data can be reached through user sessions.
 - Keep privileged operations on trusted server code only.
 
-## 13. Authentication and authorization
+## 14. Authentication and authorization
 
 Customer checkout should not require an account unless there is a strong product reason.
 
@@ -315,7 +354,7 @@ For protected areas:
 - Require strong controls for refunds, voucher redemption, partner reporting, availability changes, and content publishing.
 - Log sensitive operational actions with actor, time, target, and outcome.
 
-## 14. Privacy and legal readiness
+## 15. Privacy and legal readiness
 
 Build for GDPR-conscious operation.
 
@@ -330,7 +369,7 @@ Build for GDPR-conscious operation.
 
 Agents must not invent legal guarantees. Flag legal, insurance, licensing, tax, maritime, tourism, or consumer-protection assumptions for owner review.
 
-## 15. Performance standards
+## 16. Performance standards
 
 - Prefer server components for content-heavy pages.
 - Use client components only when interactivity requires them.
@@ -341,8 +380,10 @@ Agents must not invent legal guarantees. Flag legal, insurance, licensing, tax, 
 - Keep third-party scripts minimal.
 - Cache public content intentionally, but never cache user-specific or booking-sensitive responses incorrectly.
 - Revalidate availability and pricing at the point of commitment.
+- Avoid runtime features that require a Vercel Edge environment.
+- Validate production behavior in Railway's Node.js runtime.
 
-## 16. Observability
+## 17. Observability
 
 Production-critical flows need structured observability.
 
@@ -372,7 +413,9 @@ Track business events such as:
 
 Analytics must not become the source of truth for operational records.
 
-## 17. Testing requirements
+Logs must remain useful in Railway's log stream and should use structured JSON where it materially improves filtering and incident diagnosis.
+
+## 18. Testing requirements
 
 Every meaningful change should include the smallest effective test coverage.
 
@@ -416,7 +459,15 @@ Also test payment failure, expired availability, duplicate webhook delivery, can
 
 Do not remove, skip, or weaken tests merely to make CI pass.
 
-## 18. Code quality conventions
+For deployment-related changes, also verify:
+
+- The production build completes.
+- The production start command launches successfully.
+- The service listens on Railway's injected `PORT`.
+- The health endpoint returns a safe successful response.
+- Required environment variables fail fast with clear server-side diagnostics.
+
+## 19. Code quality conventions
 
 - Use TypeScript strict mode.
 - Avoid `any`; justify rare exceptions locally.
@@ -437,22 +488,27 @@ npm run typecheck
 npm run test
 npm run test:e2e
 npm run build
+npm run start
 ```
 
 Use the package manager already established by the lockfile. Do not create multiple lockfiles.
 
-## 19. Environment variables
+## 20. Environment variables
 
 - Commit a safe `.env.example` with names and comments only.
 - Never commit live credentials or personal tokens.
 - Validate required variables at startup.
 - Clearly separate public variables from server-only variables.
 - Use development and test credentials locally.
-- Prefer provider-supported secret storage in deployment environments.
+- Use Railway-managed environment variables for production configuration and secrets.
+- Never assume local `.env` files exist in production.
+- Do not expose Railway-provided internal variables to the browser unless explicitly safe and necessary.
 
 Potential categories:
 
 ```text
+PORT
+NODE_ENV
 NEXT_PUBLIC_APP_URL
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -462,9 +518,9 @@ STRIPE_WEBHOOK_SECRET
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 ```
 
-These are examples, not permission to add unused configuration.
+These are examples, not permission to add unused configuration. Railway normally injects `PORT`; application code must consume it rather than assigning a fixed production port.
 
-## 20. Git and pull request workflow
+## 21. Git and pull request workflow
 
 Unless instructed otherwise:
 
@@ -484,15 +540,16 @@ Pull requests should explain:
 - Screenshots or recordings for visible UI changes
 - Testing performed
 - Database or environment changes
+- Railway deployment implications
 - Risks, assumptions, and follow-up work
 
-## 21. Agent execution protocol
+## 22. Agent execution protocol
 
 Before coding:
 
 1. Read this file and any nearer `AGENTS.md`.
 2. Inspect the repository, package scripts, existing patterns, and current branch.
-3. Understand the requested outcome and identify revenue, security, data, and UX risks.
+3. Understand the requested outcome and identify revenue, security, data, deployment, and UX risks.
 4. Prefer the smallest coherent implementation that fully solves the request.
 
 While coding:
@@ -503,18 +560,20 @@ While coding:
 4. Never invent API behavior, environment values, legal terms, pricing, operational capacity, or availability rules.
 5. Add or update tests alongside behavior.
 6. Maintain accessibility and responsive behavior.
-7. Do not make unrelated changes.
+7. Preserve Railway compatibility and avoid Vercel-specific assumptions.
+8. Do not make unrelated changes.
 
 Before finishing:
 
 1. Review the diff.
-2. Run relevant linting, type checks, tests, and builds.
+2. Run relevant linting, type checks, tests, production build, and production start checks.
 3. Check mobile and desktop behavior for UI work.
 4. Check empty, loading, error, success, unavailable, and unauthorized states.
 5. Confirm no secrets or sensitive data entered the diff.
-6. Summarize changed files, validation performed, assumptions, and remaining risks.
+6. Confirm Railway runtime, `PORT`, environment-variable, logging, and health-check compatibility for deployment-related work.
+7. Summarize changed files, validation performed, assumptions, and remaining risks.
 
-## 22. Definition of done
+## 23. Definition of done
 
 A task is done only when:
 
@@ -524,12 +583,13 @@ A task is done only when:
 - Errors are handled clearly.
 - Accessibility and responsive behavior are preserved.
 - Relevant tests pass.
-- Linting, type checking, and production build pass where configured.
+- Linting, type checking, production build, and production start pass where configured.
+- Railway deployment compatibility is preserved.
 - Security, privacy, localization, and SEO implications were considered.
 - Documentation and `.env.example` are updated when needed.
-- No unrelated code, secrets, debug output, or dead code remains.
+- No unrelated code, secrets, debug output, dead code, or Vercel-specific deployment assumptions remain.
 
-## 23. Owner decisions that agents must not guess
+## 24. Owner decisions that agents must not guess
 
 Stop and surface the assumption when implementation depends on unresolved decisions such as:
 
@@ -543,6 +603,7 @@ Stop and surface the assumption when implementation depends on unresolved decisi
 - Supported service areas and pickup locations
 - Weather cancellation policy
 - Brand assets and final written tone
+- Railway service topology, regions, custom domains, scaling, persistent volumes, cron jobs, and deployment strategy unless already configured in the repository
 
 When progress is still possible, isolate the uncertain policy behind configuration or a clearly marked interface rather than hard-coding an assumption.
 
