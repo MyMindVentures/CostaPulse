@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build && node scripts/prepare-standalone.cjs",
     "start": "node start-standalone.cjs",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
