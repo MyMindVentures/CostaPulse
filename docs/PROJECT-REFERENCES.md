@@ -11,7 +11,6 @@ Use this file as the first reference point when configuring local development, C
 - **Repository:** `MyMindVentures/CostaPulse`
 - **Clone URL:** `https://github.com/MyMindVentures/CostaPulse.git`
 - **Default branch:** `main`
-- **Current initialization branch:** `feat/initialize-premium-stack`
 
 Recommended clone command:
 
