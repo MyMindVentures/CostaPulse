@@ -80,6 +80,24 @@ Every frontend implementation must:
 - Work correctly for zero, one or many records and missing optional media or metadata.
 - Produce no console errors, TypeScript errors, broken routes or dead interactions.
 
+## Responsive by default
+
+Every frontend implementation must be fully responsive and production-ready across smartphone, tablet, laptop, desktop and large desktop viewports.
+
+Mandatory responsive requirements:
+
+- Build mobile-first.
+- Support portrait and landscape orientations where relevant.
+- Prevent horizontal scrolling, overflow, clipped content, broken layouts and unreadable text.
+- Use responsive typography, spacing, grids, containers, media and component composition.
+- Keep navigation, menus, forms, dialogs, drawers, calendars, maps, tables, galleries and booking flows fully usable at every breakpoint.
+- Use touch-friendly controls with a minimum target size of 44 × 44 CSS pixels where applicable.
+- Preserve keyboard navigation, focus states, screen-reader behavior and reduced-motion support at every breakpoint.
+- Do not hide essential functionality on smaller screens without providing an equivalent accessible interaction.
+- Do not treat desktop resizing as sufficient validation; verify actual mobile, tablet and laptop layouts.
+
+A frontend feature is incomplete until it has been verified and corrected on representative smartphone, tablet, laptop and desktop viewport sizes.
+
 ## Design system
 
 All frontend code must use the CostaPulse design system, tokens and reusable primitives.
@@ -150,7 +168,10 @@ Test representative conditions, including:
 - loading, empty and error states
 - invalid input and denied authorization
 - keyboard and screen-reader interaction
-- mobile, tablet and desktop layouts
+- smartphone, tablet, laptop, desktop and large desktop layouts
+- portrait and landscape orientations where relevant
+- no horizontal overflow or clipped content
+- touch interactions and minimum target sizes
 - real navigation and route state
 - real form submission and server response
 
@@ -179,6 +200,8 @@ A frontend task is complete only when:
 - The requested user flow works end-to-end.
 - Loading, empty, error, validation, success and authorization states work.
 - The UI follows the CostaPulse design system and works responsively and accessibly.
+- The implementation was verified on representative smartphone, tablet, laptop and desktop viewports.
+- There is no horizontal overflow, clipped content, broken layout or unusable interaction at any supported viewport.
 - Repeated UI and domain states use shared components instead of copied implementations.
 - Presentational components contain no direct database calls or duplicated business logic.
 - Relevant automated tests, type checks and build checks pass.
@@ -192,6 +215,7 @@ The coding agent's final report must state:
 2. Which existing repository components, types, hooks, queries and utilities were reused.
 3. Which frontend files were created or changed.
 4. Which real end-to-end flows were verified.
-5. Which commands and tests were run and their results.
-6. Anything that could not be verified.
-7. Any missing backend capability that blocked implementation, without inventing a workaround.
+5. Which smartphone, tablet, laptop and desktop viewport sizes were tested and what responsive issues were fixed.
+6. Which commands and tests were run and their results.
+7. Anything that could not be verified.
+8. Any missing backend capability that blocked implementation, without inventing a workaround.
