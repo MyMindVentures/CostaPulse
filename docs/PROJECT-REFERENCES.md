@@ -47,10 +47,9 @@ Dockerfile
 The service must define these public environment variables:
 
 ```text
-NEXT_PUBLIC_APP_URL=https://www.costapulse.club
 NEXT_PUBLIC_SITE_URL=https://www.costapulse.club
 NEXT_PUBLIC_SUPABASE_URL=https://fbxhevctqrkulmaehrcw.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<SUPABASE_ANON_KEY>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUPABASE_ANON_KEY>
 ```
 
 The remaining server-side secrets must also be added in Railway Variables when their integrations are enabled.
@@ -89,7 +88,7 @@ Add the following values to the local `.env.local` file:
 
 ```text
 NEXT_PUBLIC_SUPABASE_URL=https://fbxhevctqrkulmaehrcw.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<SUPABASE_ANON_KEY>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUPABASE_ANON_KEY>
 SUPABASE_SERVICE_ROLE_KEY=<SUPABASE_SERVICE_ROLE_KEY>
 ```
 
@@ -137,7 +136,6 @@ The current environment template includes references for:
 - Resend
 - Sentry
 - PostHog
-- Mapbox
 
 ## Application Stack References
 
