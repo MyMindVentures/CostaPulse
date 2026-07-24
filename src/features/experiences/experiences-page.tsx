@@ -3,16 +3,20 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { BrandLink } from "@/components/shared/brand-link";
 import { Container } from "@/components/ui/container";
 import { getPublishedExperienceCards } from "@/server/repositories/catalog";
+import { getSiteLogoAsset } from "@/server/repositories/media-assets";
 import { ExperienceCard } from "./components/experience-card";
 
 export async function ExperiencesPageFeature() {
-  const experiences = await getPublishedExperienceCards();
+  const [experiences, siteLogo] = await Promise.all([
+    getPublishedExperienceCards(),
+    getSiteLogoAsset()
+  ]);
 
   return (
     <main className="catalog-page">
       <header className="catalog-header">
         <Container className="catalog-nav">
-          <BrandLink href="/" />
+          <BrandLink href="/" logoSrc={siteLogo.url} logoAlt={siteLogo.alt} />
           <Link href="/" className="button button-outline">
             <ArrowLeft size={18} aria-hidden />
             Back home

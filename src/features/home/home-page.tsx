@@ -13,6 +13,7 @@ import { BrandLink } from "@/components/shared/brand-link";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Container } from "@/components/ui/container";
 import { getPublishedExperienceCards } from "@/server/repositories/catalog";
+import { getSiteLogoAsset } from "@/server/repositories/media-assets";
 import { ExperienceSection } from "./experience-section";
 
 type CuratedCategory = {
@@ -48,6 +49,7 @@ export async function HomePageFeature() {
   const locationPills = t.raw("locationPills") as LocationPill[];
   const trustPoints = t.raw("trustPoints") as TrustPoint[];
   const experiences = await getPublishedExperienceCards(3);
+  const siteLogo = await getSiteLogoAsset();
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -62,7 +64,7 @@ export async function HomePageFeature() {
         <div className="hero-seascape" aria-hidden />
         <Container className="hero-shell">
           <nav className="hero-nav" aria-label="Primary navigation">
-            <BrandLink href="#top" />
+            <BrandLink href="#top" logoSrc={siteLogo.url} logoAlt={siteLogo.alt} />
             <div className="hero-nav-links">
               {navItems.map((item) => (
                 <a href={item.href} key={item.href}>
@@ -207,7 +209,7 @@ export async function HomePageFeature() {
 
       <footer className="footer">
         <Container className="footer-grid">
-          <BrandLink href="#top" />
+          <BrandLink href="#top" logoSrc={siteLogo.url} logoAlt={siteLogo.alt} />
           <p>{t("footerTagline")}</p>
           <p>{t("footerCopyright", { year: new Date().getFullYear() })}</p>
         </Container>

@@ -1,24 +1,42 @@
 export const EXPERIENCE_MEDIA_BUCKET = "experience-media";
+export const BRAND_ASSETS_BUCKET = "brand-assets";
+export const SITE_LOGO_FALLBACK_SRC = "/brand/costapulse-mark.svg";
 
 /**
- * Builds a public Supabase Storage URL from an object path.
+ * Builds a public Supabase Storage URL from a bucket id and object path.
+ */
+export function getPublicStorageUrl(
+  bucket: string | null | undefined,
+  path: string | null | undefined,
+  supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+): string | null {
+  if (!bucket || !path || !supabaseUrl) {
+    return null;
+  }
+
+  const normalizedBucket = bucket.replace(/^\/+|\/+$/g, "");
+  const normalizedPath = path.replace(/^\/+/, "");
+  if (!normalizedBucket || !normalizedPath) {
+    return null;
+  }
+
+  const base = supabaseUrl.replace(/\/+$/, "");
+  const encodedPath = normalizedPath
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+  return `${base}/storage/v1/object/public/${encodeURIComponent(normalizedBucket)}/${encodedPath}`;
+}
+
+/**
+ * Builds a public Supabase Storage URL from an object path in the experience-media bucket.
  * Paths are stored on experiences.hero_image_path (not full URLs).
  */
 export function getExperienceMediaUrl(
   path: string | null | undefined,
   supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 ): string | null {
-  if (!path || !supabaseUrl) {
-    return null;
-  }
-
-  const normalizedPath = path.replace(/^\/+/, "");
-  if (!normalizedPath) {
-    return null;
-  }
-
-  const base = supabaseUrl.replace(/\/+$/, "");
-  return `${base}/storage/v1/object/public/${EXPERIENCE_MEDIA_BUCKET}/${normalizedPath}`;
+  return getPublicStorageUrl(EXPERIENCE_MEDIA_BUCKET, path, supabaseUrl);
 }
 
 export function getExperienceHeroImageSrc(
@@ -59,4 +77,53 @@ export async function resolvePublicImageSrc(
   }
 
   return fallbackSrc ?? null;
+}
+
+export type MediaAssetRef = {
+  bucketId: string;
+  storagePath: string;
+};
+
+/**
+ * Prefer a linked media_assets row; fall back to experience-media path.
+ */
+export function resolveExperienceMediaUrl(
+  storagePath: string | null | undefined,
+  mediaAsset?: MediaAssetRef | null,
+  supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+): string | null {
+  if (mediaAsset?.bucketId && mediaAsset.storagePath) {
+    return getPublicStorageUrl(mediaAsset.bucketId, mediaAsset.storagePath, supabaseUrl);
+  }
+  return getExperienceMediaUrl(storagePath, supabaseUrl);
+}
+
+export type SiteLogoCandidate = {
+  bucketId: string;
+  storagePath: string;
+};
+
+/**
+ * Picks the site logo asset from catalogued brand-assets under logos/.
+ * Prefers an exact CostaPulse Logo.png match when present.
+ */
+export function selectSiteLogoAsset(
+  assets: SiteLogoCandidate[]
+): SiteLogoCandidate | null {
+  const logos = assets.filter(
+    (asset) =>
+      asset.bucketId === BRAND_ASSETS_BUCKET &&
+      asset.storagePath.startsWith("logos/") &&
+      !asset.storagePath.endsWith(".keep") &&
+      asset.storagePath !== "logos/.keep"
+  );
+
+  if (logos.length === 0) {
+    return null;
+  }
+
+  const preferred = logos.find(
+    (asset) => asset.storagePath.toLowerCase() === "logos/costapulse logo.png"
+  );
+  return preferred ?? logos.sort((a, b) => a.storagePath.localeCompare(b.storagePath))[0] ?? null;
 }

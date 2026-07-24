@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
       "https://*.posthog.com",
       "https://*.sentry.io"
     ];
-    const contentSecurityPolicy = `default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data: https://images.unsplash.com https://*.supabase.co; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src ${scriptSources.join(" ")}; connect-src ${connectSources.join(" ")}; upgrade-insecure-requests`;
+    const contentSecurityPolicy = `default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data: blob: https://*.supabase.co; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src ${scriptSources.join(" ")}; connect-src ${connectSources.join(" ")}; upgrade-insecure-requests`;
 
     return [
       {
@@ -42,7 +42,6 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "fbxhevctqrkulmaehrcw.supabase.co" },
       { protocol: "https", hostname: "*.supabase.co" }
     ]

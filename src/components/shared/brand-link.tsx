@@ -1,11 +1,21 @@
 import Image from "next/image";
+import { SITE_LOGO_FALLBACK_SRC } from "@/lib/media/experience-media";
 
 type BrandLinkProps = {
   href?: string;
   className?: string;
+  logoSrc?: string | null;
+  logoAlt?: string;
 };
 
-export function BrandLink({ href = "/", className }: BrandLinkProps) {
+export function BrandLink({
+  href = "/",
+  className,
+  logoSrc,
+  logoAlt = "CostaPulse"
+}: BrandLinkProps) {
+  const src = logoSrc?.trim() || SITE_LOGO_FALLBACK_SRC;
+
   return (
     <a
       href={href}
@@ -13,19 +23,13 @@ export function BrandLink({ href = "/", className }: BrandLinkProps) {
       aria-label="CostaPulse home"
     >
       <Image
-        src="/brand/costapulse-mark.svg"
-        alt=""
-        width={48}
-        height={48}
+        src={src}
+        alt={logoAlt}
+        width={280}
+        height={72}
         priority
-        className="brand-mark"
+        className="brand-logo"
       />
-      <span className="brand-copy">
-        <span className="brand-name">
-          Costa<span>Pulse</span>
-        </span>
-        <span className="brand-tagline">Experiences on the Costa Blanca</span>
-      </span>
     </a>
   );
 }

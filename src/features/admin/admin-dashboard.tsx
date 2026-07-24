@@ -3,6 +3,7 @@ import { BrandLink } from "@/components/shared/brand-link";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { requireAdminAccess } from "@/server/auth/admin";
 import { getAdminDashboardSnapshot } from "@/server/repositories/admin-dashboard";
+import { getSiteLogoAsset } from "@/server/repositories/media-assets";
 
 const cardIcons = {
   bookings: CalendarDays,
@@ -12,7 +13,10 @@ const cardIcons = {
 
 export async function AdminDashboardFeature() {
   const adminContext = await requireAdminAccess();
-  const snapshot = await getAdminDashboardSnapshot();
+  const [snapshot, siteLogo] = await Promise.all([
+    getAdminDashboardSnapshot(),
+    getSiteLogoAsset()
+  ]);
 
   const cards = [
     {
@@ -44,7 +48,7 @@ export async function AdminDashboardFeature() {
   return (
     <main className="admin-shell">
       <aside className="admin-sidebar">
-        <BrandLink href="/" />
+        <BrandLink href="/" logoSrc={siteLogo.url} logoAlt={siteLogo.alt} />
         <nav aria-label="Admin navigation">
           <a href="#overview" aria-current="page">
             Overview
