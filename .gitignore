@@ -10,3 +10,7 @@ test-results
 .env.*.local
 .DS_Store
 *.log
+*.tsbuildinfo
+.tmp-*
+.tmp/
+.cursor/debug-*.log

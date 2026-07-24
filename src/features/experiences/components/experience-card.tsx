@@ -134,9 +134,6 @@ export async function ExperienceCard({
   const href = `/experiences/${experience.slug}`;
   const imageSrc = getExperienceHeroImageSrc(experience.heroImagePath);
   const imageAlt = experience.heroImageAlt?.trim() || experience.title;
-  // #region agent log
-  fetch('http://127.0.0.1:7821/ingest/4a33213c-f005-42e0-867d-a7b2042de466',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'20f0e2'},body:JSON.stringify({sessionId:'20f0e2',runId:'post-fix',hypothesisId:'B',location:'experience-card.tsx:ExperienceCard',message:'card image src resolution',data:{slug:experience.slug,heroImagePath:experience.heroImagePath,imageSrc,hasSupabaseUrl:Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),fallbackIndex},timestamp:Date.now()})}).catch(()=>{});
-  // #endregion
   const tone = resolveExperienceCardTone(experience.experienceType, fallbackIndex);
   const features = buildFeatureItems(experience, t);
   const showRating =

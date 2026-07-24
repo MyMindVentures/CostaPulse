@@ -51,7 +51,6 @@ const MEDIA_PROBE_TIMEOUT_MS = 1500;
 /**
  * Prefer a live Storage object when present.
  * For published experience cards, omit fallbackSrc so missing media yields null (CSS fallback).
- * Curated empty-state tiles may still pass an interim fallbackSrc.
  */
 export async function resolvePublicImageSrc(
   path: string | null | undefined,

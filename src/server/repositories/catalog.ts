@@ -667,85 +667,14 @@ export async function getPublishedExperienceCards(
 
   const { data, error } = await query;
   if (error || !data) {
-    // #region agent log
-    fetch("http://127.0.0.1:7821/ingest/4a33213c-f005-42e0-867d-a7b2042de466", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "20f0e2"
-      },
-      body: JSON.stringify({
-        sessionId: "20f0e2",
-        runId: "post-fix",
-        hypothesisId: "A",
-        location: "catalog.ts:getPublishedExperienceCards",
-        message: "catalog query failed or empty",
-        data: {
-          hasError: Boolean(error),
-          errorMessage: error?.message ?? null,
-          rowCount: data?.length ?? 0
-        },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    // #endregion
     return [];
   }
 
   try {
-    const cards = await Promise.all(
+    return await Promise.all(
       (data as unknown as CardExperienceRow[]).map((row) => mapCardExperience(row))
     );
-    // #region agent log
-    fetch("http://127.0.0.1:7821/ingest/4a33213c-f005-42e0-867d-a7b2042de466", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "20f0e2"
-      },
-      body: JSON.stringify({
-        sessionId: "20f0e2",
-        runId: "post-fix",
-        hypothesisId: "A",
-        location: "catalog.ts:getPublishedExperienceCards",
-        message: "mapped published cards",
-        data: {
-          count: cards.length,
-          cards: cards.map((c) => ({
-            slug: c.slug,
-            heroImagePath: c.heroImagePath,
-            heroImageAlt: c.heroImageAlt,
-            categoryLabel: c.categoryLabel,
-            hasPrice: c.startingPriceMinor != null
-          }))
-        },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    // #endregion
-    return cards;
-  } catch (mapError) {
-    // #region agent log
-    fetch("http://127.0.0.1:7821/ingest/4a33213c-f005-42e0-867d-a7b2042de466", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "20f0e2"
-      },
-      body: JSON.stringify({
-        sessionId: "20f0e2",
-        runId: "post-fix",
-        hypothesisId: "A",
-        location: "catalog.ts:getPublishedExperienceCards",
-        message: "mapCardExperience threw",
-        data: {
-          errorMessage:
-            mapError instanceof Error ? mapError.message : String(mapError)
-        },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    // #endregion
+  } catch {
     return [];
   }
 }
