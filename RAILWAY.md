@@ -1,5 +1,9 @@
 # Railway
 
+Railway is the production host for the CostaPulse Next.js application and the repository's only deployment path.
+
+Railway production deployments track the repository's default branch, `main`.
+
 ## Repository contract
 
 Railway uses the root `Dockerfile` through `railway.json`. The Dockerfile uses dependency, build and runtime stages, installs reproducibly with `npm ci`, copies Next.js standalone output, runs as a non-root user, and leaves runtime `PORT` overridable. The health check is `/api/health`, with a 300-second deployment timeout and bounded on-failure restarts.
