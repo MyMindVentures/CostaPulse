@@ -6,7 +6,11 @@ type RatingStarsProps = {
   className?: string;
 };
 
-export function RatingStars({ rating, reviewCount, className }: RatingStarsProps) {
+export function RatingStars({
+  rating,
+  reviewCount,
+  className
+}: RatingStarsProps) {
   if (reviewCount <= 0) return null;
 
   const filled = Math.round(Math.min(5, Math.max(0, rating)));
@@ -24,7 +28,8 @@ export function RatingStars({ rating, reviewCount, className }: RatingStarsProps
         ))}
       </span>
       <span>
-        {rating.toFixed(1)} ({reviewCount} {reviewCount === 1 ? "review" : "reviews"})
+        {rating.toFixed(1)} ({reviewCount}{" "}
+        {reviewCount === 1 ? "review" : "reviews"})
       </span>
     </p>
   );

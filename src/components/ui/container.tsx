@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 type ContainerProps = {
   children: ReactNode;
@@ -6,9 +7,5 @@ type ContainerProps = {
 };
 
 export function Container({ children, className }: ContainerProps) {
-  return (
-    <div className={className ? `container ${className}` : "container"}>
-      {children}
-    </div>
-  );
+  return <div className={cn("container", className)}>{children}</div>;
 }

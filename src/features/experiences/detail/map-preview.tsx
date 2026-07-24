@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import type { ExperienceDetailLocation } from "@/server/repositories/catalog";
 
 type MapPreviewProps = {
@@ -5,7 +6,8 @@ type MapPreviewProps = {
   title: string;
 };
 
-export function MapPreview({ locations, title }: MapPreviewProps) {
+export async function MapPreview({ locations, title }: MapPreviewProps) {
+  const t = await getTranslations("ExperiencesPage");
   const plotted = locations.filter(
     (location) => location.latitude !== null && location.longitude !== null
   );
@@ -22,7 +24,10 @@ export function MapPreview({ locations, title }: MapPreviewProps) {
   const lngSpan = Math.max(maxLng - minLng, 0.04);
 
   return (
-    <section className="xp-map-preview" aria-label={`${title} map preview`}>
+    <section
+      className="xp-map-preview"
+      aria-label={t("mapPreviewLabel", { title })}
+    >
       <div className="xp-map-canvas" aria-hidden>
         {plotted.map((location) => {
           const x = ((location.longitude! - minLng) / lngSpan) * 70 + 15;
@@ -38,7 +43,7 @@ export function MapPreview({ locations, title }: MapPreviewProps) {
         })}
       </div>
       <a href="#location" className="button button-navy xp-map-cta">
-        View on Map
+        {t("viewOnMap")}
       </a>
     </section>
   );

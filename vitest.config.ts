@@ -8,6 +8,8 @@ export default defineConfig({
     }
   },
   test: {
+    environment: "jsdom",
+    pool: "threads",
     coverage: {
       provider: "v8",
       reporter: ["text", "html"]

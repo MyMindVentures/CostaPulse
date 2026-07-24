@@ -3,7 +3,6 @@ import {
   Clock3,
   Compass,
   MapPin,
-  Menu,
   ShieldCheck,
   Sparkles,
   Users
@@ -36,14 +35,8 @@ type LocationPill = {
   label: string;
 };
 
-type NavItem = {
-  label: string;
-  href: string;
-};
-
 export async function HomePageFeature() {
   const t = await getTranslations("HomePage");
-  const navItems = t.raw("nav") as NavItem[];
   const curatedCategories = t.raw("curatedCategories") as CuratedCategory[];
   const heroTrustPoints = t.raw("heroTrustPoints") as HeroTrustPoint[];
   const locationPills = t.raw("locationPills") as LocationPill[];
@@ -63,25 +56,6 @@ export async function HomePageFeature() {
       <section className="hero" id="top">
         <div className="hero-seascape" aria-hidden />
         <Container className="hero-shell">
-          <nav className="hero-nav" aria-label="Primary navigation">
-            <BrandLink href="#top" logoSrc={siteLogo.url} logoAlt={siteLogo.alt} />
-            <div className="hero-nav-links">
-              {navItems.map((item) => (
-                <a href={item.href} key={item.href}>
-                  {item.label}
-                </a>
-              ))}
-            </div>
-            <div className="hero-nav-actions">
-              <a href="#experiences" className="button button-coral">
-                {t("bookCta")}
-              </a>
-              <span className="menu-button" aria-hidden>
-                <Menu size={22} aria-hidden />
-              </span>
-            </div>
-          </nav>
-
           <div className="hero-grid">
             <div className="hero-copy">
               <p className="eyebrow">
@@ -154,6 +128,7 @@ export async function HomePageFeature() {
         title={t("experiencesTitle")}
         description={t("experiencesDescription")}
         viewAllLabel={t("viewAllExperiences")}
+        viewMapLabel={t("viewOnMap")}
         fallbackBadge={t("experienceBadge")}
         viewDetailsLabel={t("viewDetails")}
       />
@@ -162,7 +137,11 @@ export async function HomePageFeature() {
         <Container className="trust-grid">
           {trustPoints.map((item, index) => (
             <article key={item.title}>
-              {index === 0 ? <ShieldCheck aria-hidden /> : <Sparkles aria-hidden />}
+              {index === 0 ? (
+                <ShieldCheck aria-hidden />
+              ) : (
+                <Sparkles aria-hidden />
+              )}
               <h3>{item.title}</h3>
               <p>{item.description}</p>
             </article>
@@ -200,7 +179,10 @@ export async function HomePageFeature() {
         <Container>
           <SectionKicker>{t("ctaKicker")}</SectionKicker>
           <h2>{t("ctaTitle")}</h2>
-          <a href="mailto:hello@costapulse.club" className="inline-link cta-link">
+          <a
+            href="mailto:hello@costapulse.club"
+            className="inline-link cta-link"
+          >
             {t("ctaLink")}
             <ArrowRight size={18} aria-hidden />
           </a>
@@ -209,7 +191,11 @@ export async function HomePageFeature() {
 
       <footer className="footer">
         <Container className="footer-grid">
-          <BrandLink href="#top" logoSrc={siteLogo.url} logoAlt={siteLogo.alt} />
+          <BrandLink
+            href="#top"
+            logoSrc={siteLogo.url}
+            logoAlt={siteLogo.alt}
+          />
           <p>{t("footerTagline")}</p>
           <p>{t("footerCopyright", { year: new Date().getFullYear() })}</p>
         </Container>

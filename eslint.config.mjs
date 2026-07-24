@@ -6,9 +6,15 @@ export default defineConfig([
   ...nextVitals,
   ...nextTypeScript,
   {
-    files: ["start-standalone.cjs"],
+    files: ["start-standalone.cjs", "scripts/prepare-standalone.cjs"],
     rules: {
       "@typescript-eslint/no-require-imports": "off"
+    }
+  },
+  {
+    files: ["**/*.test.tsx"],
+    rules: {
+      "@next/next/no-img-element": "off"
     }
   },
   globalIgnores([

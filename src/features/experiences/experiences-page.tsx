@@ -1,31 +1,24 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { BrandLink } from "@/components/shared/brand-link";
+import { getTranslations } from "next-intl/server";
 import { Container } from "@/components/ui/container";
+import { EmptyState } from "@/components/shared/empty-state";
 import { getPublishedExperienceCards } from "@/server/repositories/catalog";
-import { getSiteLogoAsset } from "@/server/repositories/media-assets";
 import { ExperienceCard } from "./components/experience-card";
 
 export async function ExperiencesPageFeature() {
-  const [experiences, siteLogo] = await Promise.all([
-    getPublishedExperienceCards(),
-    getSiteLogoAsset()
-  ]);
+  const t = await getTranslations("ExperiencesPage");
+  const experiences = await getPublishedExperienceCards();
 
   return (
     <main className="catalog-page">
       <header className="catalog-header">
-        <Container className="catalog-nav">
-          <BrandLink href="/" logoSrc={siteLogo.url} logoAlt={siteLogo.alt} />
-          <Link href="/" className="button button-outline">
-            <ArrowLeft size={18} aria-hidden />
-            Back home
-          </Link>
-        </Container>
         <Container className="catalog-hero">
-          <p className="eyebrow"><span />Costa Blanca experiences</p>
-          <h1>Choose your perfect day.</h1>
-          <p>Private yacht trips, paddle adventures and personally hosted moments along the Mediterranean coast.</p>
+          <p className="eyebrow">
+            <span />
+            {t("eyebrow")}
+          </p>
+          <h1>{t("heroTitle")}</h1>
+          <p>{t("heroDescription")}</p>
         </Container>
       </header>
 
@@ -33,27 +26,35 @@ export async function ExperiencesPageFeature() {
         <Container>
           <div className="catalog-heading">
             <div>
-              <p className="section-kicker">Explore the coast</p>
-              <h2 id="catalog-title">All experiences</h2>
+              <p className="section-kicker">{t("sectionKicker")}</p>
+              <h2 id="catalog-title">{t("sectionTitle")}</h2>
             </div>
-            <p>Every experience is hosted in small groups with personal attention, local knowledge and clear pricing.</p>
+            <div className="catalog-heading__aside">
+              <p>{t("sectionDescription")}</p>
+              <Link href="/experiences/map" className="button button-outline">
+                {t("exploreMapCta")}
+              </Link>
+            </div>
           </div>
 
           {experiences.length > 0 ? (
             <div className="experience-catalog-grid">
               {experiences.map((experience, index) => (
-                <ExperienceCard key={experience.id} experience={experience} fallbackIndex={index} />
+                <ExperienceCard
+                  key={experience.id}
+                  experience={experience}
+                  fallbackIndex={index}
+                />
               ))}
             </div>
           ) : (
-            <div className="catalog-empty">
-              <h2>New experiences are coming soon.</h2>
-              <p>Contact us and we will create a private Costa Blanca day around your group.</p>
-              <a href="mailto:hello@costapulse.club" className="button button-coral">
-                Plan a private day
-                <ArrowRight size={18} aria-hidden />
-              </a>
-            </div>
+            <EmptyState
+              className="catalog-empty"
+              title={t("emptyTitle")}
+              description={t("emptyDescription")}
+              actionLabel={t("emptyCta")}
+              actionHref={t("emptyMailto")}
+            />
           )}
         </Container>
       </section>

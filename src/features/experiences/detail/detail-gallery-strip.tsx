@@ -21,10 +21,17 @@ export function DetailGalleryStrip({ media, title }: DetailGalleryStripProps) {
   const visible = expanded ? media : media.slice(0, VISIBLE_TILES);
 
   return (
-    <div className="xp-gallery-strip" role="list" aria-label={`${title} gallery`}>
+    <div
+      className="xp-gallery-strip"
+      role="list"
+      aria-label={`${title} gallery`}
+    >
       {visible.map((item, index) => {
         const isLastCollapsed =
-          !expanded && overflow > 0 && index === visible.length - 1 && media.length > VISIBLE_TILES;
+          !expanded &&
+          overflow > 0 &&
+          index === visible.length - 1 &&
+          media.length > VISIBLE_TILES;
         const showVideo = item.mediaType === "video";
 
         return (

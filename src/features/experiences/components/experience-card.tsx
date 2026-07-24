@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   Anchor,
   ArrowRight,
   Camera,
   Clock3,
   Flame,
-  Heart,
   MapPin,
   Ship,
   Star,
@@ -20,6 +19,9 @@ import {
   takeHighlightFeatures
 } from "@/features/experiences/from-price";
 import { ExperienceCardImage } from "@/features/experiences/components/experience-card-image";
+import { FavoriteToggle } from "@/features/experiences/favorite-toggle";
+import { formatDurationLabel } from "@/components/shared/duration-display";
+import { formatPriceLabel } from "@/components/shared/price-display";
 import { getExperienceHeroImageSrc } from "@/lib/media/experience-media";
 import type { ExperienceCardViewModel } from "@/server/repositories/catalog";
 
@@ -34,55 +36,42 @@ type FeatureItem = {
   label: string;
 };
 
-function formatPrice(experience: ExperienceCardViewModel) {
-  if (experience.startingPriceMinor === null || !experience.currency) return null;
-
-  return new Intl.NumberFormat("en-IE", {
-    style: "currency",
-    currency: experience.currency,
-    maximumFractionDigits: 0
-  }).format(experience.startingPriceMinor / 100);
-}
-
-function formatDurationLabel(
-  minutes: number,
-  t: Awaited<ReturnType<typeof getTranslations>>
-) {
-  if (minutes % 60 === 0) {
-    const hours = minutes / 60;
-    return hours === 1
-      ? t("meta.durationHour", { hours })
-      : t("meta.durationHours", { hours });
-  }
-
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  if (hours > 0) {
-    return t("meta.durationHoursMinutes", {
-      hours,
-      minutes: remainingMinutes
-    });
-  }
-
-  return t("meta.durationValue", { minutes });
-}
-
 function featureIconForLabel(label: string): LucideIcon {
   const normalized = label.toLowerCase();
   if (normalized.includes("photo")) return Camera;
-  if (normalized.includes("bbq") || normalized.includes("drink") || normalized.includes("food")) {
+  if (
+    normalized.includes("bbq") ||
+    normalized.includes("drink") ||
+    normalized.includes("food")
+  ) {
     return Flame;
   }
-  if (normalized.includes("skipper") || normalized.includes("boat") || normalized.includes("host")) {
+  if (
+    normalized.includes("skipper") ||
+    normalized.includes("boat") ||
+    normalized.includes("host")
+  ) {
     return Ship;
   }
-  if (normalized.includes("fuel") || normalized.includes("sunset") || normalized.includes("coach")) {
+  if (
+    normalized.includes("fuel") ||
+    normalized.includes("sunset") ||
+    normalized.includes("coach")
+  ) {
     return Sun;
   }
-  if (normalized.includes("paddle") || normalized.includes("kayak") || normalized.includes("water")) {
+  if (
+    normalized.includes("paddle") ||
+    normalized.includes("kayak") ||
+    normalized.includes("water")
+  ) {
     return Waves;
   }
-  if (normalized.includes("mentor") || normalized.includes("guide") || normalized.includes("personal")) {
+  if (
+    normalized.includes("mentor") ||
+    normalized.includes("guide") ||
+    normalized.includes("personal")
+  ) {
     return Anchor;
   }
   return Waves;
@@ -90,18 +79,19 @@ function featureIconForLabel(label: string): LucideIcon {
 
 function buildFeatureItems(
   experience: ExperienceCardViewModel,
-  t: Awaited<ReturnType<typeof getTranslations>>
+  durationLabel: string,
+  capacityLabel: string
 ): FeatureItem[] {
   const items: FeatureItem[] = [
     {
       key: "duration",
       icon: Clock3,
-      label: formatDurationLabel(experience.durationMinutes, t)
+      label: durationLabel
     },
     {
       key: "capacity",
       icon: Users,
-      label: t("meta.capacityValue", { count: experience.baseCapacity })
+      label: capacityLabel
     }
   ];
 
@@ -130,12 +120,30 @@ export async function ExperienceCard({
   fallbackIndex = 0
 }: ExperienceCardProps) {
   const t = await getTranslations("HomePage");
-  const price = formatPrice(experience);
+  const locale = await getLocale();
+  const price = formatPriceLabel(
+    experience.startingPriceMinor,
+    experience.currency,
+    locale
+  );
   const href = `/experiences/${experience.slug}`;
   const imageSrc = getExperienceHeroImageSrc(experience.heroImagePath);
   const imageAlt = experience.heroImageAlt?.trim() || experience.title;
-  const tone = resolveExperienceCardTone(experience.experienceType, fallbackIndex);
-  const features = buildFeatureItems(experience, t);
+  const tone = resolveExperienceCardTone(
+    experience.experienceType,
+    fallbackIndex
+  );
+  const durationLabel = formatDurationLabel(experience.durationMinutes, {
+    hour: (values) => t("meta.durationHour", values),
+    hours: (values) => t("meta.durationHours", values),
+    hoursMinutes: (values) => t("meta.durationHoursMinutes", values),
+    minutes: (values) => t("meta.durationValue", values)
+  });
+  const features = buildFeatureItems(
+    experience,
+    durationLabel,
+    t("meta.capacityValue", { count: experience.baseCapacity })
+  );
   const showRating =
     experience.reviewCount > 0 &&
     experience.averageRating != null &&
@@ -159,15 +167,15 @@ export async function ExperienceCard({
         ) : null}
         <div className="experience-card-overlay" aria-hidden />
         {experience.categoryLabel ? (
-          <span className="experience-category-badge">{experience.categoryLabel}</span>
+          <span className="experience-category-badge">
+            {experience.categoryLabel}
+          </span>
         ) : null}
-        <button
+        <FavoriteToggle
+          experienceId={experience.id}
+          label={t("favoriteLabel")}
           className="experience-favorite-button"
-          type="button"
-          aria-label={t("favoriteLabel")}
-        >
-          <Heart size={18} aria-hidden />
-        </button>
+        />
       </div>
 
       <div className="experience-card-body">
@@ -178,7 +186,10 @@ export async function ExperienceCard({
           {showRating ? (
             <div
               className="experience-review"
-              aria-label={`Guest rating ${experience.averageRating!.toFixed(1)} from ${experience.reviewCount} reviews`}
+              aria-label={t("ratingAriaLabel", {
+                rating: experience.averageRating!.toFixed(1),
+                count: experience.reviewCount
+              })}
             >
               <Star size={15} aria-hidden />
               <strong>{experience.averageRating!.toFixed(1)}</strong>
@@ -190,11 +201,16 @@ export async function ExperienceCard({
         </div>
 
         {experience.shortDescription ? (
-          <p className="experience-card-description">{experience.shortDescription}</p>
+          <p className="experience-card-description">
+            {experience.shortDescription}
+          </p>
         ) : null}
 
         {features.length > 0 ? (
-          <ul className="experience-card-features" aria-label={t("featuresLabel")}>
+          <ul
+            className="experience-card-features"
+            aria-label={t("featuresLabel")}
+          >
             {features.map((feature) => {
               const Icon = feature.icon;
               return (
@@ -213,7 +229,9 @@ export async function ExperienceCard({
               {experience.providerName.slice(0, 1).toUpperCase()}
             </span>
             <div>
-              <strong>{t("hostedBy", { name: experience.providerName })}</strong>
+              <strong>
+                {t("hostedBy", { name: experience.providerName })}
+              </strong>
             </div>
           </div>
         ) : null}

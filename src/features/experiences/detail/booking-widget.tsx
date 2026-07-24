@@ -1,7 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { BadgeCheck, CalendarDays, ShieldCheck, Users } from "lucide-react";
 import { useMemo, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
+import { formatBookingDateShort } from "@/lib/datetime/format-booking-date";
 import { formatMinorUnitAmount } from "@/lib/pricing/format-money";
 import type { ExperienceDetailVariant } from "@/server/repositories/catalog";
 import { RatingStars } from "./rating-stars";
@@ -22,6 +25,7 @@ type BookingWidgetProps = {
     description: string | null;
     valueMinutes: number | null;
   }>;
+  referralCode?: string | null;
 };
 
 type AvailabilitySlot = {
@@ -30,6 +34,7 @@ type AvailabilitySlot = {
   endsAt: string;
   localStartLabel: string;
   capacityRemaining: number;
+  capacityTotal: number;
   isInstantConfirmation: boolean;
 };
 
@@ -51,19 +56,9 @@ function defaultDateInTimezone(timeZone: string) {
     day: "2-digit"
   }).formatToParts(new Date());
 
-  const get = (type: string) => parts.find((part) => part.type === type)?.value ?? "01";
+  const get = (type: string) =>
+    parts.find((part) => part.type === type)?.value ?? "01";
   return `${get("year")}-${get("month")}-${get("day")}`;
-}
-
-function formatDateLabel(date: string, timeZone: string) {
-  const noonUtc = new Date(`${date}T12:00:00.000Z`);
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone,
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  }).format(noonUtc);
 }
 
 export function BookingWidget({
@@ -76,15 +71,23 @@ export function BookingWidget({
   currency,
   averageRating,
   reviewCount,
-  policies
+  policies,
+  referralCode
 }: BookingWidgetProps) {
-  const initialVariant = variants.find((variant) => variant.isDefault) ?? variants[0];
-  const [selectedVariantId, setSelectedVariantId] = useState(initialVariant?.id ?? "");
+  const t = useTranslations("Booking");
+  const initialVariant =
+    variants.find((variant) => variant.isDefault) ?? variants[0];
+  const [selectedVariantId, setSelectedVariantId] = useState(
+    initialVariant?.id ?? ""
+  );
   const selectedVariant =
-    variants.find((variant) => variant.id === selectedVariantId) ?? initialVariant;
+    variants.find((variant) => variant.id === selectedVariantId) ??
+    initialVariant;
 
   const [date, setDate] = useState(() => defaultDateInTimezone(timezone));
-  const [partySize, setPartySize] = useState(() => defaultPartySize(initialVariant));
+  const [partySize, setPartySize] = useState(() =>
+    defaultPartySize(initialVariant)
+  );
   const [slots, setSlots] = useState<AvailabilitySlot[] | null>(null);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -94,20 +97,27 @@ export function BookingWidget({
   const maxGuests = selectedVariant?.maxPartySize ?? null;
   const priceLabel =
     selectedVariant && currency
-      ? formatMinorUnitAmount(selectedVariant.unitAmountMinor, selectedVariant.currency)
+      ? formatMinorUnitAmount(
+          selectedVariant.unitAmountMinor,
+          selectedVariant.currency
+        )
       : startingPriceMinor !== null && currency
         ? formatMinorUnitAmount(startingPriceMinor, currency)
         : null;
 
   const priceSuffix =
     (selectedVariant?.pricingModel ?? pricingModel) === "per_person"
-      ? "per person"
+      ? t("widget.perPerson")
       : (selectedVariant?.pricingModel ?? pricingModel) === "per_group"
-        ? "per group"
+        ? t("widget.perGroup")
         : null;
 
-  const cancellationPolicy = policies.find((policy) => policy.policyType === "cancellation");
-  const confirmationPolicy = policies.find((policy) => policy.policyType === "confirmation");
+  const cancellationPolicy = policies.find(
+    (policy) => policy.policyType === "cancellation"
+  );
+  const confirmationPolicy = policies.find(
+    (policy) => policy.policyType === "confirmation"
+  );
 
   const guestOptions = useMemo(() => {
     if (!selectedVariant) return [1];
@@ -118,6 +128,25 @@ export function BookingWidget({
     }
     return options;
   }, [selectedVariant]);
+
+  const continueHref = useMemo(() => {
+    if (!selectedVariant || !selectedSlotId) return null;
+    const params = new URLSearchParams({
+      variantId: selectedVariant.id,
+      date,
+      partySize: String(partySize),
+      slotId: selectedSlotId
+    });
+    if (referralCode) params.set("ref", referralCode);
+    return `/book/${encodeURIComponent(experienceSlug)}?${params.toString()}`;
+  }, [
+    date,
+    experienceSlug,
+    partySize,
+    referralCode,
+    selectedSlotId,
+    selectedVariant
+  ]);
 
   function onVariantChange(variantId: string) {
     const next = variants.find((variant) => variant.id === variantId);
@@ -131,7 +160,7 @@ export function BookingWidget({
 
   function checkAvailability() {
     if (!selectedVariant) {
-      setError("Choose a duration option to continue.");
+      setError(t("widget.chooseVariant"));
       return;
     }
 
@@ -156,7 +185,7 @@ export function BookingWidget({
           setSlots(null);
           setSelectedSlotId(null);
           setChecked(true);
-          setError(payload.error ?? "Availability could not be checked.");
+          setError(payload.error ?? t("widget.availabilityError"));
           return;
         }
 
@@ -167,18 +196,22 @@ export function BookingWidget({
         setSlots(null);
         setSelectedSlotId(null);
         setChecked(true);
-        setError("Availability could not be checked. Please try again.");
+        setError(t("widget.availabilityError"));
       }
     });
   }
 
   return (
-    <section className="xp-booking-widget" id="booking" aria-labelledby="booking-title">
+    <section
+      className="xp-booking-widget"
+      id="booking"
+      aria-labelledby="booking-title"
+    >
       <div className="xp-booking-price">
         <p>
           {priceLabel ? (
             <>
-              From <strong>{priceLabel}</strong>
+              {t("widget.from")} <strong>{priceLabel}</strong>
               {priceSuffix ? ` ${priceSuffix}` : null}
             </>
           ) : null}
@@ -188,7 +221,7 @@ export function BookingWidget({
 
       {variants.length > 0 ? (
         <fieldset className="xp-variant-toggle">
-          <legend className="visually-hidden">Duration</legend>
+          <legend className="visually-hidden">{t("widget.duration")}</legend>
           {variants.map((variant) => {
             const label = `${variant.name} ${formatMinorUnitAmount(variant.unitAmountMinor, variant.currency)}`;
 
@@ -196,7 +229,9 @@ export function BookingWidget({
               <button
                 key={variant.id}
                 type="button"
-                className={variant.id === selectedVariant?.id ? "is-active" : undefined}
+                className={
+                  variant.id === selectedVariant?.id ? "is-active" : undefined
+                }
                 aria-pressed={variant.id === selectedVariant?.id}
                 onClick={() => onVariantChange(variant.id)}
               >
@@ -210,11 +245,12 @@ export function BookingWidget({
       <label className="xp-field">
         <span>
           <CalendarDays size={16} aria-hidden />
-          Date
+          {t("widget.date")}
         </span>
         <input
           type="date"
           value={date}
+          disabled={!date}
           onChange={(event) => {
             setDate(event.target.value);
             setSlots(null);
@@ -222,13 +258,15 @@ export function BookingWidget({
             setError(null);
           }}
         />
-        <em>{formatDateLabel(date, timezone)}</em>
+        <em suppressHydrationWarning>
+          {date ? formatBookingDateShort(date, timezone) : t("widget.date")}
+        </em>
       </label>
 
       <label className="xp-field">
         <span>
           <Users size={16} aria-hidden />
-          Guests
+          {t("widget.guests")}
         </span>
         <select
           value={partySize}
@@ -241,12 +279,12 @@ export function BookingWidget({
         >
           {guestOptions.map((size) => (
             <option key={size} value={size}>
-              {size} {size === 1 ? "Adult" : "Adults"}
+              {t("summary.guests", { count: size })}
             </option>
           ))}
         </select>
         {maxGuests ? (
-          <em>Maximum {maxGuests} guests per booking</em>
+          <em>{t("widget.maxGuests", { count: maxGuests })}</em>
         ) : null}
       </label>
 
@@ -256,7 +294,7 @@ export function BookingWidget({
         onClick={checkAvailability}
         disabled={isPending || !selectedVariant}
       >
-        {isPending ? "Checking…" : "Check Availability"}
+        {isPending ? t("widget.checking") : t("widget.checkAvailability")}
       </button>
 
       <div className="xp-booking-trust">
@@ -275,19 +313,24 @@ export function BookingWidget({
       </div>
 
       <div className="xp-availability-result" aria-live="polite">
-        {error ? <p className="xp-availability-error" role="alert">{error}</p> : null}
+        {error ? (
+          <p className="xp-availability-error" role="alert">
+            {error}
+          </p>
+        ) : null}
 
         {checked && !error && slots && slots.length === 0 ? (
-          <p className="xp-availability-empty">
-            No available departures on this date for your group size.
-          </p>
+          <p className="xp-availability-empty">{t("widget.noSlots")}</p>
         ) : null}
 
         {slots && slots.length > 0 ? (
           <fieldset className="xp-slot-list">
-            <legend>Available times</legend>
+            <legend>{t("widget.availableTimes")}</legend>
             {slots.map((slot) => (
-              <label key={slot.id} className={selectedSlotId === slot.id ? "is-active" : undefined}>
+              <label
+                key={slot.id}
+                className={selectedSlotId === slot.id ? "is-active" : undefined}
+              >
                 <input
                   type="radio"
                   name={`slot-${experienceId}`}
@@ -297,14 +340,20 @@ export function BookingWidget({
                 />
                 <span>{slot.localStartLabel}</span>
                 <em>
-                  {slot.capacityRemaining} spots
-                  {slot.isInstantConfirmation ? " · Instant confirmation" : ""}
+                  {t("datetime.spotsLeft", { count: slot.capacityRemaining })}
+                  {slot.isInstantConfirmation
+                    ? ` · ${t("widget.instant")}`
+                    : ""}
                 </em>
               </label>
             ))}
-            <p className="xp-availability-next">
-              Times confirmed. Checkout will be available in a later step.
-            </p>
+            {continueHref ? (
+              <Link className="button button-gold" href={continueHref}>
+                {t("widget.continue")}
+              </Link>
+            ) : (
+              <p className="xp-availability-next">{t("widget.selectSlot")}</p>
+            )}
           </fieldset>
         ) : null}
       </div>

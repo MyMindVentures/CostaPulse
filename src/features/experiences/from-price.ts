@@ -68,5 +68,5 @@ export function resolveExperienceCardTone(
     return TONE_BY_EXPERIENCE_TYPE[experienceType];
   }
 
-  return (((fallbackIndex % 3) + 1) as ExperienceCardTone);
+  return ((fallbackIndex % 3) + 1) as ExperienceCardTone;
 }

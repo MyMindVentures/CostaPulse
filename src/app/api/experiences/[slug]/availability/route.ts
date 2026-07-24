@@ -13,7 +13,9 @@ export async function GET(request: Request, context: RouteContext) {
   const url = new URL(request.url);
   const parsed = availabilityQuerySchema.safeParse({
     variantId: url.searchParams.get("variantId"),
-    date: url.searchParams.get("date"),
+    date: url.searchParams.get("date") ?? undefined,
+    from: url.searchParams.get("from") ?? undefined,
+    to: url.searchParams.get("to") ?? undefined,
     partySize: url.searchParams.get("partySize")
   });
 

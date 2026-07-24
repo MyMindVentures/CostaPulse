@@ -6,13 +6,15 @@ import { ExperienceCard } from "./experience-card";
 import type { ExperienceCardViewModel } from "@/server/repositories/catalog";
 
 vi.mock("./experience-card-image", () => ({
-  ExperienceCardImage: ({
-    alt,
-    src
-  }: {
-    alt: string;
-    src: string;
-  }) => <img alt={alt} src={src} />
+  ExperienceCardImage: ({ alt, src }: { alt: string; src: string }) => (
+    <img alt={alt} src={src} />
+  )
+}));
+
+vi.mock("@/features/experiences/favorite-toggle", () => ({
+  FavoriteToggle: ({ label }: { label: string }) => (
+    <button type="button" aria-label={label} aria-pressed="false" />
+  )
 }));
 
 vi.mock("next/link", () => ({
@@ -26,6 +28,7 @@ vi.mock("next/link", () => ({
 }));
 
 vi.mock("next-intl/server", () => ({
+  getLocale: async () => "en-GB",
   getTranslations: async () => {
     const messages: Record<string, string> = {
       favoriteLabel: "Save this experience",
@@ -35,6 +38,7 @@ vi.mock("next-intl/server", () => ({
       priceUnitPerPerson: "per person",
       priceUnitPerGroup: "per experience",
       reviewCountLabel: "({count} reviews)",
+      ratingAriaLabel: "Guest rating {rating} from {count} reviews",
       featuresLabel: "Experience highlights",
       "meta.durationHour": "{hours} hour",
       "meta.durationHours": "{hours} hours",
@@ -95,7 +99,9 @@ describe("ExperienceCard", () => {
       "https://example.supabase.co/storage/v1/object/public/experience-media/boat-experience/hero.png"
     );
     expect(screen.getByText("Yacht Experience")).toBeTruthy();
-    expect(screen.getByText("Skippered boat time on the Costa Blanca.")).toBeTruthy();
+    expect(
+      screen.getByText("Skippered boat time on the Costa Blanca.")
+    ).toBeTruthy();
     expect(screen.getByText("4 hours")).toBeTruthy();
     expect(screen.getByText("Up to 8 guests")).toBeTruthy();
     expect(screen.getByText("Professional local skipper")).toBeTruthy();
@@ -131,7 +137,9 @@ describe("ExperienceCard", () => {
 
     expect(screen.queryByRole("img")).toBeNull();
     expect(screen.queryByText("Yacht Experience")).toBeNull();
-    expect(screen.queryByText("Skippered boat time on the Costa Blanca.")).toBeNull();
+    expect(
+      screen.queryByText("Skippered boat time on the Costa Blanca.")
+    ).toBeNull();
     expect(screen.queryByText("Hosted by CostaPulse Host")).toBeNull();
     expect(screen.queryByText("From")).toBeNull();
     expect(screen.getByText("4 hours")).toBeTruthy();
@@ -153,5 +161,28 @@ describe("ExperienceCard", () => {
 
     expect(screen.getByText("4.5")).toBeTruthy();
     expect(screen.getByText("(2 reviews)")).toBeTruthy();
+  });
+
+  it("renders long translated titles without truncating the accessible name", async () => {
+    const longTitle =
+      "Private sunset yacht charter with skipper, soft drinks and coastal storytelling along the Costa Blanca";
+
+    render(
+      await ExperienceCard({
+        experience: {
+          ...baseExperience,
+          title: longTitle,
+          startingPriceMinor: null,
+          currency: null,
+          pricingModel: null,
+          averageRating: null,
+          reviewCount: 0
+        }
+      })
+    );
+
+    expect(screen.getByRole("heading", { name: longTitle })).toBeTruthy();
+    expect(screen.queryByText("€495")).toBeNull();
+    expect(screen.queryByText("4.5")).toBeNull();
   });
 });

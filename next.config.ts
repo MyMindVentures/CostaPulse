@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
@@ -20,9 +21,25 @@ const nextConfig: NextConfig = {
       "'self'",
       "https://*.supabase.co",
       "https://*.posthog.com",
-      "https://*.sentry.io"
+      "https://*.sentry.io",
+      "https://tiles.openfreemap.org",
+      "https://*.openfreemap.org"
     ];
-    const contentSecurityPolicy = `default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data: blob: https://*.supabase.co; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src ${scriptSources.join(" ")}; connect-src ${connectSources.join(" ")}; upgrade-insecure-requests`;
+    const contentSecurityPolicy = [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+      "object-src 'none'",
+      "img-src 'self' data: blob: https://*.supabase.co https://tiles.openfreemap.org https://*.openfreemap.org",
+      "font-src 'self' data:",
+      "style-src 'self' 'unsafe-inline'",
+      `script-src ${scriptSources.join(" ")}`,
+      "worker-src 'self' blob:",
+      "child-src 'self' blob:",
+      `connect-src ${connectSources.join(" ")}`,
+      "upgrade-insecure-requests"
+    ].join("; ");
 
     return [
       {
@@ -48,4 +65,15 @@ const nextConfig: NextConfig = {
   }
 };
 
-export default withNextIntl(nextConfig);
+const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN?.trim();
+
+export default withSentryConfig(withNextIntl(nextConfig), {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: sentryAuthToken,
+  silent: !process.env.CI,
+  sourcemaps: {
+    disable: !sentryAuthToken
+  },
+  widenClientFileUpload: Boolean(sentryAuthToken)
+});

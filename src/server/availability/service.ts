@@ -1,7 +1,12 @@
 import "server-only";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { filterSlotsForLocalDate } from "./filter";
+import {
+  filterSlotsForLocalDate,
+  getLocalDateKey,
+  type SlotCandidate
+} from "./filter";
 import type { AvailabilityOkResponse, AvailabilityQuery } from "./schema";
+import { classifyDayAvailability, type CalendarDayLevel } from "./thresholds";
 
 type AvailabilitySuccess = {
   ok: true;
@@ -17,6 +22,130 @@ type AvailabilityFailure = {
 };
 
 export type AvailabilityResult = AvailabilitySuccess | AvailabilityFailure;
+
+function toSlotCandidate(
+  row: {
+    availability_slot_id: string | null;
+    starts_at: string | null;
+    ends_at: string | null;
+    timezone: string | null;
+    status: string | null;
+    capacity_total: number | null;
+    capacity_available: number | null;
+    booking_cutoff_at: string | null;
+    is_instant_confirmation: boolean | null;
+    is_bookable: boolean | null;
+    location_id: string | null;
+  },
+  fallbackTimezone: string
+): SlotCandidate | null {
+  if (
+    !row.availability_slot_id ||
+    !row.starts_at ||
+    !row.ends_at ||
+    row.capacity_total == null ||
+    row.capacity_available == null ||
+    !row.status
+  ) {
+    return null;
+  }
+
+  return {
+    id: row.availability_slot_id,
+    startsAt: row.starts_at,
+    endsAt: row.ends_at,
+    timezone: row.timezone || fallbackTimezone,
+    status: row.status,
+    capacityTotal: row.capacity_total,
+    capacityAvailable: row.capacity_available,
+    bookingCutoffAt: row.booking_cutoff_at,
+    isInstantConfirmation: row.is_instant_confirmation ?? false,
+    isBookable: row.is_bookable ?? false,
+    locationId: row.location_id
+  };
+}
+
+function buildCalendarDays(
+  slots: SlotCandidate[],
+  from: string,
+  to: string,
+  timeZone: string,
+  partySize: number
+) {
+  const byDate = new Map<
+    string,
+    {
+      capacityAvailable: number;
+      capacityTotal: number;
+      slotCount: number;
+      hasBookableSlot: boolean;
+    }
+  >();
+
+  for (const slot of slots) {
+    const date = getLocalDateKey(slot.startsAt, timeZone);
+    if (date < from || date > to) continue;
+
+    const bookableForParty =
+      slot.isBookable &&
+      slot.status === "scheduled" &&
+      slot.capacityAvailable >= partySize;
+
+    const existing = byDate.get(date) ?? {
+      capacityAvailable: 0,
+      capacityTotal: 0,
+      slotCount: 0,
+      hasBookableSlot: false
+    };
+
+    existing.capacityAvailable += Math.max(slot.capacityAvailable, 0);
+    existing.capacityTotal += Math.max(slot.capacityTotal, 0);
+    existing.slotCount += 1;
+    existing.hasBookableSlot = existing.hasBookableSlot || bookableForParty;
+    byDate.set(date, existing);
+  }
+
+  const days: Array<{
+    date: string;
+    level: CalendarDayLevel;
+    capacityAvailable: number;
+    capacityTotal: number;
+    slotCount: number;
+  }> = [];
+
+  const cursor = new Date(`${from}T12:00:00.000Z`);
+  const end = new Date(`${to}T12:00:00.000Z`);
+
+  while (cursor.getTime() <= end.getTime()) {
+    const year = cursor.getUTCFullYear();
+    const month = String(cursor.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(cursor.getUTCDate()).padStart(2, "0");
+    const date = `${year}-${month}-${day}`;
+    const aggregate = byDate.get(date);
+
+    if (!aggregate) {
+      days.push({
+        date,
+        level: "none",
+        capacityAvailable: 0,
+        capacityTotal: 0,
+        slotCount: 0
+      });
+    } else {
+      days.push({
+        date,
+        level: classifyDayAvailability(aggregate),
+        capacityAvailable: aggregate.capacityAvailable,
+        capacityTotal: aggregate.capacityTotal,
+        slotCount: aggregate.slotCount
+      });
+    }
+
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+
+  return days;
+}
 
 export async function getAvailabilityForExperience(
   slug: string,
@@ -66,7 +195,8 @@ export async function getAvailabilityForExperience(
 
   if (
     query.partySize < variant.min_party_size ||
-    (variant.max_party_size !== null && query.partySize > variant.max_party_size)
+    (variant.max_party_size !== null &&
+      query.partySize > variant.max_party_size)
   ) {
     return {
       ok: false,
@@ -78,14 +208,13 @@ export async function getAvailabilityForExperience(
 
   const timezone = experience.timezone || "Europe/Madrid";
 
-  const { data: slots, error: slotsError } = await supabase
-    .from("availability_slots")
+  const { data: rows, error: slotsError } = await supabase
+    .from("booking_availability")
     .select(
-      "id, starts_at, ends_at, timezone, status, capacity_total, capacity_reserved, booking_cutoff_at, is_instant_confirmation"
+      "availability_slot_id, starts_at, ends_at, timezone, status, capacity_total, capacity_available, booking_cutoff_at, is_instant_confirmation, is_bookable, location_id"
     )
     .eq("experience_id", experience.id)
     .eq("experience_variant_id", query.variantId)
-    .eq("status", "scheduled")
     .order("starts_at", { ascending: true });
 
   if (slotsError) {
@@ -97,22 +226,35 @@ export async function getAvailabilityForExperience(
     };
   }
 
-  const filtered = filterSlotsForLocalDate(
-    (slots ?? []).map((slot) => ({
-      id: slot.id,
-      startsAt: slot.starts_at,
-      endsAt: slot.ends_at,
-      timezone: slot.timezone || timezone,
-      status: slot.status,
-      capacityTotal: slot.capacity_total,
-      capacityReserved: slot.capacity_reserved,
-      bookingCutoffAt: slot.booking_cutoff_at,
-      isInstantConfirmation: slot.is_instant_confirmation
-    })),
-    query.date,
-    timezone,
-    query.partySize
-  );
+  const candidates = (rows ?? [])
+    .map((row) => toSlotCandidate(row, timezone))
+    .filter((slot): slot is SlotCandidate => slot !== null);
+
+  if (query.date) {
+    const filtered = filterSlotsForLocalDate(
+      candidates,
+      query.date,
+      timezone,
+      query.partySize
+    );
+
+    return {
+      ok: true,
+      status: 200,
+      body: {
+        status: "ok",
+        timezone,
+        slots: filtered.map((slot) => ({
+          ...slot,
+          startsAt: new Date(slot.startsAt).toISOString(),
+          endsAt: new Date(slot.endsAt).toISOString()
+        }))
+      }
+    };
+  }
+
+  const from = query.from!;
+  const to = query.to!;
 
   return {
     ok: true,
@@ -120,11 +262,7 @@ export async function getAvailabilityForExperience(
     body: {
       status: "ok",
       timezone,
-      slots: filtered.map((slot) => ({
-        ...slot,
-        startsAt: new Date(slot.startsAt).toISOString(),
-        endsAt: new Date(slot.endsAt).toISOString()
-      }))
+      days: buildCalendarDays(candidates, from, to, timezone, query.partySize)
     }
   };
 }

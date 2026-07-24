@@ -1,4 +1,42 @@
 {
+  "Navigation": {
+    "primaryLabel": "Primary navigation",
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close navigation menu",
+    "dismissMenu": "Dismiss navigation menu",
+    "items": {
+      "experiences": "Experiences",
+      "map": "Explore map",
+      "destinations": "Destinations",
+      "about": "About",
+      "partners": "Partners"
+    },
+    "account": {
+      "login": "Log in",
+      "account": "Account",
+      "admin": "Admin"
+    },
+    "cta": {
+      "explore": "Explore experiences"
+    }
+  },
+  "MarketingPages": {
+    "destinations": {
+      "kicker": "Destinations",
+      "title": "Costa Blanca destinations",
+      "description": "Meeting points and coastal bases will appear here as they are published."
+    },
+    "about": {
+      "kicker": "About",
+      "title": "About CostaPulse",
+      "description": "Our story and approach will appear here as editorial content is published."
+    },
+    "partners": {
+      "kicker": "Partners",
+      "title": "Partner with CostaPulse",
+      "description": "Partner opportunities will appear here as they are published."
+    }
+  },
   "HomePage": {
     "title": "Your Costa Blanca. From the water.",
     "description": "Private yacht trips, paddle adventures, sunset BBQs and personally hosted Mediterranean experiences.",
@@ -81,6 +119,7 @@
     "experiencesTitle": "Handpicked days on and around the Costa Blanca.",
     "experiencesDescription": "Choose from yacht experiences, paddle adventures and sunset hospitality with trusted local hosts.",
     "viewAllExperiences": "View all experiences",
+    "viewOnMap": "Explore map",
     "experienceBadge": "CostaPulse pick",
     "favoriteLabel": "Save this experience",
     "selectedHost": "Selected host",
@@ -90,6 +129,7 @@
     "priceUnitPerPerson": "per person",
     "priceUnitPerGroup": "per experience",
     "reviewCountLabel": "({count, plural, one {# review} other {# reviews}})",
+    "ratingAriaLabel": "Guest rating {rating} from {count} reviews",
     "featuresLabel": "Experience highlights",
     "experienceFallback": "Published experience details will appear here as inventory is added to CostaPulse.",
     "meta": {
@@ -153,5 +193,241 @@
     "ctaLink": "Start a conversation",
     "footerTagline": "Curated on the Costa Blanca.",
     "footerCopyright": "© {year} CostaPulse"
+  },
+  "AnalyticsConsent": {
+    "title": "Analytics cookies",
+    "description": "We use privacy-conscious analytics to understand how CostaPulse is used. You can accept or decline analytics cookies. Essential site cookies are always active.",
+    "accept": "Accept analytics",
+    "decline": "Decline"
+  },
+  "SharedUI": {
+    "language": "Language",
+    "loadingExperiences": "Loading experiences",
+    "loadingExperience": "Loading experience",
+    "loadingBooking": "Loading booking",
+    "experiencesErrorTitle": "Experiences could not be loaded",
+    "experiencesErrorDescription": "Please try again. If the problem continues, contact us.",
+    "experienceErrorTitle": "This experience could not be loaded",
+    "experienceErrorDescription": "Please try again or browse other experiences.",
+    "bookingErrorTitle": "Booking could not be loaded",
+    "bookingErrorDescription": "Please try again. Your previous selections may still be available.",
+    "retry": "Try again"
+  },
+  "ExperiencesPage": {
+    "backHome": "Back home",
+    "eyebrow": "Costa Blanca experiences",
+    "heroTitle": "Choose your perfect day.",
+    "heroDescription": "Private yacht trips, paddle adventures and personally hosted moments along the Mediterranean coast.",
+    "sectionKicker": "Explore the coast",
+    "sectionTitle": "All experiences",
+    "sectionDescription": "Every experience is hosted in small groups with personal attention, local knowledge and clear pricing.",
+    "emptyTitle": "New experiences are coming soon.",
+    "emptyDescription": "Contact us and we will create a private Costa Blanca day around your group.",
+    "emptyCta": "Plan a private day",
+    "emptyMailto": "mailto:hello@costapulse.club",
+    "mapPreviewLabel": "{title} map preview",
+    "viewOnMap": "View on Map",
+    "exploreMapCta": "Explore map"
+  },
+  "MapPage": {
+    "meta": {
+      "title": "Explore experiences on the map | CostaPulse",
+      "description": "Discover Costa Blanca experiences by location, date, type and host on the interactive CostaPulse map."
+    },
+    "kicker": "Costa Blanca map",
+    "title": "Explore experiences on the map",
+    "description": "Find yacht days, paddle sessions and hosted moments across Costa Blanca meeting points.",
+    "resultsLabel": "{count, plural, =0 {No experiences} one {# experience} other {# experiences}}",
+    "resultsRegionLabel": "Experience results",
+    "mapRegionLabel": "Interactive experience map",
+    "viewMap": "Map",
+    "viewList": "List",
+    "viewToggleLabel": "Map or list view",
+    "openFilters": "Filters",
+    "closeFilters": "Close filters",
+    "filtersTitle": "Filter experiences",
+    "filters": {
+      "date": "Date",
+      "dateHint": "Show availability on this day",
+      "experienceType": "Experience type",
+      "experienceTypeAll": "All types",
+      "teamMember": "Host",
+      "teamMemberAll": "All hosts",
+      "location": "Location",
+      "locationAll": "All locations",
+      "clear": "Clear filters",
+      "apply": "Apply filters"
+    },
+    "list": {
+      "selectAria": "Select {title} at {location}",
+      "viewDetails": "View details",
+      "fromPrice": "From",
+      "availabilityNone": "No upcoming availability in this window",
+      "availabilityNext": "Next available {date}",
+      "slotsAvailable": "{count, plural, one {# open slot} other {# open slots}}",
+      "hostedBy": "Hosted by {names}",
+      "locationFallback": "Costa Blanca"
+    },
+    "markerAria": "{title} at {location}",
+    "popupClose": "Close",
+    "selectedClose": "Clear selection",
+    "empty": {
+      "title": "No experiences match these filters",
+      "description": "Try a different date, type, host or location — or clear filters to see everything on the map.",
+      "clear": "Clear filters"
+    },
+    "error": {
+      "title": "The map could not be loaded",
+      "description": "Please try again. If the problem continues, browse the experience list instead.",
+      "retry": "Try again",
+      "browseCatalog": "Browse experiences"
+    },
+    "mapError": {
+      "title": "Map unavailable",
+      "description": "You can still browse experiences in the list."
+    },
+    "loading": "Loading map experiences"
+  },
+  "Booking": {
+    "stepperLabel": "Booking progress",
+    "stepHint": "Step {step} of {total}",
+    "steps": {
+      "experience": "Experience",
+      "datetime": "Date & Time",
+      "details": "Details",
+      "extras": "Extras",
+      "review": "Review & Book"
+    },
+    "actions": {
+      "back": "Back",
+      "continueToDate": "Continue to date & time",
+      "continueToDetails": "Continue to details",
+      "continueToExtras": "Continue to extras",
+      "continueToReview": "Continue to review",
+      "payNow": "Pay securely"
+    },
+    "summary": {
+      "kicker": "Your experience",
+      "placeholderTitle": "Select an experience",
+      "datePending": "Date to be selected",
+      "timePending": "Time to be selected",
+      "locationPending": "Meeting point confirmed after booking",
+      "guests": "{count, plural, one {# guest} other {# guests}}",
+      "estimatedPrice": "Estimated price",
+      "pricePending": "Price pending",
+      "trust": "Secure your spot. Your hold lasts 20 minutes while you complete payment."
+    },
+    "experience": {
+      "title": "Book your experience",
+      "subtitle": "Select your preferences and we’ll create the perfect day for you.",
+      "empty": "No published experiences are available to book right now."
+    },
+    "datetime": {
+      "title": "Select your date",
+      "subtitle": "Choose an available date for your experience.",
+      "variantLabel": "Duration",
+      "guestsLabel": "Guests",
+      "prevMonth": "Previous",
+      "nextMonth": "Next",
+      "calendarLabel": "Availability calendar",
+      "dayLabel": "{date}",
+      "slotsTitle": "Select a start time",
+      "localTime": "All times are local ({timezone}).",
+      "loading": "Loading availability…",
+      "loadError": "Availability could not be loaded. Please try again.",
+      "noSlots": "No available departures on this date for your group size.",
+      "spotsLeft": "{count, plural, one {# spot left} other {# spots left}}",
+      "weekdays": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      },
+      "levels": {
+        "good": "{count} spots",
+        "limited": "{count} left",
+        "full": "Full",
+        "none": ""
+      },
+      "legend": {
+        "good": "Good availability",
+        "limited": "Limited availability",
+        "full": "Fully booked"
+      }
+    },
+    "details": {
+      "title": "Your details",
+      "subtitle": "We’ll use these details for confirmation and boarding.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "language": "Preferred language",
+      "specialRequests": "Add a message (optional)",
+      "specialRequestsPlaceholder": "Any special wishes or requests?",
+      "required": "This field is required.",
+      "emailInvalid": "Enter a valid email address."
+    },
+    "extras": {
+      "title": "Extras",
+      "subtitle": "Optional add-ons for your day.",
+      "empty": "No extras are available for this experience yet. You can continue to review."
+    },
+    "review": {
+      "title": "Review & book",
+      "subtitle": "Confirm your details, then continue to secure payment.",
+      "experience": "Experience",
+      "variant": "Option",
+      "when": "Date & time",
+      "guests": "Guests",
+      "contact": "Contact",
+      "total": "Total",
+      "terms": "I accept the booking terms and cancellation policy.",
+      "holdUntil": "Your hold is reserved until {time}.",
+      "paying": "Redirecting to payment…",
+      "payError": "Payment could not be started. Please try again.",
+      "createError": "The booking could not be created. Please try again.",
+      "incomplete": "Complete all required booking details before paying.",
+      "guestLabel": "Guest {number}"
+    },
+    "success": {
+      "kicker": "Booking confirmed",
+      "title": "Thank you — you’re booked.",
+      "subtitle": "We’ve received your payment. A confirmation email will follow shortly.",
+      "reference": "Booking reference",
+      "status": "Status",
+      "backToExperience": "Back to experience",
+      "backHome": "Back to home"
+    },
+    "cancel": {
+      "kicker": "Payment cancelled",
+      "title": "Payment was not completed",
+      "subtitle": "No charge was made. You can resume checkout while your hold is still active.",
+      "expired": "Your booking hold has expired. Please choose a new date and time.",
+      "status": "Current status: {status}",
+      "resume": "Resume booking",
+      "backToExperience": "Back to experience"
+    },
+    "widget": {
+      "from": "From",
+      "perPerson": "per person",
+      "perGroup": "per boat",
+      "duration": "Duration",
+      "date": "Date",
+      "guests": "Guests",
+      "maxGuests": "Maximum {count} guests per booking",
+      "checkAvailability": "Check Availability",
+      "checking": "Checking…",
+      "chooseVariant": "Choose a duration option to continue.",
+      "availabilityError": "Availability could not be checked. Please try again.",
+      "noSlots": "No available departures on this date for your group size.",
+      "availableTimes": "Available times",
+      "instant": "Instant confirmation",
+      "selectSlot": "Select a time to continue.",
+      "continue": "Continue to booking"
+    }
   }
 }

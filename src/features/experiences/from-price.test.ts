@@ -108,9 +108,10 @@ describe("takeHighlightFeatures", () => {
   });
 
   it("ignores non-string values", () => {
-    expect(takeHighlightFeatures(["Local guide", 42, null, "Photos"])).toEqual(
-      ["Local guide", "Photos"]
-    );
+    expect(takeHighlightFeatures(["Local guide", 42, null, "Photos"])).toEqual([
+      "Local guide",
+      "Photos"
+    ]);
   });
 });
 

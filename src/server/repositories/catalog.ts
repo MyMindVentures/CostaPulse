@@ -137,7 +137,10 @@ type CardExperienceRow = {
   category_label: string | null;
   experience_type?: string | null;
   highlights?: unknown;
-  provider: { display_name: string | null } | Array<{ display_name: string | null }> | null;
+  provider:
+    | { display_name: string | null }
+    | Array<{ display_name: string | null }>
+    | null;
   experience_variants: Array<{
     id: string;
     slug: string;
@@ -190,7 +193,10 @@ type DetailExperienceRow = {
   timezone: string;
   highlights: unknown;
   inclusions: unknown;
-  provider: { display_name: string | null } | Array<{ display_name: string | null }> | null;
+  provider:
+    | { display_name: string | null }
+    | Array<{ display_name: string | null }>
+    | null;
   experience_variants: Array<{
     id: string;
     slug: string;
@@ -278,7 +284,9 @@ type DetailExperienceRow = {
   }> | null;
 };
 
-function getProviderName(provider: CardExperienceRow["provider"]): string | null {
+function getProviderName(
+  provider: CardExperienceRow["provider"]
+): string | null {
   if (Array.isArray(provider)) {
     return provider[0]?.display_name ?? null;
   }
@@ -288,16 +296,22 @@ function getProviderName(provider: CardExperienceRow["provider"]): string | null
 
 function parseStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
-  return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
+  return value.filter(
+    (item): item is string => typeof item === "string" && item.trim().length > 0
+  );
 }
 
-function toNullableNumber(value: number | string | null | undefined): number | null {
+function toNullableNumber(
+  value: number | string | null | undefined
+): number | null {
   if (value === null || value === undefined) return null;
   const parsed = typeof value === "number" ? value : Number(value);
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-async function mapCardExperience(row: CardExperienceRow): Promise<ExperienceCardViewModel> {
+async function mapCardExperience(
+  row: CardExperienceRow
+): Promise<ExperienceCardViewModel> {
   const variants = (row.experience_variants ?? [])
     .filter((variant) => variant.is_active)
     .sort((left, right) => left.unit_amount_minor - right.unit_amount_minor);
@@ -402,11 +416,15 @@ async function mapDetailExperience(
     row.hero_image_path
   );
 
-  const publishedReviews = (row.reviews ?? []).filter((review) => review.status === "published");
+  const publishedReviews = (row.reviews ?? []).filter(
+    (review) => review.status === "published"
+  );
   const ratingSummary = aggregatePublishedRatings(publishedReviews);
 
   const locations = [...(row.experience_locations ?? [])]
-    .filter((entry) => entry.is_active && entry.location && entry.location.is_active)
+    .filter(
+      (entry) => entry.is_active && entry.location && entry.location.is_active
+    )
     .sort((left, right) => left.display_order - right.display_order)
     .map((entry) => {
       const location = entry.location!;
@@ -484,8 +502,12 @@ async function mapDetailExperience(
       reviewCount: ratingSummary.reviewCount,
       items: publishedReviews
         .sort((left, right) => {
-          const leftTime = left.published_at ? Date.parse(left.published_at) : 0;
-          const rightTime = right.published_at ? Date.parse(right.published_at) : 0;
+          const leftTime = left.published_at
+            ? Date.parse(left.published_at)
+            : 0;
+          const rightTime = right.published_at
+            ? Date.parse(right.published_at)
+            : 0;
           return rightTime - leftTime;
         })
         .map((review) => ({
@@ -672,7 +694,9 @@ export async function getPublishedExperienceCards(
 
   try {
     return await Promise.all(
-      (data as unknown as CardExperienceRow[]).map((row) => mapCardExperience(row))
+      (data as unknown as CardExperienceRow[]).map((row) =>
+        mapCardExperience(row)
+      )
     );
   } catch {
     return [];

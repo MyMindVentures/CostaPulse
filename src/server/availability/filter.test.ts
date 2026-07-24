@@ -5,12 +5,12 @@ import {
   getLocalDateKey,
   isSlotEligibleForParty
 } from "./filter";
+import { classifyDayAvailability } from "./thresholds";
 
 const TZ = "Europe/Madrid";
 
 describe("availability filter helpers", () => {
   it("maps UTC instants to the local calendar date", () => {
-    // 2026-07-26 10:00 Madrid = 08:00 UTC in summer
     expect(getLocalDateKey("2026-07-26T08:00:00.000Z", TZ)).toBe("2026-07-26");
   });
 
@@ -25,9 +25,10 @@ describe("availability filter helpers", () => {
       timezone: TZ,
       status: "scheduled",
       capacityTotal: 11,
-      capacityReserved: 0,
+      capacityAvailable: 11,
       bookingCutoffAt: "2026-07-26T06:00:00.000Z",
       isInstantConfirmation: true,
+      isBookable: true,
       partySize: 2,
       nowMs: Date.parse("2026-07-26T06:00:00.000Z")
     });
@@ -42,9 +43,10 @@ describe("availability filter helpers", () => {
       timezone: TZ,
       status: "scheduled",
       capacityTotal: 11,
-      capacityReserved: 10,
+      capacityAvailable: 1,
       bookingCutoffAt: "2026-07-26T06:00:00.000Z",
       isInstantConfirmation: true,
+      isBookable: true,
       partySize: 2,
       nowMs: Date.parse("2026-07-20T10:00:00.000Z")
     });
@@ -62,9 +64,11 @@ describe("availability filter helpers", () => {
           timezone: TZ,
           status: "scheduled",
           capacityTotal: 11,
-          capacityReserved: 0,
+          capacityAvailable: 11,
           bookingCutoffAt: "2026-07-26T06:00:00.000Z",
-          isInstantConfirmation: true
+          isInstantConfirmation: true,
+          isBookable: true,
+          locationId: null
         },
         {
           id: "22222222-2222-4222-8222-222222222222",
@@ -73,9 +77,11 @@ describe("availability filter helpers", () => {
           timezone: TZ,
           status: "scheduled",
           capacityTotal: 11,
-          capacityReserved: 0,
+          capacityAvailable: 11,
           bookingCutoffAt: "2026-07-27T06:00:00.000Z",
-          isInstantConfirmation: true
+          isInstantConfirmation: true,
+          isBookable: true,
+          locationId: null
         }
       ],
       "2026-07-26",
@@ -88,5 +94,37 @@ describe("availability filter helpers", () => {
     expect(slots[0]?.id).toBe("11111111-1111-4111-8111-111111111111");
     expect(slots[0]?.localStartLabel).toBe("10:00");
     expect(slots[0]?.capacityRemaining).toBe(11);
+  });
+});
+
+describe("classifyDayAvailability", () => {
+  it("marks good availability when plenty of seats remain", () => {
+    expect(
+      classifyDayAvailability({
+        capacityTotal: 20,
+        capacityAvailable: 12,
+        hasBookableSlot: true
+      })
+    ).toBe("good");
+  });
+
+  it("marks limited when remaining seats are low", () => {
+    expect(
+      classifyDayAvailability({
+        capacityTotal: 11,
+        capacityAvailable: 2,
+        hasBookableSlot: true
+      })
+    ).toBe("limited");
+  });
+
+  it("marks full when no bookable capacity remains", () => {
+    expect(
+      classifyDayAvailability({
+        capacityTotal: 11,
+        capacityAvailable: 0,
+        hasBookableSlot: false
+      })
+    ).toBe("full");
   });
 });

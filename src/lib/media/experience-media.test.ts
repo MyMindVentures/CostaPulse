@@ -12,9 +12,15 @@ import {
 
 describe("getPublicStorageUrl", () => {
   it("returns null when bucket, path, or supabase url is missing", () => {
-    expect(getPublicStorageUrl(null, "a.png", "https://example.supabase.co")).toBeNull();
-    expect(getPublicStorageUrl("brand-assets", null, "https://example.supabase.co")).toBeNull();
-    expect(getPublicStorageUrl("brand-assets", "logos/a.png", undefined)).toBeNull();
+    expect(
+      getPublicStorageUrl(null, "a.png", "https://example.supabase.co")
+    ).toBeNull();
+    expect(
+      getPublicStorageUrl("brand-assets", null, "https://example.supabase.co")
+    ).toBeNull();
+    expect(
+      getPublicStorageUrl("brand-assets", "logos/a.png", undefined)
+    ).toBeNull();
   });
 
   it("builds a public url for any bucket", () => {
@@ -32,7 +38,9 @@ describe("getPublicStorageUrl", () => {
 
 describe("getExperienceMediaUrl", () => {
   it("returns null when path or supabase url is missing", () => {
-    expect(getExperienceMediaUrl(null, "https://example.supabase.co")).toBeNull();
+    expect(
+      getExperienceMediaUrl(null, "https://example.supabase.co")
+    ).toBeNull();
     expect(getExperienceMediaUrl("curated/a.webp", undefined)).toBeNull();
   });
 
@@ -93,7 +101,10 @@ describe("selectSiteLogoAsset", () => {
     expect(
       selectSiteLogoAsset([
         { bucketId: BRAND_ASSETS_BUCKET, storagePath: "logos/alt.png" },
-        { bucketId: BRAND_ASSETS_BUCKET, storagePath: "logos/CostaPulse Logo.png" },
+        {
+          bucketId: BRAND_ASSETS_BUCKET,
+          storagePath: "logos/CostaPulse Logo.png"
+        },
         { bucketId: BRAND_ASSETS_BUCKET, storagePath: "team/photo.png" }
       ])
     ).toEqual({
@@ -132,7 +143,10 @@ describe("getExperienceHeroImageSrc", () => {
 
   it("uses fallback when path is missing", () => {
     expect(
-      getExperienceHeroImageSrc(null, "https://images.unsplash.com/photo-example")
+      getExperienceHeroImageSrc(
+        null,
+        "https://images.unsplash.com/photo-example"
+      )
     ).toBe("https://images.unsplash.com/photo-example");
   });
 });

@@ -21,6 +21,11 @@ function extractBookingIdFromEvent(event: Stripe.Event) {
     : null;
 }
 
+function extractProviderPaymentId(event: Stripe.Event) {
+  const object = event.data.object as { id?: string };
+  return typeof object.id === "string" ? object.id : null;
+}
+
 export async function POST(request: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const signature = request.headers.get("stripe-signature");
@@ -37,7 +42,7 @@ export async function POST(request: Request) {
 
   const rawBody = await request.text();
 
-  let event;
+  let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
   } catch {
@@ -108,33 +113,49 @@ export async function POST(request: Request) {
   }
 
   const now = new Date().toISOString();
-  const bookingPatch: Record<string, string | null> = {
-    payment_status: bookingUpdate.paymentStatus,
-    status: bookingUpdate.bookingStatus
-  };
+  const providerPaymentId = extractProviderPaymentId(event);
 
-  if (bookingUpdate.markBookedAt) {
-    bookingPatch.booked_at = now;
-  }
+  if (event.type === "checkout.session.completed") {
+    const { error: confirmError } = await supabase.rpc("confirm_paid_booking", {
+      p_booking_id: bookingId,
+      p_provider_payment_id: providerPaymentId ?? undefined
+    });
 
-  if (bookingUpdate.markCancelledAt) {
-    bookingPatch.cancelled_at = now;
-  }
+    if (confirmError) {
+      return NextResponse.json(
+        {
+          status: "booking_update_failed",
+          error:
+            "The payment event was received, but the booking could not be confirmed yet."
+        },
+        { status: 503 }
+      );
+    }
+  } else {
+    const bookingPatch: Record<string, string | null> = {
+      payment_status: bookingUpdate.paymentStatus,
+      status: bookingUpdate.bookingStatus
+    };
 
-  const { error: bookingError } = await supabase
-    .from("bookings")
-    .update(bookingPatch)
-    .eq("id", bookingId);
+    if (bookingUpdate.markCancelledAt) {
+      bookingPatch.cancelled_at = now;
+    }
 
-  if (bookingError) {
-    return NextResponse.json(
-      {
-        status: "booking_update_failed",
-        error:
-          "The payment event was received, but the booking could not be updated yet."
-      },
-      { status: 503 }
-    );
+    const { error: bookingError } = await supabase
+      .from("bookings")
+      .update(bookingPatch)
+      .eq("id", bookingId);
+
+    if (bookingError) {
+      return NextResponse.json(
+        {
+          status: "booking_update_failed",
+          error:
+            "The payment event was received, but the booking could not be updated yet."
+        },
+        { status: 503 }
+      );
+    }
   }
 
   await supabase

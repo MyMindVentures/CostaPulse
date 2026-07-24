@@ -18,6 +18,7 @@ type ExperienceSectionProps = {
   title: string;
   description: string;
   viewAllLabel: string;
+  viewMapLabel: string;
   fallbackBadge: string;
   viewDetailsLabel: string;
 };
@@ -29,10 +30,15 @@ export function ExperienceSection({
   title,
   description,
   viewAllLabel,
+  viewMapLabel,
   viewDetailsLabel
 }: ExperienceSectionProps) {
   return (
-    <section className="experiences" id="experiences" aria-labelledby="experiences-title">
+    <section
+      className="experiences"
+      id="experiences"
+      aria-labelledby="experiences-title"
+    >
       <Container>
         <div className="section-heading">
           <SectionKicker light>{kicker}</SectionKicker>
@@ -40,16 +46,25 @@ export function ExperienceSection({
             <h2 id="experiences-title">{title}</h2>
             <p>{description}</p>
           </div>
-          <Link href="/experiences" className="button button-light">
-            {viewAllLabel}
-            <ArrowRight size={18} aria-hidden />
-          </Link>
+          <div className="section-heading__actions">
+            <Link href="/experiences/map" className="button button-outline">
+              {viewMapLabel}
+            </Link>
+            <Link href="/experiences" className="button button-light">
+              {viewAllLabel}
+              <ArrowRight size={18} aria-hidden />
+            </Link>
+          </div>
         </div>
 
         {experiences.length > 0 ? (
           <div className="experience-list">
             {experiences.map((experience, index) => (
-              <ExperienceCard key={experience.id} experience={experience} fallbackIndex={index} />
+              <ExperienceCard
+                key={experience.id}
+                experience={experience}
+                fallbackIndex={index}
+              />
             ))}
           </div>
         ) : (

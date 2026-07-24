@@ -58,9 +58,14 @@ function getServerFavoriteSnapshot() {
 type FavoriteToggleProps = {
   experienceId: string;
   label: string;
+  className?: string;
 };
 
-export function FavoriteToggle({ experienceId, label }: FavoriteToggleProps) {
+export function FavoriteToggle({
+  experienceId,
+  label,
+  className = "experience-favorite-button"
+}: FavoriteToggleProps) {
   const getSnapshot = useCallback(
     () => getFavoriteSnapshot(experienceId),
     [experienceId]
@@ -84,7 +89,7 @@ export function FavoriteToggle({ experienceId, label }: FavoriteToggleProps) {
   return (
     <button
       type="button"
-      className="experience-tile-favorite"
+      className={className}
       aria-label={label}
       aria-pressed={favorited}
       onClick={(event) => {

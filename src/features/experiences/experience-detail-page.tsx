@@ -4,7 +4,6 @@ import { BookingWidget } from "./detail/booking-widget";
 import { DetailBreadcrumbs } from "./detail/detail-breadcrumbs";
 import { DetailHero } from "./detail/detail-hero";
 import { DetailHighlightsBar } from "./detail/detail-highlights-bar";
-import { DetailSiteHeader } from "./detail/detail-site-header";
 import { DetailTabs } from "./detail/detail-tabs";
 import { MapPreview } from "./detail/map-preview";
 import { MeetingPointsCard } from "./detail/meeting-points-card";
@@ -13,11 +12,11 @@ type ExperienceDetailPageProps = {
   experience: ExperienceDetailViewModel;
 };
 
-export async function ExperienceDetailPageFeature({ experience }: ExperienceDetailPageProps) {
+export async function ExperienceDetailPageFeature({
+  experience
+}: ExperienceDetailPageProps) {
   return (
     <main className="xp-detail-page">
-      <DetailSiteHeader />
-
       <Container className="xp-detail-top">
         <DetailBreadcrumbs title={experience.title} />
       </Container>
@@ -45,7 +44,10 @@ export async function ExperienceDetailPageFeature({ experience }: ExperienceDeta
               policies={experience.policies}
             />
             <MeetingPointsCard locations={experience.locations} />
-            <MapPreview locations={experience.locations} title={experience.title} />
+            <MapPreview
+              locations={experience.locations}
+              title={experience.title}
+            />
           </aside>
         </Container>
       </section>

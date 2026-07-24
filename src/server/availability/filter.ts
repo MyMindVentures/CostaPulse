@@ -10,12 +10,14 @@ export type SlotCandidate = {
   timezone: string;
   status: string;
   capacityTotal: number;
-  capacityReserved: number;
+  capacityAvailable: number;
   bookingCutoffAt: string | null;
   isInstantConfirmation: boolean;
+  isBookable: boolean;
+  locationId: string | null;
 };
 
-export type SlotEligibilityInput = Omit<SlotCandidate, "id"> & {
+export type SlotEligibilityInput = Omit<SlotCandidate, "id" | "locationId"> & {
   partySize: number;
   nowMs?: number;
 };
@@ -26,7 +28,9 @@ export type EligibleSlot = {
   endsAt: string;
   localStartLabel: string;
   capacityRemaining: number;
+  capacityTotal: number;
   isInstantConfirmation: boolean;
+  locationId: string | null;
 };
 
 function getTimeZoneParts(date: Date, timeZone: string) {
@@ -70,10 +74,14 @@ export function isSlotEligibleForParty(
   input: SlotEligibilityInput
 ): { ok: true; capacityRemaining: number } | { ok: false; reason: string } {
   const nowMs = input.nowMs ?? Date.now();
-  const capacityRemaining = input.capacityTotal - input.capacityReserved;
+  const capacityRemaining = input.capacityAvailable;
 
   if (input.status !== "scheduled") {
     return { ok: false, reason: "status" };
+  }
+
+  if (!input.isBookable) {
+    return { ok: false, reason: "not_bookable" };
   }
 
   if (capacityRemaining < input.partySize) {
@@ -112,9 +120,13 @@ export function filterSlotsForLocalDate(
         endsAt: slot.endsAt,
         localStartLabel: formatLocalStartLabel(slot.startsAt, timeZone),
         capacityRemaining: eligibility.capacityRemaining,
-        isInstantConfirmation: slot.isInstantConfirmation
+        capacityTotal: slot.capacityTotal,
+        isInstantConfirmation: slot.isInstantConfirmation,
+        locationId: slot.locationId
       };
     })
     .filter((slot): slot is EligibleSlot => slot !== null)
-    .sort((left, right) => Date.parse(left.startsAt) - Date.parse(right.startsAt));
+    .sort(
+      (left, right) => Date.parse(left.startsAt) - Date.parse(right.startsAt)
+    );
 }

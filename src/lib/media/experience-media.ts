@@ -92,7 +92,11 @@ export function resolveExperienceMediaUrl(
   supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 ): string | null {
   if (mediaAsset?.bucketId && mediaAsset.storagePath) {
-    return getPublicStorageUrl(mediaAsset.bucketId, mediaAsset.storagePath, supabaseUrl);
+    return getPublicStorageUrl(
+      mediaAsset.bucketId,
+      mediaAsset.storagePath,
+      supabaseUrl
+    );
   }
   return getExperienceMediaUrl(storagePath, supabaseUrl);
 }
@@ -124,5 +128,9 @@ export function selectSiteLogoAsset(
   const preferred = logos.find(
     (asset) => asset.storagePath.toLowerCase() === "logos/costapulse logo.png"
   );
-  return preferred ?? logos.sort((a, b) => a.storagePath.localeCompare(b.storagePath))[0] ?? null;
+  return (
+    preferred ??
+    logos.sort((a, b) => a.storagePath.localeCompare(b.storagePath))[0] ??
+    null
+  );
 }

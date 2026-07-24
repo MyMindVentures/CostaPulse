@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
+import { ConsentBanner } from "@/features/analytics/consent-banner";
+import { PostHogProvider } from "@/features/analytics/posthog-provider";
 import "./globals.css";
 
 const siteUrl =
@@ -31,7 +33,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <PostHogProvider>
+            {children}
+            <ConsentBanner />
+          </PostHogProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

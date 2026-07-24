@@ -21,7 +21,10 @@ type DetailHighlightsBarProps = {
   highlights: string[];
 };
 
-function splitHighlight(text: string): { title: string; subtitle: string | null } {
+function splitHighlight(text: string): {
+  title: string;
+  subtitle: string | null;
+} {
   const separators = [" — ", " - ", ": ", " with ", " for "];
   for (const separator of separators) {
     const index = text.indexOf(separator);

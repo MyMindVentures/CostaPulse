@@ -14,6 +14,7 @@ test("homepage renders and readiness endpoints respond", async ({
     .resolves.toMatchObject({ status: "ready" });
 
   await page.goto("/");
+  await page.getByRole("button", { name: /Decline/i }).click();
   const stylesheetPath = await page
     .locator('link[rel="stylesheet"]')
     .first()
@@ -26,11 +27,14 @@ test("homepage renders and readiness endpoints respond", async ({
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: /Feel the best of the Costa Blanca/i
+      name: /Your Costa Blanca/i
     })
   ).toBeVisible();
   await expect(
-    page.locator(".hero-nav").getByRole("link", { name: /Browse experiences/i })
+    page.getByRole("navigation", { name: /Primary navigation/i }).first()
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Explore experiences/i }).first()
   ).toBeVisible();
 });
 
@@ -39,10 +43,11 @@ test("admin redirects unauthenticated visitors back to the homepage", async ({
 }) => {
   await page.goto("/admin");
   await expect(page).toHaveURL(/admin=locked/);
+  await page.getByRole("button", { name: /Decline/i }).click();
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: /Feel the best of the Costa Blanca/i
+      name: /Your Costa Blanca/i
     })
   ).toBeVisible();
 });

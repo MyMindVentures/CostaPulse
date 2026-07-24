@@ -26,10 +26,13 @@ function formatDurationLabel(experience: ExperienceDetailViewModel) {
 }
 
 export function DetailHero({ experience }: DetailHeroProps) {
-  const heroFromMedia = experience.media.find((item) => item.isHero && item.url)?.url;
+  const heroFromMedia = experience.media.find(
+    (item) => item.isHero && item.url
+  )?.url;
   const imageSrc =
     heroFromMedia ??
-    experience.media.find((item) => item.mediaType === "image" && item.url)?.url ??
+    experience.media.find((item) => item.mediaType === "image" && item.url)
+      ?.url ??
     getExperienceHeroImageSrc(experience.heroImagePath);
 
   const badge =
@@ -60,7 +63,10 @@ export function DetailHero({ experience }: DetailHeroProps) {
           <p className="xp-hero-subtitle">{experience.shortDescription}</p>
         ) : null}
         {experience.description ? (
-          <p className="xp-hero-copy">{experience.description.slice(0, 220)}{experience.description.length > 220 ? "…" : ""}</p>
+          <p className="xp-hero-copy">
+            {experience.description.slice(0, 220)}
+            {experience.description.length > 220 ? "…" : ""}
+          </p>
         ) : null}
 
         <div className="xp-hero-stats">

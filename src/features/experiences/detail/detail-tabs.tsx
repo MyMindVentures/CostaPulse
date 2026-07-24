@@ -38,7 +38,9 @@ function QuickInfo({ experience }: { experience: ExperienceDetailViewModel }) {
 
   const languages =
     experience.languages.length > 0
-      ? experience.languages.map((language) => language.code.toUpperCase()).join(", ")
+      ? experience.languages
+          .map((language) => language.code.toUpperCase())
+          .join(", ")
       : null;
 
   const meetingPoint =
@@ -71,10 +73,16 @@ function QuickInfo({ experience }: { experience: ExperienceDetailViewModel }) {
       ? { label: "Availability", value: experience.availabilitySummary }
       : null,
     mobileTicketPolicy
-      ? { label: mobileTicketPolicy.title, value: mobileTicketPolicy.description ?? "Yes" }
+      ? {
+          label: mobileTicketPolicy.title,
+          value: mobileTicketPolicy.description ?? "Yes"
+        }
       : null,
     confirmationPolicy
-      ? { label: confirmationPolicy.title, value: confirmationPolicy.description ?? "Yes" }
+      ? {
+          label: confirmationPolicy.title,
+          value: confirmationPolicy.description ?? "Yes"
+        }
       : null
   ].filter((row): row is { label: string; value: string } => row !== null);
 
@@ -128,7 +136,11 @@ export function DetailTabs({ experience }: DetailTabsProps) {
 
   return (
     <div className="xp-tabs">
-      <div className="xp-tablist" role="tablist" aria-label="Experience details">
+      <div
+        className="xp-tablist"
+        role="tablist"
+        aria-label="Experience details"
+      >
         {tabs.map((tab) => {
           const selected = active === tab.id;
           return (
@@ -145,7 +157,11 @@ export function DetailTabs({ experience }: DetailTabsProps) {
                 if (tab.id === "location") {
                   window.history.replaceState(null, "", "#location");
                 } else if (window.location.hash === "#location") {
-                  window.history.replaceState(null, "", window.location.pathname);
+                  window.history.replaceState(
+                    null,
+                    "",
+                    window.location.pathname
+                  );
                 }
               }}
             >
@@ -169,7 +185,9 @@ export function DetailTabs({ experience }: DetailTabsProps) {
                 experience.description
                   .split(/\n+/)
                   .filter(Boolean)
-                  .map((paragraph) => <p key={paragraph.slice(0, 48)}>{paragraph}</p>)
+                  .map((paragraph) => (
+                    <p key={paragraph.slice(0, 48)}>{paragraph}</p>
+                  ))
               ) : experience.shortDescription ? (
                 <p>{experience.shortDescription}</p>
               ) : null}
@@ -226,12 +244,15 @@ export function DetailTabs({ experience }: DetailTabsProps) {
         {active === "info" ? (
           <div>
             <h2>Important Info</h2>
-            {experience.requirements.length > 0 || experience.policies.length > 0 ? (
+            {experience.requirements.length > 0 ||
+            experience.policies.length > 0 ? (
               <div className="xp-info-stacks">
                 {experience.requirements.map((requirement) => (
                   <article key={requirement.id}>
                     <h3>{requirement.title}</h3>
-                    {requirement.description ? <p>{requirement.description}</p> : null}
+                    {requirement.description ? (
+                      <p>{requirement.description}</p>
+                    ) : null}
                   </article>
                 ))}
                 {experience.policies.map((policy) => (
@@ -275,7 +296,9 @@ export function DetailTabs({ experience }: DetailTabsProps) {
                 {experience.locations.map((location) => (
                   <li key={location.id}>
                     <strong>{location.name}</strong>
-                    {location.meetingInstructions ? <p>{location.meetingInstructions}</p> : null}
+                    {location.meetingInstructions ? (
+                      <p>{location.meetingInstructions}</p>
+                    ) : null}
                     {location.city ? <span>{location.city}</span> : null}
                   </li>
                 ))}
