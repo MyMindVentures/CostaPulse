@@ -1,41 +1,31 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
-import { Container } from "@/components/ui/container";
-import { getPublishedExperienceCards } from "@/server/repositories/catalog";
+import { ExperienceDetailPageFeature } from "@/features/experiences/experience-detail-page";
+import { getPublishedExperienceBySlug } from "@/server/repositories/catalog";
 
-type ExperienceDetailPageProps = {
+type ExperiencePageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export default async function ExperienceDetailPage({
-  params
-}: ExperienceDetailPageProps) {
+export async function generateMetadata({ params }: ExperiencePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const t = await getTranslations("HomePage");
-  const cards = await getPublishedExperienceCards(50);
-  const experience = cards.find((card) => card.slug === slug);
+  const experience = await getPublishedExperienceBySlug(slug);
 
   if (!experience) {
-    notFound();
+    return { title: "Experience not found | CostaPulse" };
   }
 
-  return (
-    <main className="home-page">
-      <section className="intro">
-        <Container className="intro-grid">
-          <Link href="/" className="inline-link">
-            CostaPulse
-          </Link>
-          <div className="intro-copy">
-            <h1>{experience.title}</h1>
-            <p>{experience.shortDescription ?? t("experienceFallback")}</p>
-            <Link href="/#experiences" className="inline-link cta-link">
-              {t("viewAllExperiences")}
-            </Link>
-          </div>
-        </Container>
-      </section>
-    </main>
-  );
+  return {
+    title: `${experience.title} | CostaPulse`,
+    description: experience.shortDescription ?? `Discover ${experience.title} on the Costa Blanca.`
+  };
+}
+
+export default async function ExperiencePage({ params }: ExperiencePageProps) {
+  const { slug } = await params;
+  const experience = await getPublishedExperienceBySlug(slug);
+
+  if (!experience) notFound();
+
+  return <ExperienceDetailPageFeature experience={experience} />;
 }

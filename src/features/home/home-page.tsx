@@ -12,24 +12,11 @@ import { getTranslations } from "next-intl/server";
 import { BrandLink } from "@/components/shared/brand-link";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Container } from "@/components/ui/container";
-import {
-  CURATED_MEDIA_BY_SLUG,
-  type CuratedMediaSlug
-} from "@/features/experiences/curated-media";
-import {
-  ExperienceTile,
-  categoryIconForExperienceType
-} from "@/features/experiences/experience-tile";
-import {
-  formatDurationHours,
-  formatMinorUnitAmount
-} from "@/lib/pricing/format-money";
-import { resolvePublicImageSrc } from "@/lib/media/experience-media";
 import { getPublishedExperienceCards } from "@/server/repositories/catalog";
+import { ExperienceSection } from "./experience-section";
 
 type CuratedCategory = {
   number: string;
-  slug: CuratedMediaSlug;
   title: string;
   copy: string;
 };
@@ -60,22 +47,7 @@ export async function HomePageFeature() {
   const heroTrustPoints = t.raw("heroTrustPoints") as HeroTrustPoint[];
   const locationPills = t.raw("locationPills") as LocationPill[];
   const trustPoints = t.raw("trustPoints") as TrustPoint[];
-  const experiences = await getPublishedExperienceCards(12);
-  const curatedTiles = await Promise.all(
-    curatedCategories.map(async (item) => {
-      const media = CURATED_MEDIA_BY_SLUG[item.slug];
-      const imageSrc = media
-        ? await resolvePublicImageSrc(media.imagePath, media.interimImageSrc)
-        : null;
-      return { ...item, imageSrc };
-    })
-  );
-  const experienceTiles = await Promise.all(
-    experiences.map(async (experience) => ({
-      ...experience,
-      imageSrc: await resolvePublicImageSrc(experience.heroImagePath)
-    }))
-  );
+  const experiences = await getPublishedExperienceCards(3);
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -173,124 +145,22 @@ export async function HomePageFeature() {
         </Container>
       </section>
 
-      <section
-        className="experiences"
-        id="experiences"
-        aria-labelledby="experiences-title"
-      >
-        <Container>
-          <div className="section-heading">
-            <SectionKicker light>{t("experiencesKicker")}</SectionKicker>
-            <div>
-              <h2 id="experiences-title">{t("experiencesTitle")}</h2>
-              <p>{t("experiencesDescription")}</p>
-            </div>
-            <a href="#cta" className="button button-light">
-              {t("viewAllExperiences")}
-              <ArrowRight size={18} aria-hidden />
-            </a>
-          </div>
-
-          <div className="experience-grid">
-            {experienceTiles.length > 0
-              ? experienceTiles.map((experience) => {
-                  const duration = formatDurationHours(
-                    experience.durationMinutes
-                  );
-                  const metaItems = [
-                    {
-                      icon: "duration" as const,
-                      label:
-                        duration.labelKey === "hour"
-                          ? t("meta.durationHour", { hours: duration.hours })
-                          : t("meta.durationHours", { hours: duration.hours })
-                    },
-                    {
-                      icon: "capacity" as const,
-                      label: t("meta.capacityValue", {
-                        count: experience.baseCapacity
-                      })
-                    },
-                    ...experience.highlightFeatures.map((feature) => ({
-                      icon: "feature" as const,
-                      label: feature
-                    }))
-                  ];
-
-                  return (
-                    <ExperienceTile
-                      key={experience.id}
-                      experienceId={experience.id}
-                      title={experience.title}
-                      description={
-                        experience.shortDescription ?? t("experienceFallback")
-                      }
-                      href={`/experiences/${experience.slug}`}
-                      ctaLabel={t("viewDetails")}
-                      imageSrc={experience.imageSrc}
-                      imageAlt={
-                        experience.heroImageAlt?.trim() || experience.title
-                      }
-                      tone={experience.tone}
-                      categoryLabel={experience.categoryLabel}
-                      categoryIcon={categoryIconForExperienceType(
-                        experience.experienceType
-                      )}
-                      favoriteLabel={t("favoriteLabel")}
-                      fromLabel={t("fromPrice")}
-                      priceAmount={
-                        experience.fromPrice
-                          ? formatMinorUnitAmount(
-                              experience.fromPrice.amountMinor,
-                              experience.fromPrice.currency
-                            )
-                          : null
-                      }
-                      priceUnit={
-                        experience.fromPrice
-                          ? experience.fromPrice.pricingModel === "per_person"
-                            ? t("priceUnitPerPerson")
-                            : t("priceUnitPerGroup")
-                          : null
-                      }
-                      averageRating={experience.averageRating}
-                      reviewCount={experience.reviewCount}
-                      reviewCountLabel={
-                        experience.reviewCount > 0
-                          ? t("reviewCountLabel", {
-                              count: experience.reviewCount
-                            })
-                          : null
-                      }
-                      metaItems={metaItems}
-                    />
-                  );
-                })
-              : curatedTiles.map((item, index) => (
-                  <ExperienceTile
-                    key={item.slug}
-                    title={item.title}
-                    description={item.copy}
-                    href="#cta"
-                    ctaLabel={t("viewDetails")}
-                    imageSrc={item.imageSrc}
-                    imageAlt={item.title}
-                    tone={((index % 3) + 1) as 1 | 2 | 3}
-                  />
-                ))}
-          </div>
-        </Container>
-      </section>
+      <ExperienceSection
+        experiences={experiences}
+        curatedCategories={curatedCategories}
+        kicker={t("experiencesKicker")}
+        title={t("experiencesTitle")}
+        description={t("experiencesDescription")}
+        viewAllLabel={t("viewAllExperiences")}
+        fallbackBadge={t("experienceBadge")}
+        viewDetailsLabel={t("viewDetails")}
+      />
 
       <section className="trust" id="trust">
         <Container className="trust-grid">
           {trustPoints.map((item, index) => (
             <article key={item.title}>
-              {index === 0 ? (
-                <ShieldCheck aria-hidden />
-              ) : (
-                <Sparkles aria-hidden />
-              )}
+              {index === 0 ? <ShieldCheck aria-hidden /> : <Sparkles aria-hidden />}
               <h3>{item.title}</h3>
               <p>{item.description}</p>
             </article>
@@ -328,10 +198,7 @@ export async function HomePageFeature() {
         <Container>
           <SectionKicker>{t("ctaKicker")}</SectionKicker>
           <h2>{t("ctaTitle")}</h2>
-          <a
-            href="mailto:hello@costapulse.club"
-            className="inline-link cta-link"
-          >
+          <a href="mailto:hello@costapulse.club" className="inline-link cta-link">
             {t("ctaLink")}
             <ArrowRight size={18} aria-hidden />
           </a>

@@ -1,177 +1,185 @@
 import "server-only";
-import {
-  aggregatePublishedRatings,
-  resolveHeroMedia
-} from "@/features/experiences/card-data";
-import {
-  resolveExperienceCardTone,
-  selectFromPrice,
-  takeHighlightFeatures,
-  type ExperienceCardTone,
-  type ExperienceFromPrice
-} from "@/features/experiences/from-price";
+import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export type ExperienceHighlight = {
+const pricingModelSchema = z.enum(["per_person", "per_group"]);
+
+const experienceCardSchema = z.object({
+  id: z.string().uuid(),
+  slug: z.string().min(1),
+  title: z.string().min(1),
+  shortDescription: z.string().nullable(),
+  description: z.string().nullable(),
+  durationMinutes: z.number().int().positive(),
+  baseCapacity: z.number().int().positive(),
+  locationName: z.string().nullable(),
+  heroImagePath: z.string().nullable(),
+  categoryLabel: z.string().nullable(),
+  providerName: z.string().nullable(),
+  startingPriceMinor: z.number().int().nonnegative().nullable(),
+  currency: z.string().length(3).nullable(),
+  pricingModel: pricingModelSchema.nullable()
+});
+
+export type ExperienceCardViewModel = z.infer<typeof experienceCardSchema>;
+
+export type ExperienceDetailViewModel = ExperienceCardViewModel & {
+  variants: Array<{
+    id: string;
+    slug: string;
+    name: string;
+    description: string | null;
+    pricingModel: "per_person" | "per_group";
+    unitAmountMinor: number;
+    currency: string;
+    minPartySize: number;
+    maxPartySize: number | null;
+  }>;
+};
+
+type ExperienceRow = {
   id: string;
   slug: string;
   title: string;
-  shortDescription: string | null;
-  durationMinutes: number;
-  baseCapacity: number;
-  locationName: string | null;
-  heroImagePath: string | null;
+  short_description: string | null;
+  description: string | null;
+  duration_minutes: number;
+  base_capacity: number;
+  location_name: string | null;
+  hero_image_path: string | null;
+  category_label: string | null;
+  provider: { display_name: string | null } | Array<{ display_name: string | null }> | null;
+  experience_variants: Array<{
+    id: string;
+    slug: string;
+    name: string;
+    description: string | null;
+    pricing_model: "per_person" | "per_group";
+    unit_amount_minor: number;
+    currency: string;
+    min_party_size: number;
+    max_party_size: number | null;
+    is_default: boolean;
+    is_active: boolean;
+  }> | null;
 };
 
-export type ExperienceCard = {
-  id: string;
-  slug: string;
-  title: string;
-  shortDescription: string | null;
-  durationMinutes: number;
-  baseCapacity: number;
-  locationName: string | null;
-  heroImagePath: string | null;
-  heroImageAlt: string | null;
-  categoryLabel: string | null;
-  experienceType: string | null;
-  highlightFeatures: string[];
-  fromPrice: ExperienceFromPrice | null;
-  tone: ExperienceCardTone;
-  averageRating: number | null;
-  reviewCount: number;
-};
+function getProviderName(provider: ExperienceRow["provider"]): string | null {
+  if (Array.isArray(provider)) {
+    return provider[0]?.display_name ?? null;
+  }
 
-type VariantRow = {
-  unit_amount_minor: number;
-  currency: string;
-  pricing_model: "per_person" | "per_group";
-  is_default: boolean;
-  is_active: boolean;
-};
-
-type MediaRow = {
-  storage_path: string;
-  media_type: string;
-  alt_text: string | null;
-  is_hero: boolean;
-  display_order: number;
-};
-
-type ReviewRow = {
-  rating: number;
-  status: string;
-};
-
-export async function getPublishedExperienceHighlights(
-  limit = 3
-): Promise<ExperienceHighlight[]> {
-  const cards = await getPublishedExperienceCards(limit);
-  return cards.map((card) => ({
-    id: card.id,
-    slug: card.slug,
-    title: card.title,
-    shortDescription: card.shortDescription,
-    durationMinutes: card.durationMinutes,
-    baseCapacity: card.baseCapacity,
-    locationName: card.locationName,
-    heroImagePath: card.heroImagePath
-  }));
+  return provider?.display_name ?? null;
 }
 
+function mapExperience(row: ExperienceRow): ExperienceDetailViewModel {
+  const variants = (row.experience_variants ?? [])
+    .filter((variant) => variant.is_active)
+    .sort((left, right) => left.unit_amount_minor - right.unit_amount_minor)
+    .map((variant) => ({
+      id: variant.id,
+      slug: variant.slug,
+      name: variant.name,
+      description: variant.description,
+      pricingModel: variant.pricing_model,
+      unitAmountMinor: variant.unit_amount_minor,
+      currency: variant.currency.trim(),
+      minPartySize: variant.min_party_size,
+      maxPartySize: variant.max_party_size
+    }));
+
+  const cheapestVariant = variants[0] ?? null;
+  const card = experienceCardSchema.parse({
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    shortDescription: row.short_description,
+    description: row.description,
+    durationMinutes: row.duration_minutes,
+    baseCapacity: row.base_capacity,
+    locationName: row.location_name,
+    heroImagePath: row.hero_image_path,
+    categoryLabel: row.category_label,
+    providerName: getProviderName(row.provider),
+    startingPriceMinor: cheapestVariant?.unitAmountMinor ?? null,
+    currency: cheapestVariant?.currency ?? null,
+    pricingModel: cheapestVariant?.pricingModel ?? null
+  });
+
+  return { ...card, variants };
+}
+
+const experienceSelect = `
+  id,
+  slug,
+  title,
+  short_description,
+  description,
+  duration_minutes,
+  base_capacity,
+  location_name,
+  hero_image_path,
+  category_label,
+  provider:profiles!experiences_provider_profile_id_fkey(display_name),
+  experience_variants(
+    id,
+    slug,
+    name,
+    description,
+    pricing_model,
+    unit_amount_minor,
+    currency,
+    min_party_size,
+    max_party_size,
+    is_default,
+    is_active
+  )
+`;
+
 export async function getPublishedExperienceCards(
-  limit = 12
-): Promise<ExperienceCard[]> {
+  limit?: number
+): Promise<ExperienceCardViewModel[]> {
   const supabase = await createSupabaseServerClient();
-  if (!supabase) {
+  if (!supabase) return [];
+
+  let query = supabase
+    .from("experiences")
+    .select(experienceSelect)
+    .eq("status", "published")
+    .order("is_featured", { ascending: false })
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if (typeof limit === "number") query = query.limit(limit);
+
+  const { data, error } = await query;
+  if (error || !data) return [];
+
+  try {
+    return (data as unknown as ExperienceRow[]).map(mapExperience);
+  } catch {
     return [];
   }
+}
+
+export async function getPublishedExperienceBySlug(
+  slug: string
+): Promise<ExperienceDetailViewModel | null> {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return null;
 
   const { data, error } = await supabase
     .from("experiences")
-    .select(
-      `
-      id,
-      slug,
-      title,
-      short_description,
-      duration_minutes,
-      base_capacity,
-      location_name,
-      hero_image_path,
-      category_label,
-      experience_type,
-      highlights,
-      sort_order,
-      experience_variants (
-        unit_amount_minor,
-        currency,
-        pricing_model,
-        is_default,
-        is_active
-      ),
-      experience_media (
-        storage_path,
-        media_type,
-        alt_text,
-        is_hero,
-        display_order
-      ),
-      reviews (
-        rating,
-        status
-      )
-    `
-    )
+    .select(experienceSelect)
     .eq("status", "published")
-    .order("sort_order", { ascending: true })
-    .limit(limit);
+    .eq("slug", slug)
+    .maybeSingle();
 
-  if (error || !data) {
-    return [];
+  if (error || !data) return null;
+
+  try {
+    return mapExperience(data as unknown as ExperienceRow);
+  } catch {
+    return null;
   }
-
-  return data.map((experience, index) => {
-    const variants = (experience.experience_variants ?? []) as VariantRow[];
-    const media = (experience.experience_media ?? []) as MediaRow[];
-    const reviews = (experience.reviews ?? []) as ReviewRow[];
-    const hero = resolveHeroMedia(
-      media.map((item) => ({
-        storagePath: item.storage_path,
-        mediaType: item.media_type,
-        altText: item.alt_text,
-        isHero: item.is_hero,
-        displayOrder: item.display_order
-      })),
-      experience.hero_image_path
-    );
-    const rating = aggregatePublishedRatings(reviews);
-
-    return {
-      id: experience.id,
-      slug: experience.slug,
-      title: experience.title,
-      shortDescription: experience.short_description,
-      durationMinutes: experience.duration_minutes,
-      baseCapacity: experience.base_capacity,
-      locationName: experience.location_name,
-      heroImagePath: hero.path,
-      heroImageAlt: hero.altText,
-      categoryLabel: experience.category_label,
-      experienceType: experience.experience_type,
-      highlightFeatures: takeHighlightFeatures(experience.highlights),
-      fromPrice: selectFromPrice(
-        variants.map((variant) => ({
-          unitAmountMinor: variant.unit_amount_minor,
-          currency: variant.currency,
-          pricingModel: variant.pricing_model,
-          isDefault: variant.is_default,
-          isActive: variant.is_active
-        }))
-      ),
-      tone: resolveExperienceCardTone(experience.experience_type, index),
-      averageRating: rating.averageRating,
-      reviewCount: rating.reviewCount
-    };
-  });
 }
