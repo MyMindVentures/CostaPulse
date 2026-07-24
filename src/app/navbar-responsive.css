@@ -1,0 +1,55 @@
+/* Responsive navbar override: tablet and mobile use the compact drawer. */
+.shell-navbar__inner {
+  min-width: 0;
+}
+
+.shell-brand {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.shell-brand .brand-logo {
+  max-width: min(13rem, calc(100vw - 5.75rem));
+}
+
+.shell-navbar__actions {
+  flex: 0 0 auto;
+  min-width: 2.75rem;
+  white-space: nowrap;
+}
+
+.shell-menu-button {
+  flex: 0 0 2.75rem;
+}
+
+@media (max-width: 67.999rem) {
+  .shell-navbar__links,
+  .shell-navbar__actions > .shell-lang-switch,
+  .shell-navbar__actions > .shell-account,
+  .shell-navbar__actions > .shell-cta {
+    display: none;
+  }
+
+  .shell-menu-button {
+    display: inline-grid;
+  }
+}
+
+@media (min-width: 68rem) {
+  .shell-navbar__links,
+  .shell-lang-switch,
+  .shell-account,
+  .shell-cta {
+    display: inline-flex;
+  }
+
+  .shell-navbar__links {
+    min-width: 0;
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .shell-menu-button {
+    display: none;
+  }
+}
