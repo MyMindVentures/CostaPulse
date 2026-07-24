@@ -1,14 +1,10 @@
-FROM node:22-alpine AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+FROM node:22-alpine AS deps
 WORKDIR /app
+COPY package*.json ./
+RUN npm install
 
-FROM base AS deps
-COPY package.json ./
-RUN pnpm install --no-frozen-lockfile
-
-FROM base AS builder
+FROM node:22-alpine AS builder
+WORKDIR /app
 ARG NEXT_PUBLIC_APP_URL=https://www.costapulse.club
 ARG NEXT_PUBLIC_SITE_URL=https://www.costapulse.club
 ARG NEXT_PUBLIC_SUPABASE_URL
@@ -26,7 +22,7 @@ ENV NEXT_PUBLIC_POSTHOG_HOST=$NEXT_PUBLIC_POSTHOG_HOST
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN pnpm build
+RUN npm run build
 
 FROM node:22-alpine AS runner
 WORKDIR /app
