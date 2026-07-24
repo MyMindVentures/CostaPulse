@@ -122,6 +122,26 @@ Mandatory responsive requirements:
 
 A frontend feature is incomplete until it has been verified and corrected on representative smartphone, tablet, laptop and desktop viewport sizes.
 
+## Cross-platform and cross-browser correctness
+
+The complete website must render and function correctly across supported operating systems, browsers, input methods and device classes.
+
+Mandatory cross-platform requirements:
+
+- Support current stable versions of Chrome, Safari, Firefox and Edge.
+- Verify rendering on macOS, Windows, iOS/iPadOS and Android where the relevant browser engine differs.
+- Do not rely on browser-specific APIs, CSS behavior, hover-only interactions or unsupported experimental features without a verified fallback.
+- Account for Safari/WebKit differences in viewport units, sticky positioning, scrolling, form controls, date inputs, media playback and safe-area insets.
+- Support touch, mouse, keyboard and trackpad interaction without losing functionality.
+- Use standards-compliant semantic HTML, CSS and JavaScript.
+- Preserve correct hydration and server/client rendering behavior in Next.js.
+- Prevent layout shifts, font fallback breakage, missing icons, distorted media and platform-specific overflow.
+- Ensure forms, dialogs, menus, navigation, calendars, maps, uploads and checkout flows remain functional across supported platforms.
+- Use feature detection and progressive enhancement where platform capabilities differ.
+- Do not declare a task complete based on a single browser or operating system.
+
+A frontend feature is incomplete until its critical user flow has been verified in representative Chromium, WebKit and Firefox environments, with platform-specific issues fixed rather than ignored.
+
 ## Design system
 
 All frontend code must use the CostaPulse design system, tokens and reusable primitives.
@@ -196,6 +216,9 @@ Test representative conditions, including:
 - portrait and landscape orientations where relevant
 - no horizontal overflow or clipped content
 - touch interactions and minimum target sizes
+- Chromium, WebKit and Firefox rendering
+- macOS, Windows, iOS/iPadOS and Android behavior where relevant
+- mouse, keyboard, touch and trackpad input
 - real navigation and route state
 - real form submission and server response
 
@@ -225,7 +248,9 @@ A frontend task is complete only when:
 - Loading, empty, error, validation, success and authorization states work.
 - The UI follows the CostaPulse design system and works responsively and accessibly.
 - The implementation was verified on representative smartphone, tablet, laptop and desktop viewports.
-- There is no horizontal overflow, clipped content, broken layout or unusable interaction at any supported viewport.
+- The critical flow was verified in Chromium, WebKit and Firefox.
+- Platform-specific behavior was checked on representative desktop and mobile operating systems where relevant.
+- There is no horizontal overflow, clipped content, broken layout, browser-specific rendering defect or unusable interaction at any supported viewport or platform.
 - Repeated UI and domain states use shared components instead of copied implementations.
 - Presentational components contain no direct database calls or duplicated business logic.
 - Relevant automated tests, type checks and build checks pass.
@@ -240,6 +265,7 @@ The coding agent's final report must state:
 3. Which frontend files were created or changed.
 4. Which real end-to-end flows were verified.
 5. Which smartphone, tablet, laptop and desktop viewport sizes were tested and what responsive issues were fixed.
-6. Which commands and tests were run and their results.
-7. Anything that could not be verified.
-8. Any missing backend capability that blocked implementation, without inventing a workaround.
+6. Which browsers, browser engines, operating systems and input methods were verified and what platform-specific issues were fixed.
+7. Which commands and tests were run and their results.
+8. Anything that could not be verified.
+9. Any missing backend capability that blocked implementation, without inventing a workaround.
