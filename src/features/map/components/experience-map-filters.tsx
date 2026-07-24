@@ -9,7 +9,7 @@ import {
   applyCatalogFilters,
   type CatalogFilters
 } from "@/lib/url/catalog-filters";
-import type { MapFilterOptions } from "@/server/repositories/map";
+import type { MapFilterOptions } from "@/lib/view-models/experience-map";
 
 type ExperienceMapFiltersProps = {
   filters: CatalogFilters;

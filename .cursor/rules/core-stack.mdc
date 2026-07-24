@@ -1,0 +1,33 @@
+---
+description: CostaPulse stack, workflow, and quality bar for every change
+alwaysApply: true
+---
+
+# Core stack and workflow
+
+## Stack (do not replace)
+
+Next.js App Router, React, TypeScript strict, Tailwind CSS, Supabase (PostgreSQL/Auth/Storage/RLS), Stripe, Railway, Zod, React Hook Form, Playwright, Vitest + React Testing Library.
+
+Do not add major frameworks, infra, UI kits, or duplicate libraries without a proven need. No Vercel-only services.
+
+## Mandatory feature order
+
+```text
+Database → Storage → Backend → Frontend → Tests
+```
+
+Skip a layer only when it is genuinely unaffected.
+
+## Before editing
+
+1. Read existing repo files; never guess tables, columns, contracts, or config.
+2. Inspect real Supabase schema, migrations, RLS, and Storage when relevant.
+3. Follow `docs/AGENT-PLAYBOOK.md` and `ARCHITECTURE.md`.
+
+## Quality
+
+- Prefer typed, secure, server-authoritative code over shortcuts.
+- Avoid `any`, dead code, and premature abstractions.
+- Preserve Railway standalone compatibility.
+- Before claiming done: `npm run lint`, `typecheck`, `test`, and relevant `test:e2e` / `build`.

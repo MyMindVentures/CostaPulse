@@ -79,14 +79,17 @@ test.describe("Map View", () => {
     await expect(page.getByText(/No experiences/i).first()).toBeVisible();
   });
 
-  test("nav exposes Explore map", async ({ page }) => {
+  test("nav exposes Explore map under Experiences", async ({ page }) => {
     await page.goto("/");
     await dismissConsentIfPresent(page);
     await page.setViewportSize({ width: 1200, height: 800 });
+
+    const primaryNav = page.getByRole("navigation", {
+      name: /Primary navigation/i
+    });
+    await primaryNav.getByRole("button", { name: /Experiences/i }).click();
     await expect(
-      page
-        .getByRole("navigation", { name: /Primary navigation/i })
-        .getByRole("link", { name: /Explore map/i })
+      primaryNav.getByRole("menuitem", { name: /Explore map/i })
     ).toBeVisible();
   });
 });

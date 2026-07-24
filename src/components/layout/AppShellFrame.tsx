@@ -8,11 +8,13 @@ import {
   type PageBackgroundVariant
 } from "@/components/layout/PageBackground";
 import type { NavAudience } from "@/config/navigation";
+import type { SiteNavigationViewModel } from "@/lib/view-models/site-navigation";
 import { cn } from "@/lib/utils";
 
 type AppShellFrameProps = {
   children: ReactNode;
   audience: NavAudience;
+  navigation: SiteNavigationViewModel;
   logoSrc?: string | null;
   logoAlt?: string;
   backgroundVariant?: PageBackgroundVariant;
@@ -26,6 +28,7 @@ type AppShellFrameProps = {
 export function AppShellFrame({
   children,
   audience,
+  navigation,
   logoSrc,
   logoAlt,
   backgroundVariant = "default",
@@ -42,7 +45,12 @@ export function AppShellFrame({
       )}
     >
       <PageBackground variant={backgroundVariant} />
-      <Navbar audience={audience} logoSrc={logoSrc} logoAlt={logoAlt} />
+      <Navbar
+        audience={audience}
+        navigation={navigation}
+        logoSrc={logoSrc}
+        logoAlt={logoAlt}
+      />
       <div className="app-shell__content">{children}</div>
       <footer className="app-shell__footer">{footer}</footer>
     </div>

@@ -3,7 +3,9 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   filterMapItemsByLocationSlug,
   parseExperienceMapRows,
-  type ExperienceMapItem
+  type ExperienceMapItem,
+  type MapFilterOptions,
+  type MapFilterTeamMemberOption
 } from "@/lib/view-models/experience-map";
 import {
   catalogFiltersToMapRpcParams,
@@ -17,17 +19,7 @@ export type GetExperienceMapResult =
   | { ok: true; items: ExperienceMapItem[] }
   | { ok: false; error: "unavailable" | "query_failed" };
 
-export type MapFilterTeamMemberOption = {
-  id: string;
-  slug: string;
-  displayName: string;
-};
-
-export type MapFilterOptions = {
-  experienceTypes: string[];
-  teamMembers: MapFilterTeamMemberOption[];
-  locations: Array<{ slug: string; name: string }>;
-};
+export type { MapFilterOptions, ExperienceMapItem };
 
 /**
  * Server-only wrapper around `get_experience_map`.
@@ -137,5 +129,3 @@ export async function listMapFilterOptions(): Promise<MapFilterOptions> {
     )
   };
 }
-
-export type { ExperienceMapItem };

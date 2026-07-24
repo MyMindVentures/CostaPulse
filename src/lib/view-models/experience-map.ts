@@ -188,3 +188,16 @@ export function filterMapItemsByLocationSlug(
   if (!locationSlug) return items;
   return items.filter((item) => item.location.slug === locationSlug);
 }
+
+export type MapFilterTeamMemberOption = {
+  id: string;
+  slug: string;
+  displayName: string;
+};
+
+/** Filter dropdown options for the map/catalog discovery UI. */
+export type MapFilterOptions = {
+  experienceTypes: string[];
+  teamMembers: MapFilterTeamMemberOption[];
+  locations: Array<{ slug: string; name: string }>;
+};

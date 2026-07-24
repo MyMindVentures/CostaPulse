@@ -1,6 +1,6 @@
 # CostaPulse — Coding Agent Guardrails
 
-Binding instructions for every coding agent working in this repository.
+Binding instructions for every coding agent working in this repository. Focused Cursor rules and playbooks hold operational detail — keep this file as the policy source of truth.
 
 ## Role boundary
 
@@ -9,6 +9,30 @@ The coding agent is responsible for frontend implementation only unless the task
 Database architecture, SQL migrations, PostgreSQL functions, RLS policies, Storage buckets and policies, backend contracts, authorization rules, business logic and API design are defined outside the coding agent workflow.
 
 The coding agent must consume that architecture exactly as it exists. It may not redesign, replace, extend or bypass it without explicit written instructions in the current task.
+
+## Read first
+
+| Doc                                                      | Purpose                                                       |
+| -------------------------------------------------------- | ------------------------------------------------------------- |
+| [docs/AGENT-PLAYBOOK.md](docs/AGENT-PLAYBOOK.md)         | Commands, file map, before-edit checklist, definition of done |
+| [docs/ARCHITECTURE-INDEX.md](docs/ARCHITECTURE-INDEX.md) | Path → responsibility index                                   |
+| [docs/DATA-CONTRACTS.md](docs/DATA-CONTRACTS.md)         | Repository → view-model → UI contract                         |
+| [docs/TOKENS.md](docs/TOKENS.md)                         | Design token source of truth                                  |
+| [ARCHITECTURE.md](ARCHITECTURE.md)                       | Runtime, routes, boundaries, design tokens                    |
+| [SUPABASE.md](SUPABASE.md)                               | Clients, RLS, Storage                                         |
+| [ENVIRONMENT.md](ENVIRONMENT.md)                         | Validated environment variables                               |
+
+## Cursor rules (`.cursor/rules/`)
+
+| Rule                     | Scope                                     |
+| ------------------------ | ----------------------------------------- |
+| `core-stack.mdc`         | Always — stack, workflow, quality bar     |
+| `no-hardcoding.mdc`      | Always — no mocks / magic business values |
+| `react-architecture.mdc` | UI / features / app                       |
+| `supabase-backend.mdc`   | Server, migrations, Supabase clients      |
+| `testing.mdc`            | Test files                                |
+| `i18n.mdc`               | Locales and messages                      |
+| `design-system.mdc`      | Tokens, `ui` / `shared`, stories          |
 
 ## Stack
 

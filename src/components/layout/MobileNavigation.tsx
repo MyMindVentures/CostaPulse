@@ -1,35 +1,39 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { BrandLink } from "@/components/shared/brand-link";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import {
   getAccountNav,
-  getPrimaryCta,
-  getPrimaryNavItems,
-  isNavItemActive,
+  isNavHrefActive,
+  isNavItemTreeActive,
   type NavAudience
 } from "@/config/navigation";
+import type { SiteNavigationViewModel } from "@/lib/view-models/site-navigation";
 import { cn } from "@/lib/utils";
 
 type MobileNavigationProps = {
+  mounted: boolean;
   open: boolean;
   onClose: () => void;
   pathname: string;
   audience: NavAudience;
+  navigation: SiteNavigationViewModel;
   logoSrc?: string | null;
   logoAlt?: string;
   overlayTone: boolean;
 };
 
 export function MobileNavigation({
+  mounted,
   open,
   onClose,
   pathname,
   audience,
+  navigation,
   logoSrc,
   logoAlt,
   overlayTone
@@ -38,16 +42,18 @@ export function MobileNavigation({
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const items = getPrimaryNavItems(audience);
   const account = getAccountNav(audience);
-  const cta = getPrimaryCta(audience);
+  const { primary: items, cta } = navigation;
+  const [expandedKeys, setExpandedKeys] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    if (!open) return;
+    if (!mounted) return;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    closeRef.current?.focus();
+    if (open) {
+      closeRef.current?.focus();
+    }
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -78,12 +84,12 @@ export function MobileNavigation({
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open, onClose]);
+  }, [mounted, open, onClose]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   return (
-    <div className="mobile-nav" role="presentation">
+    <div className={cn("mobile-nav", open && "is-open")} role="presentation">
       <button
         type="button"
         className="mobile-nav__overlay"
@@ -121,7 +127,58 @@ export function MobileNavigation({
 
         <nav className="mobile-nav__links" aria-label={t("primaryLabel")}>
           {items.map((item) => {
-            const active = isNavItemActive(item.href, pathname);
+            if (item.children.length > 0) {
+              const expanded =
+                expandedKeys[item.id] ?? isNavItemTreeActive(item, pathname);
+              return (
+                <div key={item.id} className="mobile-nav__group">
+                  <button
+                    type="button"
+                    className={cn(
+                      "mobile-nav__group-trigger",
+                      isNavItemTreeActive(item, pathname) && "is-active"
+                    )}
+                    aria-expanded={expanded}
+                    onClick={() =>
+                      setExpandedKeys((current) => ({
+                        ...current,
+                        [item.id]: !expanded
+                      }))
+                    }
+                  >
+                    <span>{item.label}</span>
+                    <ChevronDown
+                      size={18}
+                      aria-hidden
+                      className={cn(
+                        "mobile-nav__group-chevron",
+                        expanded && "is-open"
+                      )}
+                    />
+                  </button>
+                  {expanded ? (
+                    <div className="mobile-nav__sublinks">
+                      {item.children.map((child) => {
+                        const active = isNavHrefActive(child.href, pathname);
+                        return (
+                          <Link
+                            key={child.id}
+                            href={child.href}
+                            className={active ? "is-active" : undefined}
+                            aria-current={active ? "page" : undefined}
+                            onClick={onClose}
+                          >
+                            {child.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            }
+
+            const active = isNavItemTreeActive(item, pathname);
             return (
               <Link
                 key={item.id}
@@ -130,7 +187,7 @@ export function MobileNavigation({
                 aria-current={active ? "page" : undefined}
                 onClick={onClose}
               >
-                {t(`items.${item.labelKey}`)}
+                {item.label}
               </Link>
             );
           })}
@@ -141,13 +198,15 @@ export function MobileNavigation({
           <Link href={account.href} className="shell-account" onClick={onClose}>
             {t(`account.${account.labelKey}`)}
           </Link>
-          <Link
-            href={cta.href}
-            className="button button-coral"
-            onClick={onClose}
-          >
-            {t(`cta.${cta.labelKey}`)}
-          </Link>
+          {cta ? (
+            <Link
+              href={cta.href}
+              className="button button-coral"
+              onClick={onClose}
+            >
+              {cta.label}
+            </Link>
+          ) : null}
         </div>
       </div>
     </div>

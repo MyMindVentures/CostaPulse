@@ -1,48 +1,14 @@
 /**
- * Central marketing navigation config.
- * Labels come from the `Navigation` i18n namespace; hrefs stay here.
+ * Audience + account slot helpers and active-route matching for marketing nav.
+ * Primary link labels/hrefs come from site_navigation_* tables via the repository.
  */
 
 export type NavAudience = "guest" | "customer" | "team" | "admin";
-
-export type NavItemId =
-  | "experiences"
-  | "map"
-  | "destinations"
-  | "about"
-  | "partners";
-
-export type NavItemConfig = {
-  id: NavItemId;
-  href: string;
-  /** i18n key under Navigation.items.* */
-  labelKey: NavItemId;
-};
 
 export type AccountNavConfig = {
   href: string;
   /** i18n key under Navigation.account.* */
   labelKey: "login" | "account" | "admin";
-};
-
-export type CtaNavConfig = {
-  href: string;
-  /** i18n key under Navigation.cta */
-  labelKey: "explore";
-};
-
-/** Primary links shared by desktop and mobile navigation. */
-export const PRIMARY_NAV_ITEMS: readonly NavItemConfig[] = [
-  { id: "experiences", href: "/experiences", labelKey: "experiences" },
-  { id: "map", href: "/experiences/map", labelKey: "map" },
-  { id: "destinations", href: "/destinations", labelKey: "destinations" },
-  { id: "about", href: "/about", labelKey: "about" },
-  { id: "partners", href: "/partners", labelKey: "partners" }
-] as const;
-
-export const PRIMARY_CTA: CtaNavConfig = {
-  href: "/experiences",
-  labelKey: "explore"
 };
 
 /**
@@ -57,30 +23,22 @@ export const ACCOUNT_NAV_BY_AUDIENCE: Record<NavAudience, AccountNavConfig> = {
   admin: { href: "/admin", labelKey: "admin" }
 };
 
-export function getPrimaryNavItems(
-  audience: NavAudience = "guest"
-): readonly NavItemConfig[] {
-  void audience;
-  // Guest-first: all audiences share the same primary marketing links for now.
-  return PRIMARY_NAV_ITEMS;
-}
-
 export function getAccountNav(
   audience: NavAudience = "guest"
 ): AccountNavConfig {
   return ACCOUNT_NAV_BY_AUDIENCE[audience];
 }
 
-export function getPrimaryCta(audience: NavAudience = "guest"): CtaNavConfig {
-  void audience;
-  return PRIMARY_CTA;
-}
-
 /**
- * Active-route matching for marketing nav.
- * `/experiences` matches itself and `/experiences/[slug]`, but not `/experiences/map`.
+ * Active-route matching for marketing nav hrefs.
+ * `/experiences` matches itself and `/experiences/[slug]`, but not `/experiences/map`
+ * unless `includeMap` is true (used for parent dropdown highlighting).
  */
-export function isNavItemActive(href: string, pathname: string): boolean {
+export function isNavHrefActive(
+  href: string,
+  pathname: string,
+  options?: { includeMap?: boolean }
+): boolean {
   if (href === "/") {
     return pathname === "/";
   }
@@ -94,10 +52,29 @@ export function isNavItemActive(href: string, pathname: string): boolean {
       pathname === "/experiences/map" ||
       pathname.startsWith("/experiences/map/")
     ) {
-      return false;
+      return options?.includeMap === true;
     }
     return pathname.startsWith("/experiences/");
   }
 
   return pathname.startsWith(`${href}/`);
+}
+
+/** @deprecated Prefer isNavHrefActive */
+export function isNavItemActive(href: string, pathname: string): boolean {
+  return isNavHrefActive(href, pathname);
+}
+
+export function isNavItemTreeActive(
+  item: { href: string; children?: readonly { href: string }[] },
+  pathname: string
+): boolean {
+  if (item.children && item.children.length > 0) {
+    if (item.children.some((child) => isNavHrefActive(child.href, pathname))) {
+      return true;
+    }
+    return isNavHrefActive(item.href, pathname, { includeMap: true });
+  }
+
+  return isNavHrefActive(item.href, pathname);
 }

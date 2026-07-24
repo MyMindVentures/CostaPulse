@@ -1,0 +1,21 @@
+---
+description: CostaPulse design tokens and reusable UI primitives
+globs: src/components/ui/**/*,src/components/shared/**/*,src/app/globals.css,**/*.stories.*
+alwaysApply: false
+---
+
+# Design system
+
+## Tokens
+
+- Source of truth: brand CSS variables in `src/app/globals.css` (`--navy`, `--coral`, `--turquoise`, `--sand`, …).
+- shadcn semantic tokens (`--background`, `--primary`, `--ring`, …) alias those brand values.
+- Do not introduce a second palette or default purple/neutral shadcn theme.
+
+## Components
+
+- `src/components/ui` — foundational primitives only (no domain data).
+- `src/components/shared` — cross-domain compositions and universal states.
+- Add new shadcn primitives only when ≥2 real use cases exist.
+- Mobile-first; target WCAG 2.2 AA; handle loading, empty, error, disabled, focus, validation, responsive states.
+- Prefer Storybook stories for `ui` + `shared` when documenting visuals.

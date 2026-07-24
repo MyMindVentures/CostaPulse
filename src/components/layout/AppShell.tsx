@@ -3,10 +3,12 @@ import { Suspense } from "react";
 import { AppShellFrame } from "@/components/layout/AppShellFrame";
 import type { PageBackgroundVariant } from "@/components/layout/PageBackground";
 import type { NavAudience } from "@/config/navigation";
+import type { SiteNavigationViewModel } from "@/lib/view-models/site-navigation";
 
 type AppShellProps = {
   children: ReactNode;
   audience?: NavAudience;
+  navigation: SiteNavigationViewModel;
   logoSrc?: string | null;
   logoAlt?: string;
   backgroundVariant?: PageBackgroundVariant;
@@ -20,6 +22,7 @@ type AppShellProps = {
 export function AppShell({
   children,
   audience = "guest",
+  navigation,
   logoSrc,
   logoAlt,
   backgroundVariant = "default",
@@ -35,6 +38,7 @@ export function AppShell({
     >
       <AppShellFrame
         audience={audience}
+        navigation={navigation}
         logoSrc={logoSrc}
         logoAlt={logoAlt}
         backgroundVariant={backgroundVariant}

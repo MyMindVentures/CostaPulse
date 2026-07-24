@@ -8,32 +8,42 @@ import { Menu } from "lucide-react";
 import { BrandLink } from "@/components/shared/brand-link";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { MobileNavigation } from "@/components/layout/MobileNavigation";
+import { NavDropdown } from "@/components/layout/NavDropdown";
 import {
   getAccountNav,
-  getPrimaryCta,
-  getPrimaryNavItems,
-  isNavItemActive,
+  isNavHrefActive,
+  isNavItemTreeActive,
   type NavAudience
 } from "@/config/navigation";
+import type { SiteNavigationViewModel } from "@/lib/view-models/site-navigation";
 import { cn } from "@/lib/utils";
 
 type NavbarProps = {
   audience?: NavAudience;
+  navigation: SiteNavigationViewModel;
   logoSrc?: string | null;
   logoAlt?: string;
 };
 
 const SCROLL_THRESHOLD_PX = 12;
 
-export function Navbar({ audience = "guest", logoSrc, logoAlt }: NavbarProps) {
+export function Navbar({
+  audience = "guest",
+  navigation,
+  logoSrc,
+  logoAlt
+}: NavbarProps) {
   const t = useTranslations("Navigation");
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuPhase, setMenuPhase] = useState<"closed" | "open" | "closing">(
+    "closed"
+  );
   const overlayHome = pathname === "/";
-  const items = getPrimaryNavItems(audience);
   const account = getAccountNav(audience);
-  const cta = getPrimaryCta(audience);
+  const { primary: items, cta } = navigation;
+  const menuMounted = menuPhase !== "closed";
+  const menuOpen = menuPhase === "open";
 
   useEffect(() => {
     function onScroll() {
@@ -45,14 +55,21 @@ export function Navbar({ audience = "guest", logoSrc, logoAlt }: NavbarProps) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    if (menuPhase !== "closing") return;
+    const timeout = window.setTimeout(() => setMenuPhase("closed"), 220);
+    return () => window.clearTimeout(timeout);
+  }, [menuPhase]);
+
   const [menuPath, setMenuPath] = useState(pathname);
   if (menuPath !== pathname) {
     setMenuPath(pathname);
-    setMenuOpen(false);
+    setMenuPhase("closed");
   }
 
-  const closeMenu = useCallback(() => setMenuOpen(false), []);
-
+  const closeMenu = useCallback(() => {
+    setMenuPhase((phase) => (phase === "open" ? "closing" : phase));
+  }, []);
   const overlayTone = overlayHome && !scrolled;
 
   return (
@@ -75,7 +92,18 @@ export function Navbar({ audience = "guest", logoSrc, logoAlt }: NavbarProps) {
 
           <nav className="shell-navbar__links" aria-label={t("primaryLabel")}>
             {items.map((item) => {
-              const active = isNavItemActive(item.href, pathname);
+              if (item.children.length > 0) {
+                return (
+                  <NavDropdown
+                    key={item.id}
+                    item={item}
+                    pathname={pathname}
+                    overlayTone={overlayTone}
+                  />
+                );
+              }
+
+              const active = isNavItemTreeActive(item, pathname);
               return (
                 <Link
                   key={item.id}
@@ -83,7 +111,7 @@ export function Navbar({ audience = "guest", logoSrc, logoAlt }: NavbarProps) {
                   className={active ? "is-active" : undefined}
                   aria-current={active ? "page" : undefined}
                 >
-                  {t(`items.${item.labelKey}`)}
+                  {item.label}
                 </Link>
               );
             })}
@@ -94,16 +122,24 @@ export function Navbar({ audience = "guest", logoSrc, logoAlt }: NavbarProps) {
             <Link href={account.href} className="shell-account">
               {t(`account.${account.labelKey}`)}
             </Link>
-            <Link href={cta.href} className="button button-coral shell-cta">
-              {t(`cta.${cta.labelKey}`)}
-            </Link>
+            {cta ? (
+              <Link
+                href={cta.href}
+                className={cn(
+                  "button button-coral shell-cta",
+                  isNavHrefActive(cta.href, pathname) && "is-active"
+                )}
+              >
+                {cta.label}
+              </Link>
+            ) : null}
             <button
               type="button"
               className="shell-menu-button"
               aria-label={t("openMenu")}
               aria-expanded={menuOpen}
               aria-controls="mobile-navigation"
-              onClick={() => setMenuOpen(true)}
+              onClick={() => setMenuPhase("open")}
             >
               <Menu size={22} aria-hidden />
             </button>
@@ -113,10 +149,12 @@ export function Navbar({ audience = "guest", logoSrc, logoAlt }: NavbarProps) {
 
       <div id="mobile-navigation">
         <MobileNavigation
+          mounted={menuMounted}
           open={menuOpen}
           onClose={closeMenu}
           pathname={pathname}
           audience={audience}
+          navigation={navigation}
           logoSrc={logoSrc}
           logoAlt={logoAlt}
           overlayTone={overlayTone}

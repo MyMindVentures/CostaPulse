@@ -4,20 +4,10 @@
     "openMenu": "Open navigation menu",
     "closeMenu": "Close navigation menu",
     "dismissMenu": "Dismiss navigation menu",
-    "items": {
-      "experiences": "Experiences",
-      "map": "Explore map",
-      "destinations": "Destinations",
-      "about": "About",
-      "partners": "Partners"
-    },
     "account": {
       "login": "Log in",
       "account": "Account",
       "admin": "Admin"
-    },
-    "cta": {
-      "explore": "Explore experiences"
     }
   },
   "MarketingPages": {
@@ -25,6 +15,11 @@
       "kicker": "Destinations",
       "title": "Costa Blanca destinations",
       "description": "Meeting points and coastal bases will appear here as they are published."
+    },
+    "services": {
+      "kicker": "Services",
+      "title": "CostaPulse services",
+      "description": "Concierge and hosted service offerings will appear here as they are published."
     },
     "about": {
       "kicker": "About",

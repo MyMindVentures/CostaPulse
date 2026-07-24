@@ -48,9 +48,10 @@ CostaPulse brand CSS variables in `src/app/globals.css` are the source of truth 
 
 ## Deferred frontend libraries (Scope B)
 
-Installed for Map View:
+Installed:
 
 - `maplibre-gl` — interactive map (dynamic client import; OpenFreeMap style via `NEXT_PUBLIC_MAP_STYLE_URL`)
+- Storybook 9 (`npm run storybook`) — catalog for `src/components/ui` and `src/components/shared`
 
 Still candidate when needed:
 

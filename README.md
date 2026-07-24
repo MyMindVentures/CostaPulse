@@ -45,6 +45,9 @@ See [SUPABASE.md](SUPABASE.md) for security requirements, client boundaries and 
 - **Playwright** — tests complete browser flows such as authentication, navigation and future booking journeys.
 - **ESLint + Prettier** — keep code quality and formatting consistent.
 - **`npm run check`** — runs formatting checks, linting, type checking, unit tests and a production build as the local quality gate.
+- **`npm run test:coverage`** — Vitest with thresholds on bookings pricing/schema, view-models, URL filters and pricing helpers.
+- **`npm run storybook`** — component catalog for `src/components/ui` and `src/components/shared`.
+- Agent guidance: [AGENTS.md](AGENTS.md), [docs/AGENT-PLAYBOOK.md](docs/AGENT-PLAYBOOK.md).
 
 ### Hosting and delivery
 
