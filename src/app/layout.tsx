@@ -4,6 +4,7 @@ import { ConsentBanner } from "@/features/analytics/consent-banner";
 import { PostHogProvider } from "@/features/analytics/posthog-provider";
 import { BRAND_ASSETS_BUCKET, getPublicStorageUrl } from "@/lib/media/experience-media";
 import "./globals.css";
+import "./navbar-responsive.css";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.costapulse.club";
