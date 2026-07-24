@@ -3,7 +3,7 @@
 ## Release flow
 
 1. Set Railway variables according to `ENVIRONMENT.md`.
-2. Connect the production service to the intended GitHub branch.
+2. Connect the production service to the repository's `main` branch. `main` is the default and production deployment branch.
 3. Railway builds the root `Dockerfile` as configured by `railway.json`.
 4. The container starts `node server.js`, binds to `0.0.0.0`, and uses Railway's injected `PORT`.
 5. Railway waits for `GET /api/health` to return HTTP 200 before switching traffic.
