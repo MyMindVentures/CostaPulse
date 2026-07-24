@@ -25,8 +25,8 @@ export function BrandLink({
       <Image
         src={src}
         alt={logoAlt}
-        width={280}
-        height={72}
+        width={256}
+        height={256}
         priority
         className="brand-logo"
       />
