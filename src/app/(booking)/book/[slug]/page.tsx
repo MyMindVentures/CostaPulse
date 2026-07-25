@@ -25,7 +25,8 @@ export default async function BookExperiencePage({
   if (!experience) notFound();
 
   const image =
-    experience.media.find((item) => item.isHero && item.url)?.url ??
+    experience.media.find((item) => item.placementKey === "hero" && item.url)
+      ?.url ??
     experience.media.find((item) => item.url)?.url ??
     getExperienceHeroImageSrc(experience.heroImagePath);
 

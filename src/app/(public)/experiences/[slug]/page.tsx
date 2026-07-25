@@ -25,7 +25,8 @@ export async function generateMetadata({
     experience.shortDescription ??
     `Discover ${experience.title} on the Costa Blanca.`;
   const ogImage =
-    experience.media.find((item) => item.isHero && item.url)?.url ??
+    experience.media.find((item) => item.placementKey === "hero" && item.url)
+      ?.url ??
     experience.media.find((item) => item.url)?.url ??
     getExperienceHeroImageSrc(experience.heroImagePath);
   const canonical = `${siteUrl.replace(/\/+$/, "")}/experiences/${experience.slug}`;
@@ -51,7 +52,8 @@ export default async function ExperiencePage({ params }: ExperiencePageProps) {
   if (!experience) notFound();
 
   const image =
-    experience.media.find((item) => item.isHero && item.url)?.url ??
+    experience.media.find((item) => item.placementKey === "hero" && item.url)
+      ?.url ??
     experience.media.find((item) => item.url)?.url ??
     getExperienceHeroImageSrc(experience.heroImagePath);
 
