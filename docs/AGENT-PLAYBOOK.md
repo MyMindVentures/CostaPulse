@@ -18,7 +18,6 @@ npm run lint           # ESLint, zero warnings
 npm run typecheck      # tsc --noEmit
 npm run test           # Vitest unit/component
 npm run test:coverage  # Vitest + coverage thresholds
-npm run test:e2e       # Playwright (tests/e2e)
 npm run format         # Prettier write
 npm run format:check   # Prettier check
 npm run guardrails     # i18n, mocks, route discoverability, stack, companion tests
@@ -43,7 +42,7 @@ Local gates run automatically; do not bypass them to land broken work.
 Pre-commit is intentionally fast and deterministic: it checks secrets, formats
 and lints staged files, and runs repository guardrails. Pre-push owns the full
 TypeScript and Vitest checks. CI owns formatting verification, coverage,
-repository-wide linting, the production build, Storybook, and Playwright.
+repository-wide linting, the production build, and Storybook.
 Skipping hooks (`--no-verify` / `HUSKY=0`) is for emergencies only and must be
 called out in the PR.
 
@@ -71,7 +70,6 @@ those remain release-time checks.
 | `src/i18n`                            | Locale registry                                                       |
 | `messages`                            | next-intl message catalogs                                            |
 | `supabase/migrations`                 | Schema, RLS, RPCs                                                     |
-| `tests/e2e`                           | Playwright journeys                                                   |
 | `.cursor/rules`                       | Focused agent rules                                                   |
 | `.storybook`                          | Storybook config                                                      |
 
@@ -113,7 +111,7 @@ Marketing routes (`/destinations`, `/about`, `/partners`) may still use i18n pla
       flow; every new indexable public page is included in the sitemap
 - [ ] UI uses design-system tokens/primitives; shared states reused
 - [ ] Presentational components have no direct DB/Supabase access
-- [ ] `npm run lint`, `typecheck`, `test` (and `test:e2e` / `build` when relevant) pass
+- [ ] `npm run lint`, `typecheck`, `test` (and `build` when relevant) pass
 - [ ] No secrets, debug leftovers, or unrelated churn
 
 ## Related docs

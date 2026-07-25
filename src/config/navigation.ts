@@ -20,7 +20,10 @@ export const DASHBOARD_NAVIGATION = {
     { labelKey: "overview", href: "/account" },
     { labelKey: "bookings", href: "/account/bookings" }
   ],
-  partner: [{ labelKey: "overview", href: "/partner" }],
+  partner: [
+    { labelKey: "overview", href: "/partner" },
+    { labelKey: "partnerQr", href: "/partner/qr" }
+  ],
   admin: [
     { labelKey: "overview", href: "/admin" },
     { labelKey: "experiences", href: "/admin/experiences" },
@@ -29,10 +32,16 @@ export const DASHBOARD_NAVIGATION = {
     { labelKey: "locations", href: "/admin/locations" },
     { labelKey: "team", href: "/admin/team" },
     { labelKey: "bookings", href: "/admin/bookings" },
+    { labelKey: "bookingStories", href: "/admin/booking-stories" },
     { labelKey: "calendar", href: "/admin/calendar" },
     { labelKey: "customers", href: "/admin/customers" }
   ]
 } as const satisfies Record<string, readonly NavigationItem[]>;
+
+export const REFERRAL_FLOW_ENTRY = {
+  labelKey: "partnerQrAccess",
+  href: "/referral"
+} as const;
 
 export type AdminDashboardNavKey =
   (typeof DASHBOARD_NAVIGATION.admin)[number]["labelKey"];
@@ -45,6 +54,7 @@ const adminNavHrefBySection = {
   locations: "/admin/locations",
   team: "/admin/team",
   bookings: "/admin/bookings",
+  bookingStories: "/admin/booking-stories",
   calendar: "/admin/calendar",
   customers: "/admin/customers"
 } as const;

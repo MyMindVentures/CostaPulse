@@ -6,9 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { formatMinorUnitAmount } from "@/lib/pricing/format-money";
 import { AdminApiError } from "@/server/admin/schemas";
 import { fetchAdminBookingDetail } from "@/server/repositories/admin-ops";
-import { canMutateBookingStatus } from "@/server/auth/role-access";
+import {
+  canMutateAdminContent,
+  canMutateBookingStatus
+} from "@/server/auth/role-access";
 import type { AppRole } from "@/server/auth/role-access";
+import { getBookingStoryIdForBooking } from "@/server/repositories/admin-booking-stories";
 import { AdminBookingStatusForm } from "./booking-status-form";
+import { CreateBookingStoryButton } from "./create-booking-story-button";
 
 function formatWhen(value: string | null | undefined): string {
   if (!value) return "—";
@@ -56,6 +61,10 @@ export async function AdminBookingDetailFeature({ bookingId, roles }: Props) {
   }
 
   const canMutate = canMutateBookingStatus(roles);
+  const canManageStory = canMutateAdminContent(roles);
+  const storyId = canManageStory
+    ? await getBookingStoryIdForBooking(booking.id)
+    : null;
 
   return (
     <section className="flex flex-col gap-6">
@@ -139,6 +148,32 @@ export async function AdminBookingDetailFeature({ bookingId, roles }: Props) {
           <p className="text-ink mt-2 whitespace-pre-wrap">
             {booking.special_requests}
           </p>
+        </article>
+      ) : null}
+
+      {canManageStory ? (
+        <article className="border-border rounded-[var(--radius)] border bg-white p-5">
+          <h2 className="text-ink text-lg font-semibold">Booking story</h2>
+          <p className="text-muted mt-2 text-sm">
+            The public guest name is managed separately from private booking
+            contact details.
+          </p>
+          <div className="mt-4">
+            {storyId ? (
+              <Link
+                href={`/admin/booking-stories/${storyId}`}
+                className="button button-outline min-h-11"
+              >
+                Edit Story
+              </Link>
+            ) : booking.status === "completed" ? (
+              <CreateBookingStoryButton bookingId={booking.id} />
+            ) : (
+              <p className="text-muted text-sm">
+                A story can be created after the booking is completed.
+              </p>
+            )}
+          </div>
         </article>
       ) : null}
 

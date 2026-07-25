@@ -12,6 +12,8 @@ Quick path → responsibility map. Narrative detail: [ARCHITECTURE.md](../ARCHIT
 | `src/features/experiences`   | Catalog, detail, cards, booking widget sections                |
 | `src/features/map`           | MapLibre discovery shell, list sync, filters                   |
 | `src/features/booking`       | Booking wizard steps and session helpers                       |
+| `src/features/referrals`     | Public referral contact and verification UI                    |
+| `src/features/partner`       | Partner-owned QR promotional material                          |
 | `src/features/admin`         | Admin dashboard composition                                    |
 | `src/features/analytics`     | Consent + PostHog provider                                     |
 | `src/features/shell`         | Public AppShell data loader (marketing + booking)              |
@@ -21,6 +23,7 @@ Quick path → responsibility map. Narrative detail: [ARCHITECTURE.md](../ARCHIT
 | `src/server/repositories`    | Supabase I/O, validation, view-model mapping at boundary       |
 | `src/server/auth`            | Role access helpers                                            |
 | `src/server/bookings`        | Booking schemas and pricing logic                              |
+| `src/server/referrals`       | Referral tokens, sessions, QR and email services               |
 | `src/server/availability`    | Slot filters and summaries                                     |
 | `src/server/payments`        | Stripe webhook handling                                        |
 | `src/server/readiness`       | Readiness report assembly                                      |
@@ -35,7 +38,6 @@ Quick path → responsibility map. Narrative detail: [ARCHITECTURE.md](../ARCHIT
 | `supabase/migrations`        | Schema, RLS, RPCs, Storage policies                            |
 | `messages`                   | next-intl catalogs                                             |
 | `src/i18n`                   | Locale registry                                                |
-| `tests/e2e`                  | Playwright critical journeys                                   |
 
 ## Boundary rules
 

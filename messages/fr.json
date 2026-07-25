@@ -29,7 +29,8 @@
     "partners": {
       "kicker": "Partenaires",
       "title": "Devenir partenaire CostaPulse",
-      "description": "Les opportunités partenaires apparaîtront ici dès leur publication."
+      "description": "Les opportunités partenaires apparaîtront ici dès leur publication.",
+      "referralCta": "J’ai un QR code partenaire"
     },
     "contact": {
       "kicker": "Contact",
@@ -414,7 +415,10 @@
       "payError": "Le paiement n’a pas pu démarrer. Veuillez réessayer.",
       "createError": "La réservation n’a pas pu être créée. Veuillez réessayer.",
       "incomplete": "Complétez tous les détails obligatoires avant de payer.",
-      "guestLabel": "Invité {number}"
+      "guestLabel": "Invité {number}",
+      "partnerReward": "Choisissez votre récompense partenaire",
+      "partnerRewardPercent": "{percent}% après paiement réussi",
+      "projectedVoucher": "Bon partenaire estimé : {amount}"
     },
     "success": {
       "kicker": "Réservation confirmée",
@@ -423,7 +427,15 @@
       "reference": "Référence de réservation",
       "status": "Statut",
       "backToExperience": "Retour à l’expérience",
-      "backHome": "Retour à l’accueil"
+      "backHome": "Retour à l’accueil",
+      "voucherPending": "Votre bon partenaire est en cours de préparation. Cette page sera mise à jour automatiquement.",
+      "voucherIssued": "Votre bon partenaire",
+      "voucherFailed": "Votre paiement a bien été reçu, mais le bon ne peut pas encore être affiché. CostaPulse a été informé.",
+      "voucherCode": "Code du bon",
+      "voucherAmount": "Montant",
+      "voucherPartner": "Valable chez",
+      "voucherExpiry": "Expire le",
+      "voucherRestriction": "Utilisable uniquement chez {partner}."
     },
     "email": {
       "paymentReceived": {
@@ -440,7 +452,13 @@
         "outro": "Des questions ? Répondez à cet e-mail ou contactez CostaPulse.",
         "guestFallback": "bonjour",
         "whenFallback": "À confirmer",
-        "notProvided": "—"
+        "notProvided": "—",
+        "voucherCodeLabel": "Code du bon partenaire",
+        "voucherAmountLabel": "Montant du bon",
+        "voucherPartnerLabel": "Valable chez",
+        "voucherExpiryLabel": "Expiration du bon",
+        "voucherRestrictionLabel": "Utilisation",
+        "voucherRestriction": "Ce bon peut uniquement être utilisé chez {partner}."
       }
     },
     "cancel": {
@@ -474,7 +492,9 @@
   "Dashboards": {
     "navigationLabel": "Navigation du tableau de bord",
     "overview": "Aperçu",
+    "partnerQr": "Support QR",
     "bookings": "Réservations",
+    "bookingStories": "Récits de réservation",
     "calendar": "Calendrier",
     "customers": "Clients",
     "signOut": "Déconnexion",
@@ -489,7 +509,12 @@
     "partner": {
       "title": "Tableau de bord partenaire",
       "heading": "Aperçu partenaire",
-      "description": "Votre espace partenaire CostaPulse autorisé."
+      "description": "Votre espace partenaire CostaPulse autorisé.",
+      "qrDescription": "Ouvrez le support QR imprimable de chaque établissement associé à votre compte.",
+      "fallbackType": "Partenaire",
+      "status": "Statut : {status}",
+      "openQr": "Ouvrir le support QR",
+      "empty": "Aucun établissement n’est encore associé à ce compte partenaire."
     },
     "admin": {
       "title": "Administration",
@@ -635,6 +660,49 @@
     "partners": "Partenaires",
     "locations": "Lieux",
     "team": "Équipe"
+  },
+  "Referral": {
+    "entryTitle": "Commencez avec un QR code partenaire",
+    "entryDescription": "Scannez le QR code affiché par un partenaire CostaPulse participant pour démarrer le parcours vérifié.",
+    "entryCta": "Voir les partenaires CostaPulse",
+    "formKicker": "Récompense partenaire CostaPulse",
+    "formTitle": "Vérifiez votre e-mail pour continuer",
+    "formDescription": "Saisissez vos coordonnées pour associer cette visite partenaire à votre réservation. Aucun mot de passe n’est requis.",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Adresse e-mail",
+    "phone": "Téléphone (facultatif)",
+    "marketingConsent": "Je souhaite recevoir occasionnellement les actualités et offres de CostaPulse.",
+    "whatsappConsent": "J’accepte de recevoir des messages WhatsApp liés à ma réservation.",
+    "submit": "Envoyer le lien de vérification",
+    "submitting": "Envoi…",
+    "checkEmailTitle": "Consultez votre e-mail",
+    "checkEmailDescription": "Nous avons envoyé un lien de vérification à usage unique. Il expire dans 15 minutes.",
+    "resend": "Envoyer un nouveau lien",
+    "unavailableTitle": "Cette offre partenaire n’est pas disponible",
+    "unavailableDescription": "Le lien est peut-être invalide ou expiré, ou le partenaire n’est plus actif.",
+    "verifiedTitle": "Récompense partenaire vérifiée",
+    "verifiedDescription": "Choisissez une expérience. Votre récompense partenaire éligible sera proposée lors de la vérification de la réservation.",
+    "expiredTitle": "Lien de vérification indisponible",
+    "expiredDescription": "Ce lien est invalide, expiré ou déjà utilisé. Revenez à la page partenaire et demandez un nouveau lien.",
+    "validationError": "Vérifiez les champs signalés.",
+    "sendError": "Impossible d’envoyer l’e-mail de vérification. Réessayez."
+  },
+  "BookingStories": {
+    "kicker": "Récits de voyageurs",
+    "heading": "Aventures précédentes",
+    "description": "Des moments authentiques vécus par des voyageurs CostaPulse.",
+    "featured": "À la une",
+    "viewStory": "Voir le récit",
+    "viewStoryLabel": "Voir le récit : {title}",
+    "viewerLabel": "Visionneuse du récit : {title}",
+    "mediaCounter": "{current} sur {total}",
+    "close": "Fermer le récit",
+    "previousMedia": "Média précédent",
+    "nextMedia": "Média suivant",
+    "previousStory": "Récit précédent",
+    "nextStory": "Récit suivant",
+    "bookExperience": "Réserver cette expérience"
   },
   "Auth": {
     "login": {

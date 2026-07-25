@@ -7,6 +7,8 @@ import {
   getPublishedExperienceBySlug,
   getPublishedExperienceCards
 } from "@/server/repositories/catalog";
+import { getVerifiedReferralContext } from "@/server/referrals/service";
+import { toBookingReferralContext } from "@/lib/view-models/referral";
 
 export const dynamic = "force-dynamic";
 
@@ -19,9 +21,10 @@ export default async function BookExperiencePage({
 }: BookExperiencePageProps) {
   const { slug } = await params;
   const locale = await getLocale();
-  const [experience, cards] = await Promise.all([
+  const [experience, cards, verifiedReferral] = await Promise.all([
     getPublishedExperienceBySlug(slug, locale),
-    getPublishedExperienceCards(undefined, locale)
+    getPublishedExperienceCards(undefined, locale),
+    getVerifiedReferralContext()
   ]);
 
   if (!experience) notFound();
@@ -74,6 +77,7 @@ export default async function BookExperiencePage({
             isDefault: variant.isDefault
           }))
         }}
+        referralContext={toBookingReferralContext(verifiedReferral)}
       />
     </Suspense>
   );

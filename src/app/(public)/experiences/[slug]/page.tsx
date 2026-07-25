@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { ExperienceDetail } from "@/features/experiences/detail/experience-detail";
 import { getExperienceHeroImageSrc } from "@/lib/media/experience-media";
+import { getPublicExperienceBookingStories } from "@/server/repositories/booking-stories";
 import { getPublishedExperienceBySlug } from "@/server/repositories/catalog";
 
 type ExperiencePageProps = {
@@ -50,7 +51,14 @@ export async function generateMetadata({
 export default async function ExperiencePage({ params }: ExperiencePageProps) {
   const { slug } = await params;
   const locale = await getLocale();
-  const experience = await getPublishedExperienceBySlug(slug, locale);
+  const [experience, bookingStories] = await Promise.all([
+    getPublishedExperienceBySlug(slug, locale),
+    getPublicExperienceBookingStories({
+      experienceSlug: slug,
+      limit: 6,
+      offset: 0
+    }).catch(() => ({ items: [], nextOffset: null }))
+  ]);
 
   if (!experience) notFound();
 
@@ -104,7 +112,10 @@ export default async function ExperiencePage({ params }: ExperiencePageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <ExperienceDetail experience={experience} />
+      <ExperienceDetail
+        experience={experience}
+        bookingStories={bookingStories}
+      />
     </>
   );
 }

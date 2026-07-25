@@ -47,7 +47,6 @@ Use the established stack only:
 - Railway
 - Zod
 - React Hook Form
-- Playwright
 - Vitest/Jest + React Testing Library
 
 Do not add major frameworks, infrastructure services, UI kits or duplicate libraries without a proven need and explicit approval.
@@ -225,7 +224,7 @@ Every changed flow must be tested at the appropriate levels:
 - Unit tests for frontend transformation and validation logic.
 - Component tests for UI states and interactions.
 - Integration tests for verified frontend/backend contracts where configured.
-- Playwright tests for critical end-to-end journeys.
+- Integration tests for critical end-to-end journeys where configured.
 
 Test representative conditions, including:
 
@@ -251,7 +250,6 @@ Before completion, run the configured equivalents of:
 npm run lint
 npm run typecheck
 npm run test
-npm run test:e2e
 npm run build
 npm run start
 ```

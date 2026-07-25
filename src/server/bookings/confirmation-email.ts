@@ -29,7 +29,9 @@ const bookingEmailSelect = `
   timezone_snapshot,
   party_size,
   total_amount_minor,
-  currency
+  currency,
+  customer_id,
+  referral_id
 ` as const;
 
 export type BookingPaymentReceivedEmailResult =
@@ -97,42 +99,99 @@ export async function sendBookingPaymentReceivedEmail(
   );
 
   const subject = t("subject", { reference: booking.booking_reference });
+  const { data: voucher } = await supabase
+    .from("vouchers")
+    .select(
+      "id, code, partner_id, voucher_amount_minor, currency, expires_at, partner:partners(name)"
+    )
+    .eq("booking_id", bookingId)
+    .maybeSingle();
+  const voucherPartner = voucher
+    ? Array.isArray(voucher.partner)
+      ? voucher.partner[0]
+      : voucher.partner
+    : null;
+  const rows = [
+    { label: t("referenceLabel"), value: booking.booking_reference },
+    {
+      label: t("experienceLabel"),
+      value: booking.experience_title_snapshot?.trim() || notProvided
+    },
+    {
+      label: t("variantLabel"),
+      value: booking.variant_name_snapshot?.trim() || notProvided
+    },
+    { label: t("whenLabel"), value: when },
+    {
+      label: t("locationLabel"),
+      value: booking.location_name_snapshot?.trim() || notProvided
+    },
+    { label: t("guestsLabel"), value: String(booking.party_size) },
+    {
+      label: t("totalLabel"),
+      value: formatMinorUnitAmount(
+        booking.total_amount_minor,
+        booking.currency,
+        LOCALE_FORMAT_TAGS[locale]
+      )
+    }
+  ];
+  if (voucher) {
+    rows.push(
+      { label: t("voucherCodeLabel"), value: voucher.code },
+      {
+        label: t("voucherAmountLabel"),
+        value: formatMinorUnitAmount(
+          voucher.voucher_amount_minor,
+          voucher.currency,
+          LOCALE_FORMAT_TAGS[locale]
+        )
+      },
+      {
+        label: t("voucherPartnerLabel"),
+        value: voucherPartner?.name ?? notProvided
+      },
+      {
+        label: t("voucherExpiryLabel"),
+        value: voucher.expires_at
+          ? new Intl.DateTimeFormat(LOCALE_FORMAT_TAGS[locale], {
+              dateStyle: "long"
+            }).format(new Date(voucher.expires_at))
+          : notProvided
+      },
+      {
+        label: t("voucherRestrictionLabel"),
+        value: t("voucherRestriction", {
+          partner: voucherPartner?.name ?? notProvided
+        })
+      }
+    );
+  }
+
   const html = buildBookingPaymentReceivedHtml({
     greeting: t("greeting", {
       name: displayName.length > 0 ? displayName : t("guestFallback")
     }),
     intro: t("intro"),
-    rows: [
-      { label: t("referenceLabel"), value: booking.booking_reference },
-      {
-        label: t("experienceLabel"),
-        value: booking.experience_title_snapshot?.trim() || notProvided
-      },
-      {
-        label: t("variantLabel"),
-        value: booking.variant_name_snapshot?.trim() || notProvided
-      },
-      { label: t("whenLabel"), value: when },
-      {
-        label: t("locationLabel"),
-        value: booking.location_name_snapshot?.trim() || notProvided
-      },
-      { label: t("guestsLabel"), value: String(booking.party_size) },
-      {
-        label: t("totalLabel"),
-        value: formatMinorUnitAmount(
-          booking.total_amount_minor,
-          booking.currency,
-          LOCALE_FORMAT_TAGS[locale]
-        )
-      }
-    ],
+    rows,
     outro: t("outro")
   });
 
-  return sendTransactionalEmail({
+  const result = await sendTransactionalEmail({
     to: booking.customer_email,
     subject,
     html
   });
+  if (voucher) {
+    await supabase.from("partner_referral_events").insert({
+      event_type: result.ok ? "voucher_email_sent" : "voucher_email_failed",
+      partner_id: voucher.partner_id,
+      referral_id: booking.referral_id,
+      customer_id: booking.customer_id,
+      booking_id: bookingId,
+      voucher_id: voucher.id,
+      metadata: result.ok ? { provider_message_id: result.id } : {}
+    });
+  }
+  return result;
 }

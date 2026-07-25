@@ -3,6 +3,16 @@
 import { useEffect, useId, useMemo, useRef, type FormEvent } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import {
+  CalendarDays,
+  Compass,
+  MapPin,
+  RotateCcw,
+  Search,
+  SlidersHorizontal,
+  UserRound,
+  X
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -30,6 +40,13 @@ export function ExperienceMapFilters({
   const searchParams = useSearchParams();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const formId = useId();
+  const activeFilterCount = [
+    filters.date,
+    filters.experienceType,
+    filters.teamMember,
+    filters.location
+  ].filter(Boolean).length;
+  const hasActiveFilters = activeFilterCount > 0;
 
   const filterKey = useMemo(
     () =>
@@ -94,117 +111,143 @@ export function ExperienceMapFilters({
   }
 
   return (
-    <div className="map-filters-wrap col-span-full grid gap-3">
+    <div className="map-filters-wrap">
       <div className="md:hidden">
         <button
           type="button"
-          className="button button-outline map-filters-open justify-self-start"
+          className="button button-outline map-filters-open"
           onClick={() => dialogRef.current?.showModal()}
         >
+          <SlidersHorizontal aria-hidden />
           {t("openFilters")}
+          {hasActiveFilters ? (
+            <span className="map-filters-open__count" aria-hidden>
+              {activeFilterCount}
+            </span>
+          ) : null}
         </button>
       </div>
 
-      <dialog
-        ref={dialogRef}
-        className="map-filters-dialog md:static md:block md:w-full md:max-w-none md:border-0 md:bg-transparent md:p-0"
-      >
-        <div className="map-filters-dialog__inner grid gap-4 p-5 md:p-0">
-          <div className="map-filters-dialog__header flex items-center justify-between gap-4 md:hidden">
+      <dialog ref={dialogRef} className="map-filters-dialog">
+        <div className="map-filters-dialog__inner">
+          <div className="map-filters-dialog__header">
             <h2>{t("filtersTitle")}</h2>
             <button
               type="button"
-              className="button button-outline map-filters-dialog__close"
+              className="map-filters-dialog__close"
               onClick={() => dialogRef.current?.close()}
+              aria-label={t("closeFilters")}
             >
-              {t("closeFilters")}
+              <X aria-hidden />
             </button>
           </div>
 
           <form
             key={filterKey}
             id={formId}
-            className="map-filters grid gap-4 md:grid-cols-4 md:items-end"
+            className="map-filters"
             onSubmit={handleSubmit}
             aria-label={t("filtersTitle")}
           >
             <div className="map-filters__field">
               <Label htmlFor={`${formId}-date`}>{t("filters.date")}</Label>
-              <Input
-                id={`${formId}-date`}
-                name="date"
-                type="date"
-                defaultValue={filters.date ?? ""}
-              />
-              <p className="map-filters__hint">{t("filters.dateHint")}</p>
+              <div className="map-filters__control">
+                <CalendarDays aria-hidden />
+                <Input
+                  id={`${formId}-date`}
+                  name="date"
+                  type="date"
+                  className="map-filters__input"
+                  defaultValue={filters.date ?? ""}
+                  aria-describedby={`${formId}-date-hint`}
+                />
+              </div>
+              <p id={`${formId}-date-hint`} className="sr-only">
+                {t("filters.dateHint")}
+              </p>
             </div>
 
             <div className="map-filters__field">
               <Label htmlFor={`${formId}-type`}>
                 {t("filters.experienceType")}
               </Label>
-              <select
-                id={`${formId}-type`}
-                name="experienceType"
-                className="map-filters__select"
-                defaultValue={filters.experienceType ?? ""}
-              >
-                <option value="">{t("filters.experienceTypeAll")}</option>
-                {options.experienceTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {humanizeType(type)}
-                  </option>
-                ))}
-              </select>
+              <div className="map-filters__control">
+                <Compass aria-hidden />
+                <select
+                  id={`${formId}-type`}
+                  name="experienceType"
+                  className="map-filters__select"
+                  defaultValue={filters.experienceType ?? ""}
+                >
+                  <option value="">{t("filters.experienceTypeAll")}</option>
+                  {options.experienceTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {humanizeType(type)}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div className="map-filters__field">
               <Label htmlFor={`${formId}-team`}>
                 {t("filters.teamMember")}
               </Label>
-              <select
-                id={`${formId}-team`}
-                name="teamMember"
-                className="map-filters__select"
-                defaultValue={filters.teamMember ?? ""}
-              >
-                <option value="">{t("filters.teamMemberAll")}</option>
-                {options.teamMembers.map((member) => (
-                  <option key={member.id} value={member.id}>
-                    {member.displayName}
-                  </option>
-                ))}
-              </select>
+              <div className="map-filters__control">
+                <UserRound aria-hidden />
+                <select
+                  id={`${formId}-team`}
+                  name="teamMember"
+                  className="map-filters__select"
+                  defaultValue={filters.teamMember ?? ""}
+                >
+                  <option value="">{t("filters.teamMemberAll")}</option>
+                  {options.teamMembers.map((member) => (
+                    <option key={member.id} value={member.id}>
+                      {member.displayName}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div className="map-filters__field">
               <Label htmlFor={`${formId}-location`}>
                 {t("filters.location")}
               </Label>
-              <select
-                id={`${formId}-location`}
-                name="location"
-                className="map-filters__select"
-                defaultValue={filters.location ?? ""}
-              >
-                <option value="">{t("filters.locationAll")}</option>
-                {options.locations.map((location) => (
-                  <option key={location.slug} value={location.slug}>
-                    {location.name}
-                  </option>
-                ))}
-              </select>
+              <div className="map-filters__control">
+                <MapPin aria-hidden />
+                <select
+                  id={`${formId}-location`}
+                  name="location"
+                  className="map-filters__select"
+                  defaultValue={filters.location ?? ""}
+                >
+                  <option value="">{t("filters.locationAll")}</option>
+                  {options.locations.map((location) => (
+                    <option key={location.slug} value={location.slug}>
+                      {location.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            <div className="map-filters__actions flex flex-wrap gap-3 md:col-span-full">
-              <button type="submit" className="button button-coral">
+            <div className="map-filters__actions">
+              <button
+                type="submit"
+                className="button button-coral map-filters__apply"
+              >
+                <Search aria-hidden />
                 {t("filters.apply")}
               </button>
               <button
                 type="button"
-                className="button button-outline"
+                className="button button-outline map-filters__clear"
                 onClick={handleClear}
+                disabled={!hasActiveFilters}
               >
+                <RotateCcw aria-hidden />
                 {t("filters.clear")}
               </button>
             </div>

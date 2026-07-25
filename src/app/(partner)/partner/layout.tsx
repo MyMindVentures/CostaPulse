@@ -15,7 +15,10 @@ export default async function PartnerLayout({
       title={t("partner.title")}
       navigationLabel={t("navigationLabel")}
       items={DASHBOARD_NAVIGATION.partner}
-      labels={{ overview: t("overview") }}
+      labels={{
+        overview: t("overview"),
+        partnerQr: t("partnerQr")
+      }}
     >
       {children}
     </DashboardShell>

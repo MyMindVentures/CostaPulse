@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
-import { MapPin } from "lucide-react";
+import {
+  ArrowUpRight,
+  CalendarClock,
+  ImageIcon,
+  MapPin,
+  Users
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PriceDisplay } from "@/components/shared/price-display";
 import { cn } from "@/lib/utils";
@@ -64,9 +70,17 @@ export function ExperienceMapListItem({
         <div className="map-list-item__media" aria-hidden={!item.imageUrl}>
           {item.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- remote Storage URLs; next/image optional later
-            <img src={item.imageUrl} alt="" className="map-list-item__img" />
+            <img
+              src={item.imageUrl}
+              alt=""
+              className="map-list-item__img"
+              loading="lazy"
+              decoding="async"
+            />
           ) : (
-            <div className="map-list-item__img-fallback" />
+            <div className="map-list-item__img-fallback">
+              <ImageIcon aria-hidden />
+            </div>
           )}
         </div>
         <div className="map-list-item__body">
@@ -80,31 +94,33 @@ export function ExperienceMapListItem({
             </span>
           </div>
           <h3 className="map-list-item__title">{item.title}</h3>
-          <div className="map-list-item__price">
-            {item.price.amountMinor != null ? (
-              <>
-                <span className="map-list-item__price-label">
-                  {t("fromPrice")}
-                </span>
-                <PriceDisplay
-                  amountMinor={item.price.amountMinor}
-                  currency={item.price.currency}
-                  locale={locale}
-                />
-              </>
-            ) : null}
+          {item.price.amountMinor != null ? (
+            <div className="map-list-item__price">
+              <span className="map-list-item__price-label">
+                {t("fromPrice")}
+              </span>
+              <PriceDisplay
+                amountMinor={item.price.amountMinor}
+                currency={item.price.currency}
+                locale={locale}
+              />
+            </div>
+          ) : null}
+          <div className="map-list-item__availability">
+            <CalendarClock aria-hidden />
+            <span>
+              {nextAvailable
+                ? t("availabilityNext", { date: nextAvailable })
+                : t("availabilityNone")}
+              {item.availability.slotCount > 0
+                ? ` · ${t("slotsAvailable", { count: item.availability.slotCount })}`
+                : null}
+            </span>
           </div>
-          <p className="map-list-item__availability">
-            {nextAvailable
-              ? t("availabilityNext", { date: nextAvailable })
-              : t("availabilityNone")}
-            {item.availability.slotCount > 0
-              ? ` · ${t("slotsAvailable", { count: item.availability.slotCount })}`
-              : null}
-          </p>
           {hostNames ? (
             <p className="map-list-item__hosts">
-              {t("hostedBy", { names: hostNames })}
+              <Users aria-hidden />
+              <span>{t("hostedBy", { names: hostNames })}</span>
             </p>
           ) : null}
         </div>
@@ -113,7 +129,8 @@ export function ExperienceMapListItem({
         href={`/experiences/${item.slug}`}
         className="map-list-item__cta button button-outline"
       >
-        {t("viewDetails")}
+        <span>{t("viewDetails")}</span>
+        <ArrowUpRight aria-hidden />
       </Link>
     </article>
   );

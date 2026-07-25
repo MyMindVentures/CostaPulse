@@ -426,7 +426,8 @@ export const adminPartnerSchema = z
     postal_code: z.string().nullable().optional(),
     city: z.string().nullable().optional(),
     province: z.string().nullable().optional(),
-    country_code: z.string().nullable().optional()
+    country_code: z.string().nullable().optional(),
+    owner_profile_id: z.string().uuid().nullable().optional()
   })
   .passthrough();
 

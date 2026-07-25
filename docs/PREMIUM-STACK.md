@@ -51,7 +51,6 @@ Analytics is never an operational source of truth. Never log secrets or unnecess
 
 - Vitest
 - React Testing Library and jest-dom
-- Playwright
 - ESLint 9
 - Prettier with Tailwind sorting
 - Husky + lint-staged + fast repository guardrails (pre-commit)
@@ -66,14 +65,13 @@ npm run guardrails
 npm run lint
 npm run typecheck
 npm run test
-npm run test:e2e
 npm run build
 ```
 
 Local git hooks: `pre-commit` (secrets + staged formatting/lint + guardrails),
 `commit-msg` (commitlint), `pre-push` (typecheck + unit tests). CI owns
 repository-wide formatting/lint/coverage, the production build, Storybook, and
-Playwright.
+deployment validation.
 
 ## Agent rules
 

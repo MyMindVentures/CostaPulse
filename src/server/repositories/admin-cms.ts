@@ -2,6 +2,7 @@ import "server-only";
 
 import { z } from "zod";
 import { callAdminApi } from "@/server/admin/api-client";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   adminExperienceDetailSchema,
   adminExperienceListSchema,
@@ -132,6 +133,25 @@ export async function fetchAdminPartners(): Promise<AdminPartner[]> {
     body: { action: "list_partners" },
     schema: z.array(adminPartnerSchema)
   });
+}
+
+export async function fetchPartnerOwnerProfiles() {
+  const supabase = createSupabaseAdminClient();
+  if (!supabase) throw new Error("Supabase admin client is not configured.");
+  const { data: roleRows, error: roleError } = await supabase
+    .from("user_roles")
+    .select("profile_id")
+    .eq("role", "partner");
+  if (roleError) throw new Error(roleError.message);
+  const ids = [...new Set((roleRows ?? []).map((row) => row.profile_id))];
+  if (ids.length === 0) return [];
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, display_name, email")
+    .in("id", ids)
+    .order("display_name");
+  if (error) throw new Error(error.message);
+  return data ?? [];
 }
 
 export async function fetchAdminPartnerDetail(

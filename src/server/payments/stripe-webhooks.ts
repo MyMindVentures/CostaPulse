@@ -24,6 +24,10 @@ const bookingUpdates: Record<string, BookingUpdate> = {
   "payment_intent.payment_failed": {
     paymentStatus: "failed",
     bookingStatus: "pending_payment"
+  },
+  "charge.refunded": {
+    paymentStatus: "partially_refunded",
+    bookingStatus: "partially_refunded"
   }
 };
 

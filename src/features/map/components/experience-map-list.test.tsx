@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { NextIntlClientProvider } from "next-intl";
 import { ExperienceMapList } from "./experience-map-list";
+import { ExperienceMapFilters } from "./experience-map-filters";
 import { MapListToggle } from "./map-list-toggle";
 import type { ExperienceMapItem } from "@/lib/view-models/experience-map";
 import messages from "../../../../messages/en.json";
@@ -15,6 +16,19 @@ vi.mock("next/navigation", () => ({
 }));
 
 afterEach(() => cleanup());
+
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: vi.fn().mockImplementation(() => ({
+    matches: true,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn()
+  }))
+});
+
+HTMLDialogElement.prototype.show = function show() {
+  this.open = true;
+};
 
 function wrap(ui: React.ReactNode) {
   return (
@@ -143,5 +157,53 @@ describe("MapListToggle", () => {
     render(wrap(<MapListToggle view="map" onChange={onChange} />));
     fireEvent.click(screen.getByRole("button", { name: /^List$/i }));
     expect(onChange).toHaveBeenCalledWith("list");
+  });
+});
+
+describe("ExperienceMapFilters", () => {
+  const filters = {
+    date: null,
+    experienceType: null,
+    location: null,
+    teamMember: null,
+    experience: null,
+    view: "map" as const
+  };
+
+  const options = {
+    experienceTypes: ["kayak_mentor", "paddlesurf_mentor"],
+    teamMembers: [
+      {
+        id: "33333333-3333-4333-8333-333333333333",
+        slug: "alex",
+        displayName: "Alex"
+      }
+    ],
+    locations: [{ slug: "nerja", name: "Nerja" }]
+  };
+
+  it("renders all verified filter options and disables reset when inactive", () => {
+    render(wrap(<ExperienceMapFilters filters={filters} options={options} />));
+
+    expect(screen.getByLabelText("Experience type")).toBeTruthy();
+    expect(screen.getByRole("option", { name: "kayak mentor" })).toBeTruthy();
+    expect(screen.getByRole("option", { name: "Alex" })).toBeTruthy();
+    expect(screen.getByRole("option", { name: "Nerja" })).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Clear filters" })
+    ).toBeDisabled();
+  });
+
+  it("enables reset when a URL-backed filter is active", () => {
+    render(
+      wrap(
+        <ExperienceMapFilters
+          filters={{ ...filters, location: "nerja" }}
+          options={options}
+        />
+      )
+    );
+
+    expect(screen.getByRole("button", { name: "Clear filters" })).toBeEnabled();
   });
 });

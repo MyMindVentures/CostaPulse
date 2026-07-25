@@ -1,5 +1,7 @@
 import { Container } from "@/components/ui/container";
 import type { ExperienceDetailViewModel } from "@/server/repositories/catalog";
+import type { BookingStoryPage } from "@/lib/view-models/booking-story";
+import { ExperienceBookingStories } from "../booking-stories/experience-booking-stories";
 import { BookingWidget } from "./booking-widget";
 import { DetailBreadcrumbs } from "./detail-breadcrumbs";
 import { DetailHero } from "./detail-hero";
@@ -10,9 +12,13 @@ import { MeetingPointsCard } from "./meeting-points-card";
 
 type ExperienceDetailProps = {
   experience: ExperienceDetailViewModel;
+  bookingStories?: BookingStoryPage;
 };
 
-export async function ExperienceDetail({ experience }: ExperienceDetailProps) {
+export async function ExperienceDetail({
+  experience,
+  bookingStories
+}: ExperienceDetailProps) {
   return (
     <main className="xp-detail-page">
       <Container className="xp-detail-top">
@@ -49,6 +55,12 @@ export async function ExperienceDetail({ experience }: ExperienceDetailProps) {
           </aside>
         </Container>
       </section>
+      {bookingStories && bookingStories.items.length > 0 ? (
+        <ExperienceBookingStories
+          experienceSlug={experience.slug}
+          initialPage={bookingStories}
+        />
+      ) : null}
     </main>
   );
 }

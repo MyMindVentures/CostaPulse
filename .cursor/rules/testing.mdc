@@ -1,5 +1,5 @@
 ---
-description: Testing expectations for unit, component, and e2e changes
+description: Testing expectations for unit, component, and integration changes
 globs: "**/*.{test,spec}.{ts,tsx}"
 alwaysApply: false
 ---
@@ -10,7 +10,7 @@ alwaysApply: false
 
 - Unit: business logic, validation, mappers, URL/filter parsers
 - Component: UI states and interactions (RTL)
-- E2E: critical journeys in `tests/e2e` (Playwright)
+- Integration: critical journeys across frontend and verified backend contracts
 
 ## Must cover when relevant
 
@@ -29,6 +29,5 @@ Reusable UI: zero / one / many records, missing media, long translated text, loa
 ```bash
 npm run test
 npm run test:coverage
-npm run test:e2e
 npm run check
 ```

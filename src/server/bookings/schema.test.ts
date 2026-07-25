@@ -13,7 +13,7 @@ describe("createBookingInputSchema", () => {
       idempotencyKey: "8a112c5d-0a11-4a88-b2ef-7f07d77f14cd",
       preferredLanguage: "en",
       specialRequests: "Two guests need vegetarian options.",
-      referralCode: "REF-123456ABCD"
+      selectedReferralId: "3d52d3b5-8266-4ee4-a175-3ffb5fc8ce55"
     });
 
     expect(payload.partySize).toBe(4);

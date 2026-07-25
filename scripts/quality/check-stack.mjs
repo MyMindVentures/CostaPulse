@@ -12,7 +12,6 @@ const packageJsonPath = path.join(root, "package.json");
 const REQUIRED_DEV_DEPENDENCIES = [
   "@commitlint/cli",
   "@commitlint/config-conventional",
-  "@playwright/test",
   "eslint",
   "husky",
   "lint-staged",

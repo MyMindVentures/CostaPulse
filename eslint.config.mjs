@@ -148,9 +148,7 @@ export default defineConfig([
     ".next-app/**",
     "out/**",
     "coverage/**",
-    "playwright-report/**",
     "storybook-static/**",
-    "test-results/**",
     "scripts/i18n/_admin_api_min.js",
     "scripts/i18n/_admin_api_loader.ts",
     "scripts/i18n/_admin_api_bundle.js"

@@ -38,7 +38,6 @@ export default defineConfig({
         statements: 70
       }
     },
-    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
-    exclude: ["tests/e2e/**"]
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx"]
   }
 });

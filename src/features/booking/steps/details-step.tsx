@@ -19,6 +19,7 @@ export type DetailsFormValues = z.infer<typeof detailsSchema>;
 type DetailsStepProps = {
   languages: Array<{ code: string; displayName: string }>;
   defaults: DetailsFormValues;
+  lockVerifiedEmail?: boolean;
   onBack: () => void;
   onContinue: (values: DetailsFormValues) => void;
 };
@@ -26,6 +27,7 @@ type DetailsStepProps = {
 export function DetailsStep({
   languages,
   defaults,
+  lockVerifiedEmail = false,
   onBack,
   onContinue
 }: DetailsStepProps) {
@@ -80,6 +82,8 @@ export function DetailsStep({
             {...register("customerEmail")}
             type="email"
             autoComplete="email"
+            readOnly={lockVerifiedEmail}
+            aria-readonly={lockVerifiedEmail}
           />
           {errors.customerEmail ? (
             <em role="alert">{t("details.emailInvalid")}</em>

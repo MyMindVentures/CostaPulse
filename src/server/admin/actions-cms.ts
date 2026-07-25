@@ -318,7 +318,8 @@ const partnerSchema = z.object({
   postal_code: z.string().trim().max(32).optional().nullable(),
   city: z.string().trim().max(120).optional().nullable(),
   province: z.string().trim().max(120).optional().nullable(),
-  country_code: z.string().trim().length(2).default("ES")
+  country_code: z.string().trim().length(2).default("ES"),
+  owner_profile_id: z.string().uuid().optional().nullable()
 });
 
 export async function upsertPartnerAction(
