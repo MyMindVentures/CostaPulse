@@ -5,8 +5,8 @@ import { useCallback, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/container";
+import { ExperienceBooking } from "@/features/experiences/booking/experience-booking";
 import { BookingStepper } from "./booking-stepper";
-import { BookingSummary } from "./booking-summary";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import {
   clearIdempotencyKey,
@@ -389,7 +389,7 @@ export function BookingWizard({
             ) : null}
           </div>
 
-          <BookingSummary draft={draft} />
+          <ExperienceBooking draft={draft} />
         </div>
 
         <p className="bk-step-hint">
