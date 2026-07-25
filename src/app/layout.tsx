@@ -7,6 +7,7 @@ import {
   BRAND_ASSETS_BUCKET,
   getPublicStorageUrl
 } from "@/lib/media/experience-media";
+import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
 
 const siteUrl =
