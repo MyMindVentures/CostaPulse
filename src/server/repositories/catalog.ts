@@ -151,7 +151,10 @@ type CardExperienceRow = {
   }> | null;
 };
 
-type DetailExperienceRow = CardExperienceRow & {
+type DetailExperienceRow = Omit<
+  CardExperienceRow,
+  "experience_variants" | "reviews"
+> & {
   timezone: string;
   inclusions: unknown;
   experience_variants: Array<{
@@ -227,7 +230,9 @@ type DetailExperienceRow = CardExperienceRow & {
   }> | null;
 };
 
-function getProviderName(provider: CardExperienceRow["provider"]): string | null {
+function getProviderName(
+  provider: CardExperienceRow["provider"]
+): string | null {
   if (Array.isArray(provider)) return provider[0]?.display_name ?? null;
   return provider?.display_name ?? null;
 }
@@ -239,7 +244,9 @@ function parseStringArray(value: unknown): string[] {
   );
 }
 
-function toNullableNumber(value: number | string | null | undefined): number | null {
+function toNullableNumber(
+  value: number | string | null | undefined
+): number | null {
   if (value === null || value === undefined) return null;
   const parsed = typeof value === "number" ? value : Number(value);
   return Number.isFinite(parsed) ? parsed : null;
@@ -413,9 +420,10 @@ function mapDetailExperience(
       averageRating: ratingSummary.averageRating,
       reviewCount: ratingSummary.reviewCount,
       items: publishedReviews
-        .sort((left, right) =>
-          (right.published_at ? Date.parse(right.published_at) : 0) -
-          (left.published_at ? Date.parse(left.published_at) : 0)
+        .sort(
+          (left, right) =>
+            (right.published_at ? Date.parse(right.published_at) : 0) -
+            (left.published_at ? Date.parse(left.published_at) : 0)
         )
         .map((review) => ({
           id: review.id,
@@ -504,7 +512,9 @@ export async function getPublishedExperienceCards(
   );
 
   try {
-    return rows.map((row) => mapCardExperience(row, mediaBySlug.get(row.slug) ?? []));
+    return rows.map((row) =>
+      mapCardExperience(row, mediaBySlug.get(row.slug) ?? [])
+    );
   } catch {
     return [];
   }
