@@ -55,7 +55,8 @@ Installed:
 - `sonner` — accessible toasts (shadcn Toaster)
 - `embla-carousel-react` — media galleries (shadcn Carousel)
 - `vaul` — mobile sheets (shadcn Drawer)
-- `react-day-picker` — richer calendar primitive (shadcn Calendar)
+- `react-day-picker` — richer calendar primitive (shadcn Calendar), with `date-fns` for day helpers
+- `date-fns` — calendar date helpers used by `react-day-picker` / Calendar
 
 Wire these through CostaPulse tokens and `src/components/ui` only. Do not add TanStack Query for server-rendered catalog data. Do not add `nuqs` while `catalog-filters` covers URL state.
 

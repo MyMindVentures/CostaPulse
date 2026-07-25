@@ -20,7 +20,7 @@ Canonical stack reference for coding agents. Follow the repository and lockfile;
 - Lucide icons
 - `next-intl` for routing, translations, formatting, and the language switch
 - React Hook Form with Zod resolvers for complex forms
-- Scope B UX primitives: `sonner` (toasts), `vaul` (drawers), `embla-carousel-react` (galleries), `react-day-picker` (calendar)
+- Scope B UX primitives: `sonner` (toasts), `vaul` (drawers), `embla-carousel-react` (galleries), `react-day-picker` + `date-fns` (calendar)
 
 Do not add one-off styling systems, arbitrary UI kits, duplicate component libraries, or hardcoded user-facing copy.
 
