@@ -59,8 +59,8 @@ describe("PartnerCard", () => {
     expect(button).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText("Beach restaurant")).toBeInTheDocument();
     expect(screen.getByText("Benajarafe")).toBeInTheDocument();
-    expect(screen.getAllByText("0")).toHaveLength(2);
-    expect(screen.getByText("0%")).toBeInTheDocument();
+    expect(screen.getByText("CostaPulse partner")).toBeInTheDocument();
+    expect(screen.getByText("Featured")).toBeInTheDocument();
 
     fireEvent.click(button);
     expect(onSelect).toHaveBeenCalledWith("la-plata");

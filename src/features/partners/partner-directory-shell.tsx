@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import posthog from "posthog-js";
 import {
@@ -221,7 +221,7 @@ export function PartnerDirectoryShell({
 
             {mapOpen ? (
               <section className="mt-10 overflow-hidden rounded-[2rem] border border-white/70 bg-white shadow-[0_28px_90px_rgba(2,28,43,0.12)]">
-                <div className="flex items-center justify-between border-b border-border px-5 py-4 sm:px-7">
+                <div className="border-border flex items-center justify-between border-b px-5 py-4 sm:px-7">
                   <div>
                     <p className="text-turquoise-deep text-xs font-semibold tracking-[0.18em] uppercase">
                       {t("map")}
@@ -256,7 +256,7 @@ export function PartnerDirectoryShell({
       </WideContainer>
 
       {selected ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-navy/55 p-0 backdrop-blur-sm sm:items-center sm:p-6">
+        <div className="bg-navy/55 fixed inset-0 z-50 flex items-end justify-center p-0 backdrop-blur-sm sm:items-center sm:p-6">
           <button
             type="button"
             className="absolute inset-0"
@@ -374,7 +374,7 @@ function DirectoryToolbar({
             type="button"
             className={cn(
               "border-border flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-semibold",
-              filters.featured ? "bg-navy text-white" : "bg-white text-navy"
+              filters.featured ? "bg-navy text-white" : "text-navy bg-white"
             )}
             aria-pressed={filters.featured}
             onClick={() =>
@@ -411,7 +411,7 @@ function CategoryButton({
         "flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition-colors",
         active
           ? "border-navy bg-navy text-white"
-          : "border-border bg-white text-navy hover:border-turquoise"
+          : "border-border text-navy hover:border-turquoise bg-white"
       )}
       onClick={onClick}
       aria-pressed={active}
@@ -438,7 +438,7 @@ function FilterSelect({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="border-border bg-white text-navy relative flex min-h-11 items-center gap-2 rounded-xl border px-3 text-sm font-semibold">
+    <label className="border-border text-navy relative flex min-h-11 items-center gap-2 rounded-xl border bg-white px-3 text-sm font-semibold">
       <span className="[&>svg]:size-4">{icon}</span>
       <span className="sr-only">{label}</span>
       <select
@@ -473,7 +473,7 @@ function PartnerDetailPanel({
 
   return (
     <aside className={cn("flex-col", className)}>
-      <div className="relative aspect-[16/7] overflow-hidden bg-sand">
+      <div className="bg-sand relative aspect-[16/7] overflow-hidden">
         {item.image.url ? (
           // eslint-disable-next-line @next/next/no-img-element -- canonical Supabase media URL
           <img
@@ -486,7 +486,7 @@ function PartnerDetailPanel({
         )}
         <button
           type="button"
-          className="absolute top-4 right-4 flex size-10 items-center justify-center rounded-full bg-white/90 text-navy shadow-lg backdrop-blur"
+          className="text-navy absolute top-4 right-4 flex size-10 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur"
           onClick={onClose}
           aria-label={t("close")}
         >
@@ -545,14 +545,16 @@ function PartnerDetailPanel({
           <button
             type="button"
             className="button button-outline inline-flex items-center gap-2"
-            onClick={() => navigator.share?.({ title: item.name, url: window.location.href })}
+            onClick={() =>
+              navigator.share?.({ title: item.name, url: window.location.href })
+            }
           >
             <Share2 className="size-4" aria-hidden />
             {t("share")}
           </button>
         </div>
 
-        <div className="border-border rounded-2xl border bg-sand/45 p-5">
+        <div className="border-border bg-sand/45 rounded-2xl border p-5">
           <p className="text-navy flex items-center gap-2 text-sm font-semibold">
             <MapPin className="text-turquoise size-4" aria-hidden />
             {item.location.addressLine1}
@@ -570,7 +572,10 @@ function PartnerDetailPanel({
               <h3 className="text-navy font-serif text-2xl">
                 {t("nearbyExperiences")}
               </h3>
-              <Link href="/experiences" className="text-navy text-sm font-semibold">
+              <Link
+                href="/experiences"
+                className="text-navy text-sm font-semibold"
+              >
                 {t("seeAll")}
               </Link>
             </div>
@@ -610,10 +615,13 @@ function PartnerCallout() {
         <h2 className="mt-3 font-serif text-4xl leading-tight sm:text-5xl">
           {t("becomeTitle")}
         </h2>
-        <p className="mt-4 max-w-2xl text-white/75 leading-7">
+        <p className="mt-4 max-w-2xl leading-7 text-white/75">
           {t("becomeDescription")}
         </p>
-        <Link href="/contact" className="button button-primary mt-7 inline-flex items-center gap-2">
+        <Link
+          href="/contact"
+          className="button button-primary mt-7 inline-flex items-center gap-2"
+        >
           {t("partnerCta")}
           <ArrowRight className="size-4" aria-hidden />
         </Link>
@@ -625,14 +633,52 @@ function PartnerCallout() {
 function filterItems(
   items: PartnerDirectoryItem[],
   filters: PartnerDirectoryFilters
-) {
-  return applyPartnerDirectoryFilters(items, filters);
+): PartnerDirectoryItem[] {
+  const query = filters.query?.toLocaleLowerCase() ?? null;
+  const filtered = items.filter((item) => {
+    if (filters.category && item.category !== filters.category) return false;
+    if (filters.area && item.location.city !== filters.area) return false;
+    if (filters.featured && !item.isFeatured) return false;
+    if (!query) return true;
+
+    return [
+      item.name,
+      item.category,
+      item.description,
+      item.location.name,
+      item.location.city,
+      item.location.province
+    ].some((value) => value?.toLocaleLowerCase().includes(query));
+  });
+
+  return filtered.toSorted(partnerComparator(filters.sort));
+}
+
+function partnerComparator(
+  sort: PartnerSort
+): (left: PartnerDirectoryItem, right: PartnerDirectoryItem) => number {
+  if (sort === "scans") {
+    return (left, right) => right.metrics.scans - left.metrics.scans;
+  }
+  if (sort === "conversion") {
+    return (left, right) =>
+      right.metrics.conversionRate - left.metrics.conversionRate;
+  }
+  if (sort === "newest") {
+    return (left, right) =>
+      Date.parse(right.publishedAt) - Date.parse(left.publishedAt);
+  }
+  if (sort === "alphabetical") {
+    return (left, right) => left.name.localeCompare(right.name);
+  }
+  return (left, right) => right.metrics.bookings - left.metrics.bookings;
 }
 
 function categoryIcon(category: string) {
   const normalized = category.toLowerCase();
   if (normalized.includes("beach")) return <Waves />;
-  if (normalized.includes("coffee") || normalized.includes("cafe")) return <Coffee />;
+  if (normalized.includes("coffee") || normalized.includes("cafe"))
+    return <Coffee />;
   if (normalized.includes("ice")) return <IceCreamBowl />;
   if (normalized.includes("restaurant")) return <Utensils />;
   return <Store />;
@@ -645,5 +691,7 @@ function WideContainer({
   className?: string;
   children: React.ReactNode;
 }) {
-  return <Container className={cn("max-w-[90rem]", className)}>{children}</Container>;
+  return (
+    <Container className={cn("max-w-[90rem]", className)}>{children}</Container>
+  );
 }
