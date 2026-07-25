@@ -18,7 +18,7 @@ export async function getPublishedMediaPlacements(
   if (!supabase) return grouped;
 
   const { data, error } = await supabase
-    .from("published_media_placements")
+    .from("published_media_assets")
     .select("*")
     .eq("scope_type", scopeType)
     .in("scope_key", scopeKeys)
