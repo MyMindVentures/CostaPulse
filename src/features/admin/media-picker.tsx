@@ -1,22 +1,30 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  createSignedUploadAction,
   deleteMediaAction,
+  detachMediaPlacementAction,
+  finalizeMediaUploadAction,
   linkMediaToScopeAction,
+  prepareMediaUploadAction,
+  replaceMediaPlacementAction,
+  setMediaPrimaryAction,
   upsertMediaAssetAction
 } from "@/server/admin/actions-cms";
 import { getPublicStorageUrl } from "@/lib/media/experience-media";
 import type { AdminMediaAsset } from "@/server/admin/schemas";
+import type { MediaEntityType, MediaUsage } from "@/server/media/path-map";
 
 type Props = {
   scopeType: string;
   scopeKey: string;
   role: string;
+  entityId?: string;
+  parentEntityId?: string | null;
   initialSelectedIds?: string[];
   libraryItems?: AdminMediaAsset[];
 };
@@ -25,6 +33,8 @@ export function MediaPicker({
   scopeType,
   scopeKey,
   role,
+  entityId,
+  parentEntityId = null,
   initialSelectedIds = [],
   libraryItems = []
 }: Props) {
@@ -46,34 +56,34 @@ export function MediaPicker({
   }
 
   function onUpload(files: FileList | null) {
-    if (!files || files.length === 0) return;
+    if (!files?.[0] || !entityId) {
+      toast.error("Entity context is required for upload");
+      return;
+    }
     const file = files[0];
-    const bucket =
-      scopeType === "team_member"
-        ? "team-media"
-        : scopeType === "partner"
-          ? "brand-assets"
-          : "experience-media";
-    const folder =
-      scopeType === "partner"
-        ? `partners/${scopeKey}`
-        : scopeType === "team_member"
-          ? scopeKey
-          : scopeKey;
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
-    const path = `${folder}/${Date.now()}-${safeName}`;
+    const entityType = scopeType as MediaEntityType;
+    const usage = (role === "content" ? "gallery" : role) as MediaUsage;
 
     startTransition(async () => {
-      const signed = await createSignedUploadAction({ bucket, path });
-      if (!signed.ok || !signed.data) {
-        toast.error(signed.ok ? "Upload URL missing" : signed.message);
+      const prepared = await prepareMediaUploadAction({
+        entityType,
+        entityId,
+        parentEntityId,
+        usage,
+        originalFilename: file.name,
+        mimeType: file.type || "application/octet-stream",
+        byteSize: file.size
+      });
+      if (!prepared.ok || !prepared.data) {
+        toast.error(prepared.ok ? "Upload URL missing" : prepared.message);
         return;
       }
-      const data = signed.data as {
+      const data = prepared.data as {
         signedUrl?: string;
         signed_url?: string;
-        token?: string;
-        path?: string;
+        bucket: string;
+        storage_path: string;
+        generated_filename: string;
       };
       const uploadUrl = data.signedUrl ?? data.signed_url;
       if (!uploadUrl) {
@@ -91,7 +101,33 @@ export function MediaPicker({
         toast.error("Upload failed");
         return;
       }
-      toast.success("Uploaded — refresh to see new assets");
+      const finalized = await finalizeMediaUploadAction({
+        bucket: data.bucket as
+          | "experience-media"
+          | "team-media"
+          | "brand-assets"
+          | "admin-documents",
+        storagePath: data.storage_path,
+        entityType,
+        entityId,
+        parentEntityId,
+        usage,
+        originalFilename: file.name,
+        generatedFilename: data.generated_filename,
+        displayOrder: selectedIds.length,
+        isPrimary: selectedIds.length === 0 && usage === "hero"
+      });
+      if (!finalized.ok) {
+        toast.error(finalized.message);
+        return;
+      }
+      const asset = (finalized.data as { asset?: AdminMediaAsset } | undefined)
+        ?.asset;
+      if (asset) {
+        setItems((current) => [asset, ...current]);
+        setSelectedIds((current) => [...current, asset.id]);
+      }
+      toast.success("Uploaded and linked");
     });
   }
 
@@ -135,6 +171,9 @@ export function MediaPicker({
           onClick={() => onSaveLink()}
         >
           Save gallery link
+        </Button>
+        <Button asChild variant="outline">
+          <Link href="/admin/media/upload">Open upload form</Link>
         </Button>
       </div>
 
@@ -184,9 +223,6 @@ export function MediaPicker({
           them. You can also upload directly above.
         </p>
       ) : null}
-
-      {/* Keep setters available for parent refreshes */}
-      <span className="sr-only">{setItems.length}</span>
     </div>
   );
 }
@@ -208,6 +244,9 @@ type LibraryProps = {
     used: string;
     unused: string;
     all: string;
+    detach?: string;
+    setPrimary?: string;
+    replace?: string;
   };
 };
 
@@ -215,58 +254,7 @@ export function MediaLibraryClient({ initial, labels }: LibraryProps) {
   const [pending, startTransition] = useTransition();
   const [items, setItems] = useState(initial.items);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const editing = items.find((item) => item.id === editingId) ?? null;
-
-  function onUpload(files: FileList | null) {
-    if (!files?.[0]) return;
-    const file = files[0];
-    const bucket =
-      file.type.startsWith("image/") || file.type.startsWith("video/")
-        ? "experience-media"
-        : "brand-assets";
-    const folder = bucket === "brand-assets" ? "website" : "library";
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
-    const path = `${folder}/${Date.now()}-${safeName}`;
-
-    startTransition(async () => {
-      const signed = await createSignedUploadAction({ bucket, path });
-      if (!signed.ok || !signed.data) {
-        toast.error(signed.ok ? "Upload URL missing" : signed.message);
-        return;
-      }
-      const data = signed.data as { signedUrl?: string; signed_url?: string };
-      const uploadUrl = data.signedUrl ?? data.signed_url;
-      if (!uploadUrl) {
-        toast.error("Signed upload URL missing");
-        return;
-      }
-
-      setUploadProgress(0);
-      const ok = await new Promise<boolean>((resolve) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("PUT", uploadUrl);
-        xhr.setRequestHeader(
-          "Content-Type",
-          file.type || "application/octet-stream"
-        );
-        xhr.upload.onprogress = (event) => {
-          if (!event.lengthComputable) return;
-          setUploadProgress(Math.round((event.loaded / event.total) * 100));
-        };
-        xhr.onload = () => resolve(xhr.status >= 200 && xhr.status < 300);
-        xhr.onerror = () => resolve(false);
-        xhr.send(file);
-      });
-      setUploadProgress(null);
-      if (!ok) {
-        toast.error("Upload failed");
-        return;
-      }
-      toast.success("Uploaded. Reload to sync metadata.");
-      window.location.reload();
-    });
-  }
 
   function onSaveMeta(formData: FormData) {
     if (!editing) return;
@@ -310,7 +298,7 @@ export function MediaLibraryClient({ initial, labels }: LibraryProps) {
 
   function onDelete(item: AdminMediaAsset) {
     if ((item.used_by?.length ?? 0) > 0) {
-      toast.error("Media is still in use");
+      toast.error("Media is still in use — detach placements first");
       return;
     }
     if (!window.confirm("Delete this media asset permanently?")) return;
@@ -325,23 +313,110 @@ export function MediaLibraryClient({ initial, labels }: LibraryProps) {
     });
   }
 
+  function onDetach(placementId: string) {
+    startTransition(async () => {
+      const result = await detachMediaPlacementAction({ placementId });
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
+      toast.success(labels.detach ?? "Detached");
+      window.location.reload();
+    });
+  }
+
+  function onSetPrimary(placementId: string) {
+    startTransition(async () => {
+      const result = await setMediaPrimaryAction({ placementId });
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
+      toast.success(labels.setPrimary ?? "Set as primary");
+      window.location.reload();
+    });
+  }
+
+  function onReplace(entry: Record<string, unknown>, files: FileList | null) {
+    const file = files?.[0];
+    const placementId =
+      typeof entry.placement_id === "string" ? entry.placement_id : null;
+    const entityType =
+      typeof entry.entity_type === "string" ? entry.entity_type : null;
+    const entityId =
+      typeof entry.entity_id === "string" ? entry.entity_id : null;
+    const usage = typeof entry.usage === "string" ? entry.usage : null;
+    if (!file || !placementId || !entityType || !entityId || !usage) {
+      toast.error("Placement context is incomplete for replace");
+      return;
+    }
+
+    startTransition(async () => {
+      const prepared = await prepareMediaUploadAction({
+        entityType: entityType as MediaEntityType,
+        entityId,
+        parentEntityId:
+          typeof entry.parent_entity_id === "string"
+            ? entry.parent_entity_id
+            : null,
+        usage: usage as MediaUsage,
+        originalFilename: file.name,
+        mimeType: file.type || "application/octet-stream",
+        byteSize: file.size
+      });
+      if (!prepared.ok || !prepared.data) {
+        toast.error(prepared.ok ? "Upload URL missing" : prepared.message);
+        return;
+      }
+      const data = prepared.data as {
+        signedUrl?: string;
+        signed_url?: string;
+        bucket: string;
+        storage_path: string;
+        generated_filename: string;
+      };
+      const uploadUrl = data.signedUrl ?? data.signed_url;
+      if (!uploadUrl) {
+        toast.error("Signed upload URL missing");
+        return;
+      }
+      const response = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type || "application/octet-stream"
+        },
+        body: file
+      });
+      if (!response.ok) {
+        toast.error("Upload failed");
+        return;
+      }
+      const replaced = await replaceMediaPlacementAction({
+        placementId,
+        bucket: data.bucket as
+          | "experience-media"
+          | "team-media"
+          | "brand-assets"
+          | "admin-documents",
+        storagePath: data.storage_path,
+        originalFilename: file.name,
+        generatedFilename: data.generated_filename
+      });
+      if (!replaced.ok) {
+        toast.error(replaced.message);
+        return;
+      }
+      toast.success(labels.replace ?? "Replaced");
+      window.location.reload();
+    });
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center gap-3">
-        <label className="button button-coral inline-flex min-h-11 cursor-pointer items-center px-4">
-          {labels.upload}
-          <input
-            type="file"
-            className="sr-only"
-            accept="image/*,video/mp4,video/webm,application/pdf"
-            onChange={(event) => onUpload(event.target.files)}
-          />
-        </label>
-        {uploadProgress !== null ? (
-          <p className="text-muted text-sm" aria-live="polite">
-            Uploading… {uploadProgress}%
-          </p>
-        ) : null}
+        <Button asChild className="button-coral">
+          <Link href="/admin/media/upload">{labels.upload}</Link>
+        </Button>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -387,11 +462,54 @@ export function MediaLibraryClient({ initial, labels }: LibraryProps) {
                   </Badge>
                 </div>
                 {item.used_by && item.used_by.length > 0 ? (
-                  <p className="text-muted text-xs">
-                    {item.used_by
-                      .map((entry) => entry.label ?? entry.kind)
-                      .join(", ")}
-                  </p>
+                  <ul className="text-muted flex flex-col gap-1 text-xs">
+                    {item.used_by.map((entry) => {
+                      const placementId =
+                        typeof entry.placement_id === "string"
+                          ? entry.placement_id
+                          : null;
+                      return (
+                        <li
+                          key={`${entry.kind}-${entry.label ?? placementId}`}
+                          className="flex flex-wrap items-center gap-2"
+                        >
+                          <span>{entry.label ?? entry.kind}</span>
+                          {placementId ? (
+                            <>
+                              <button
+                                type="button"
+                                className="underline"
+                                disabled={pending}
+                                onClick={() => onSetPrimary(placementId)}
+                              >
+                                {labels.setPrimary ?? "Primary"}
+                              </button>
+                              <button
+                                type="button"
+                                className="underline"
+                                disabled={pending}
+                                onClick={() => onDetach(placementId)}
+                              >
+                                {labels.detach ?? "Detach"}
+                              </button>
+                              <label className="inline-flex cursor-pointer underline">
+                                <span>{labels.replace ?? "Replace"}</span>
+                                <input
+                                  type="file"
+                                  className="sr-only"
+                                  disabled={pending}
+                                  onChange={(event) => {
+                                    onReplace(entry, event.target.files);
+                                    event.target.value = "";
+                                  }}
+                                />
+                              </label>
+                            </>
+                          ) : null}
+                        </li>
+                      );
+                    })}
+                  </ul>
                 ) : null}
                 <div className="flex flex-wrap gap-2">
                   <Button

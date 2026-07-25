@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -8,6 +9,8 @@ type SearchParams = Promise<{
   q?: string;
   type?: string;
   usage?: string;
+  entityType?: string;
+  mime?: string;
 }>;
 
 export default async function AdminMediaPage({
@@ -21,17 +24,27 @@ export default async function AdminMediaPage({
     search: params.q ?? null,
     mediaType: params.type || null,
     usage: params.usage || null,
+    entityType: params.entityType || null,
+    mimeType: params.mime || null,
     pageSize: 48
   });
 
   return (
     <section className="flex flex-col gap-6">
-      <header>
-        <SectionKicker>{t("kicker")}</SectionKicker>
-        <h1 className="text-ink mt-2 text-3xl font-semibold">
-          {t("mediaHeading")}
-        </h1>
-        <p className="text-muted mt-2 max-w-2xl">{t("mediaDescription")}</p>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <SectionKicker>{t("kicker")}</SectionKicker>
+          <h1 className="text-ink mt-2 text-3xl font-semibold">
+            {t("mediaHeading")}
+          </h1>
+          <p className="text-muted mt-2 max-w-2xl">{t("mediaDescription")}</p>
+        </div>
+        <Link
+          href="/admin/media/upload"
+          className="button button-coral inline-flex min-h-11 items-center px-4"
+        >
+          {t("upload")}
+        </Link>
       </header>
 
       <form className="flex flex-wrap gap-3" method="get">
@@ -53,6 +66,20 @@ export default async function AdminMediaPage({
           <option value="document">document</option>
         </select>
         <select
+          name="entityType"
+          defaultValue={params.entityType ?? ""}
+          className="border-border bg-panel min-h-11 rounded-md border px-3"
+          aria-label={t("mediaFilterEntityType")}
+        >
+          <option value="">{t("all")}</option>
+          <option value="experience">experience</option>
+          <option value="experience_variant">experience variant</option>
+          <option value="location">location</option>
+          <option value="team_member">team member</option>
+          <option value="partner">partner</option>
+          <option value="site_content">site content</option>
+        </select>
+        <select
           name="usage"
           defaultValue={params.usage ?? ""}
           className="border-border bg-panel min-h-11 rounded-md border px-3"
@@ -61,6 +88,17 @@ export default async function AdminMediaPage({
           <option value="">{t("all")}</option>
           <option value="used">{t("used")}</option>
           <option value="unused">{t("unused")}</option>
+        </select>
+        <select
+          name="mime"
+          defaultValue={params.mime ?? ""}
+          className="border-border bg-panel min-h-11 rounded-md border px-3"
+          aria-label={t("mediaFilterMime")}
+        >
+          <option value="">{t("all")}</option>
+          <option value="image/">image/*</option>
+          <option value="video/">video/*</option>
+          <option value="application/pdf">application/pdf</option>
         </select>
         <button
           type="submit"
@@ -88,7 +126,10 @@ export default async function AdminMediaPage({
           filterUsage: t("filterUsage"),
           used: t("used"),
           unused: t("unused"),
-          all: t("all")
+          all: t("all"),
+          detach: t("mediaDetach"),
+          setPrimary: t("mediaSetPrimary"),
+          replace: t("mediaReplace")
         }}
       />
     </section>

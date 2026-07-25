@@ -150,6 +150,9 @@ export default defineConfig([
     "coverage/**",
     "playwright-report/**",
     "storybook-static/**",
-    "test-results/**"
+    "test-results/**",
+    "scripts/i18n/_admin_api_min.js",
+    "scripts/i18n/_admin_api_loader.ts",
+    "scripts/i18n/_admin_api_bundle.js"
   ])
 ]);

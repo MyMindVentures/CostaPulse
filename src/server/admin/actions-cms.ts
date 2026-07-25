@@ -5,9 +5,14 @@ import { z } from "zod";
 import {
   createAdminSignedUpload,
   deleteAdminMedia,
+  detachAdminMediaPlacement,
+  finalizeAdminMediaUpload,
   linkAdminMediaToScope,
+  prepareAdminMediaUpload,
   replaceAdminExperienceCollection,
+  replaceAdminMediaPlacement,
   replaceAdminTeamCollection,
+  setAdminMediaPrimary,
   upsertAdminAddon,
   upsertAdminExperience,
   upsertAdminLocation,
@@ -21,6 +26,14 @@ import {
   partnerStatusSchema,
   publicationStatusSchema
 } from "@/server/admin/schemas";
+import {
+  MEDIA_ENTITY_TYPES,
+  MEDIA_USAGES,
+  isMimeAllowedForUsage,
+  isUsageAllowed,
+  type MediaEntityType,
+  type MediaUsage
+} from "@/server/media/path-map";
 import { requireAreaAccess } from "@/server/auth/protected-area";
 import {
   canDeleteAdminMedia,
@@ -483,19 +496,230 @@ export async function createSignedUploadAction(input: {
   }
   const parsed = z
     .object({
+      bucket: z.literal("admin-documents"),
+      path: z
+        .string()
+        .trim()
+        .min(1)
+        .max(500)
+        .refine((value) => !value.includes("..") && !value.startsWith("/"), {
+          message: "Invalid path"
+        })
+    })
+    .safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      message:
+        "Only admin-documents signed uploads are allowed from this action"
+    };
+  }
+
+  try {
+    const data = await createAdminSignedUpload(parsed.data);
+    return { ok: true, data };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+const prepareUploadSchema = z.object({
+  entityType: z.enum(MEDIA_ENTITY_TYPES),
+  entityId: z.string().uuid(),
+  parentEntityId: z.string().uuid().optional().nullable(),
+  usage: z.enum(MEDIA_USAGES),
+  originalFilename: z.string().trim().min(1).max(255),
+  mimeType: z.string().trim().min(1).max(120),
+  byteSize: z.number().int().nonnegative().max(30_000_000)
+});
+
+export async function prepareMediaUploadAction(
+  input: z.infer<typeof prepareUploadSchema>
+): Promise<AdminActionResult & { data?: unknown }> {
+  const { roles } = await requireAreaAccess("admin");
+  if (!canMutateAdminContent(roles)) {
+    return { ok: false, message: "Forbidden", status: 403 };
+  }
+  const parsed = prepareUploadSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, message: "Invalid upload request" };
+
+  const { entityType, usage, mimeType } = parsed.data;
+  if (!isUsageAllowed(entityType as MediaEntityType, usage as MediaUsage)) {
+    return { ok: false, message: "Usage not allowed for entity type" };
+  }
+  if (!isMimeAllowedForUsage(usage as MediaUsage, mimeType)) {
+    return { ok: false, message: "File type not allowed for this usage" };
+  }
+  if (
+    parsed.data.entityType === "experience_variant" &&
+    !parsed.data.parentEntityId
+  ) {
+    return { ok: false, message: "Parent experience is required for variants" };
+  }
+
+  try {
+    const data = await prepareAdminMediaUpload(parsed.data);
+    return { ok: true, data };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+const finalizeUploadSchema = z.object({
+  bucket: z.enum([
+    "experience-media",
+    "team-media",
+    "brand-assets",
+    "admin-documents"
+  ]),
+  storagePath: z.string().trim().min(1).max(500),
+  entityType: z.enum(MEDIA_ENTITY_TYPES),
+  entityId: z.string().uuid(),
+  parentEntityId: z.string().uuid().optional().nullable(),
+  usage: z.enum(MEDIA_USAGES),
+  originalFilename: z.string().trim().min(1).max(255),
+  generatedFilename: z.string().trim().min(1).max(255),
+  altText: z.string().trim().max(500).optional().nullable(),
+  caption: z.string().trim().max(1000).optional().nullable(),
+  displayOrder: z.number().int().min(0).max(10_000).optional(),
+  isPrimary: z.boolean().optional(),
+  width: z.number().int().positive().optional().nullable(),
+  height: z.number().int().positive().optional().nullable(),
+  durationSeconds: z.number().nonnegative().optional().nullable()
+});
+
+export async function finalizeMediaUploadAction(
+  input: z.infer<typeof finalizeUploadSchema>
+): Promise<AdminActionResult & { data?: unknown }> {
+  const { roles } = await requireAreaAccess("admin");
+  if (!canMutateAdminContent(roles)) {
+    return { ok: false, message: "Forbidden", status: 403 };
+  }
+  const parsed = finalizeUploadSchema.safeParse(input);
+  if (!parsed.success)
+    return { ok: false, message: "Invalid finalize request" };
+
+  try {
+    const data = await finalizeAdminMediaUpload({
+      bucket: parsed.data.bucket,
+      storagePath: parsed.data.storagePath,
+      payload: {
+        entity_type: parsed.data.entityType,
+        entity_id: parsed.data.entityId,
+        parent_entity_id: parsed.data.parentEntityId ?? null,
+        usage: parsed.data.usage,
+        original_filename: parsed.data.originalFilename,
+        generated_filename: parsed.data.generatedFilename,
+        alt_text: parsed.data.altText ?? null,
+        caption: parsed.data.caption ?? null,
+        display_order: parsed.data.displayOrder ?? 0,
+        is_primary: parsed.data.isPrimary ?? false,
+        width: parsed.data.width ?? null,
+        height: parsed.data.height ?? null,
+        duration_seconds: parsed.data.durationSeconds ?? null,
+        folder_path: parsed.data.storagePath.split("/").slice(0, -1).join("/")
+      }
+    });
+    revalidatePath("/admin/media");
+    revalidatePath("/admin/experiences");
+    revalidatePath("/admin/team");
+    revalidatePath("/admin/partners");
+    revalidatePath("/admin/locations");
+    return { ok: true, data };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function detachMediaPlacementAction(input: {
+  placementId: string;
+}): Promise<AdminActionResult> {
+  const { roles } = await requireAreaAccess("admin");
+  if (!canMutateAdminContent(roles)) {
+    return { ok: false, message: "Forbidden", status: 403 };
+  }
+  const parsed = z.object({ placementId: z.string().uuid() }).safeParse(input);
+  if (!parsed.success) return { ok: false, message: "Invalid placement" };
+  try {
+    await detachAdminMediaPlacement(parsed.data);
+    revalidatePath("/admin/media");
+    return { ok: true };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function setMediaPrimaryAction(input: {
+  placementId: string;
+}): Promise<AdminActionResult> {
+  const { roles } = await requireAreaAccess("admin");
+  if (!canMutateAdminContent(roles)) {
+    return { ok: false, message: "Forbidden", status: 403 };
+  }
+  const parsed = z.object({ placementId: z.string().uuid() }).safeParse(input);
+  if (!parsed.success) return { ok: false, message: "Invalid placement" };
+  try {
+    await setAdminMediaPrimary(parsed.data);
+    revalidatePath("/admin/media");
+    return { ok: true };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function replaceMediaPlacementAction(input: {
+  placementId: string;
+  bucket:
+    | "experience-media"
+    | "team-media"
+    | "brand-assets"
+    | "admin-documents";
+  storagePath: string;
+  originalFilename: string;
+  generatedFilename: string;
+  altText?: string | null;
+  caption?: string | null;
+}): Promise<AdminActionResult> {
+  const { roles } = await requireAreaAccess("admin");
+  if (!canMutateAdminContent(roles)) {
+    return { ok: false, message: "Forbidden", status: 403 };
+  }
+  const parsed = z
+    .object({
+      placementId: z.string().uuid(),
       bucket: z.enum([
         "experience-media",
         "team-media",
         "brand-assets",
         "admin-documents"
       ]),
-      path: z.string().trim().min(1).max(500)
+      storagePath: z.string().min(1),
+      originalFilename: z.string().min(1),
+      generatedFilename: z.string().min(1),
+      altText: z.string().nullable().optional(),
+      caption: z.string().nullable().optional()
     })
     .safeParse(input);
-  if (!parsed.success) return { ok: false, message: "Invalid upload request" };
-
+  if (!parsed.success) {
+    return { ok: false, message: "Invalid replace payload" };
+  }
   try {
-    const data = await createAdminSignedUpload(parsed.data);
+    const data = await replaceAdminMediaPlacement({
+      placementId: parsed.data.placementId,
+      bucket: parsed.data.bucket,
+      storagePath: parsed.data.storagePath,
+      payload: {
+        original_filename: parsed.data.originalFilename,
+        generated_filename: parsed.data.generatedFilename,
+        alt_text: parsed.data.altText ?? null,
+        caption: parsed.data.caption ?? null
+      }
+    });
+    revalidatePath("/admin/media");
+    revalidatePath("/admin/experiences");
+    revalidatePath("/admin/team");
+    revalidatePath("/admin/partners");
+    revalidatePath("/admin/locations");
     return { ok: true, data };
   } catch (error) {
     return toActionError(error);

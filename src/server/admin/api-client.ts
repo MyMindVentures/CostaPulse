@@ -33,6 +33,11 @@ export type AdminApiAction =
   | "list_media"
   | "upsert_media_asset"
   | "link_media_to_scope"
+  | "detach_media_placement"
+  | "set_media_primary"
+  | "prepare_media_upload"
+  | "finalize_media_upload"
+  | "replace_media_placement"
   | "delete_media"
   | "create_signed_upload"
   | "delete_entity";

@@ -15,6 +15,8 @@ function json(data: unknown, status = 200) {
   });
 }
 
+import { prepareMediaUpload } from "./media-upload.ts";
+
 const groups = {
   staff: [
     "operations_staff",
@@ -394,7 +396,11 @@ Deno.serve(async (req: Request) => {
             p_usage: body.usage ?? null,
             p_scope_type: body.scope_type ?? null,
             p_page: body.page ?? 1,
-            p_page_size: body.page_size ?? 24
+            p_page_size: body.page_size ?? 24,
+            p_entity_type: body.entity_type ?? null,
+            p_entity_id: body.entity_id ?? null,
+            p_placement_usage: body.placement_usage ?? null,
+            p_mime_type: body.mime_type ?? null
           })
         });
       case "upsert_media_asset":
@@ -415,6 +421,88 @@ Deno.serve(async (req: Request) => {
             p_items: body.items ?? []
           })
         });
+      case "detach_media_placement":
+        if (!hasAny(groups.content)) return json({ error: "Forbidden" }, 403);
+        return json({
+          data: await rpc("admin_detach_media_placement", {
+            p_placement_id: body.placement_id
+          })
+        });
+      case "set_media_primary":
+        if (!hasAny(groups.content)) return json({ error: "Forbidden" }, 403);
+        return json({
+          data: await rpc("admin_set_media_primary", {
+            p_placement_id: body.placement_id
+          })
+        });
+      case "prepare_media_upload": {
+        if (!hasAny(groups.content)) return json({ error: "Forbidden" }, 403);
+        const prepared = await prepareMediaUpload(admin, body);
+        const { data, error } = await admin.storage
+          .from(prepared.bucket)
+          .createSignedUploadUrl(prepared.storagePath);
+        if (error) throw error;
+        return json({
+          data: {
+            ...data,
+            bucket: prepared.bucket,
+            path: prepared.storagePath,
+            storage_path: prepared.storagePath,
+            generated_filename: prepared.generatedFilename,
+            folder: prepared.folder,
+            human_label: prepared.humanLabel,
+            original_filename: prepared.originalFilename,
+            mime_type: prepared.mimeType,
+            entity_type: prepared.entityType,
+            entity_id: prepared.entityId,
+            parent_entity_id: prepared.parentEntityId,
+            usage: prepared.usage
+          }
+        });
+      }
+      case "finalize_media_upload": {
+        if (!hasAny(groups.content)) return json({ error: "Forbidden" }, 403);
+        const bucket = String(body.bucket ?? "");
+        const storagePath = String(body.storage_path ?? body.path ?? "");
+        if (!bucket || !storagePath) {
+          return json({ error: "bucket and storage_path are required" }, 400);
+        }
+        try {
+          const data = await rpc("admin_finalize_media_upload", {
+            p_bucket_id: bucket,
+            p_storage_path: storagePath,
+            p_payload: body.payload ?? {}
+          });
+          return json({ data });
+        } catch (finalizeError) {
+          await admin.storage.from(bucket).remove([storagePath]);
+          throw finalizeError;
+        }
+      }
+      case "replace_media_placement": {
+        if (!hasAny(groups.content)) return json({ error: "Forbidden" }, 403);
+        const bucket = String(body.bucket ?? "");
+        const storagePath = String(body.storage_path ?? body.path ?? "");
+        const placementId = String(body.placement_id ?? "");
+        if (!bucket || !storagePath || !placementId) {
+          return json(
+            { error: "placement_id, bucket and storage_path are required" },
+            400
+          );
+        }
+        try {
+          const data = await rpc("admin_replace_media_placement", {
+            p_placement_id: placementId,
+            p_bucket_id: bucket,
+            p_storage_path: storagePath,
+            p_payload: body.payload ?? {}
+          });
+          return json({ data });
+        } catch (replaceError) {
+          await admin.storage.from(bucket).remove([storagePath]);
+          throw replaceError;
+        }
+      }
       case "delete_media":
         if (!hasAny(groups.content)) return json({ error: "Forbidden" }, 403);
         return json({
@@ -424,12 +512,24 @@ Deno.serve(async (req: Request) => {
           })
         });
       case "create_signed_upload": {
+        // Restricted: admin-documents only (legacy). Media must use prepare_media_upload.
         if (!hasAny([...groups.operations, ...groups.content])) {
           return json({ error: "Forbidden" }, 403);
         }
         const bucket = body.bucket ?? "admin-documents";
+        if (bucket !== "admin-documents") {
+          return json(
+            {
+              error:
+                "Arbitrary media uploads are disabled. Use prepare_media_upload."
+            },
+            400
+          );
+        }
         const path = String(body.path ?? "");
-        if (!path) return json({ error: "path is required" }, 400);
+        if (!path || path.includes("..") || path.startsWith("/")) {
+          return json({ error: "Invalid path" }, 400);
+        }
         const { data, error } = await admin.storage
           .from(bucket)
           .createSignedUploadUrl(path);

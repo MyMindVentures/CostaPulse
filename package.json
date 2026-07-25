@@ -28,7 +28,7 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [
       "prettier --write",
-      "eslint --fix --max-warnings=0"
+      "eslint --fix --max-warnings=0 --no-warn-ignored"
     ],
     "*.{json,md,css,yml,yaml}": [
       "prettier --write"
@@ -39,6 +39,7 @@
     "@radix-ui/react-label": "^2.1.14",
     "@radix-ui/react-separator": "^1.1.14",
     "@radix-ui/react-slot": "1.2.4",
+    "@react-email/render": "^1.1.2",
     "@sentry/nextjs": "10.68.0",
     "@supabase/ssr": "0.7.0",
     "@supabase/supabase-js": "2.57.4",

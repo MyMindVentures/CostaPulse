@@ -39,6 +39,17 @@ export function getExperienceMediaUrl(
   return getPublicStorageUrl(EXPERIENCE_MEDIA_BUCKET, path, supabaseUrl);
 }
 
+/**
+ * Builds a public Supabase Storage URL for a team member photo.
+ * Paths are stored on team_members.photo_path under the brand-assets bucket.
+ */
+export function getTeamMemberPhotoUrl(
+  path: string | null | undefined,
+  supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+): string | null {
+  return getPublicStorageUrl(BRAND_ASSETS_BUCKET, path, supabaseUrl);
+}
+
 export function getExperienceHeroImageSrc(
   heroImagePath: string | null | undefined,
   fallbackSrc?: string | null

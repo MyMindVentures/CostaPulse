@@ -665,16 +665,23 @@ em {
   background: var(--panel);
 }
 .experience-host-avatar {
+  position: relative;
   display: grid;
   width: 2.6rem;
   aspect-ratio: 1;
   flex: none;
   place-items: center;
+  overflow: hidden;
   border-radius: 999px;
   background: linear-gradient(135deg, var(--navy-soft), var(--turquoise-deep));
   color: #fff;
   font-size: 1rem;
   font-weight: 900;
+}
+.experience-host-avatar__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .experience-host-row > div {
   min-width: 0;

@@ -11,6 +11,8 @@ import {
   adminPartnerDetailSchema,
   adminPartnerSchema,
   adminTeamMemberSchema,
+  finalizedMediaUploadSchema,
+  preparedMediaUploadSchema,
   publicationStatusSchema,
   signedUploadSchema,
   type AdminExperienceDetail,
@@ -204,6 +206,10 @@ export async function fetchAdminMedia(input?: {
   mediaType?: string | null;
   usage?: string | null;
   scopeType?: string | null;
+  entityType?: string | null;
+  entityId?: string | null;
+  placementUsage?: string | null;
+  mimeType?: string | null;
   page?: number;
   pageSize?: number;
 }): Promise<AdminMediaList> {
@@ -213,7 +219,11 @@ export async function fetchAdminMedia(input?: {
       search: input?.search ?? null,
       media_type: input?.mediaType ?? null,
       usage: input?.usage ?? null,
-      scope_type: input?.scopeType ?? null,
+      scope_type: input?.scopeType ?? input?.entityType ?? null,
+      entity_type: input?.entityType ?? null,
+      entity_id: input?.entityId ?? null,
+      placement_usage: input?.placementUsage ?? null,
+      mime_type: input?.mimeType ?? null,
       page: input?.page ?? 1,
       page_size: input?.pageSize ?? 24
     },
@@ -278,6 +288,86 @@ export async function createAdminSignedUpload(input: {
       path: input.path
     },
     schema: signedUploadSchema
+  });
+}
+
+export async function prepareAdminMediaUpload(input: {
+  entityType: string;
+  entityId: string;
+  parentEntityId?: string | null;
+  usage: string;
+  originalFilename: string;
+  mimeType: string;
+  byteSize: number;
+}) {
+  return callAdminApi({
+    body: {
+      action: "prepare_media_upload",
+      entity_type: input.entityType,
+      entity_id: input.entityId,
+      parent_entity_id: input.parentEntityId ?? null,
+      usage: input.usage,
+      original_filename: input.originalFilename,
+      mime_type: input.mimeType,
+      byte_size: input.byteSize
+    },
+    schema: preparedMediaUploadSchema
+  });
+}
+
+export async function finalizeAdminMediaUpload(input: {
+  bucket: string;
+  storagePath: string;
+  payload: Record<string, unknown>;
+}) {
+  return callAdminApi({
+    body: {
+      action: "finalize_media_upload",
+      bucket: input.bucket,
+      storage_path: input.storagePath,
+      payload: input.payload
+    },
+    schema: finalizedMediaUploadSchema
+  });
+}
+
+export async function replaceAdminMediaPlacement(input: {
+  placementId: string;
+  bucket: string;
+  storagePath: string;
+  payload: Record<string, unknown>;
+}) {
+  return callAdminApi({
+    body: {
+      action: "replace_media_placement",
+      placement_id: input.placementId,
+      bucket: input.bucket,
+      storage_path: input.storagePath,
+      payload: input.payload
+    },
+    schema: finalizedMediaUploadSchema
+  });
+}
+
+export async function detachAdminMediaPlacement(input: {
+  placementId: string;
+}) {
+  return callAdminApi({
+    body: {
+      action: "detach_media_placement",
+      placement_id: input.placementId
+    },
+    schema: z.boolean()
+  });
+}
+
+export async function setAdminMediaPrimary(input: { placementId: string }) {
+  return callAdminApi({
+    body: {
+      action: "set_media_primary",
+      placement_id: input.placementId
+    },
+    schema: z.record(z.string(), z.unknown())
   });
 }
 

@@ -5,9 +5,27 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ExperienceCard } from "./experience-card";
 import type { ExperienceCardViewModel } from "@/lib/view-models/experience-card";
 
-vi.mock("./experience-card-image", () => ({
-  ExperienceCardImage: ({ alt, src }: { alt: string; src: string }) => (
+vi.mock("@/features/experiences/preview/experience-preview-image", () => ({
+  ExperiencePreviewImage: ({ alt, src }: { alt: string; src: string }) => (
     <img alt={alt} src={src} />
+  )
+}));
+
+vi.mock("@/features/experiences/preview/experience-host-avatar", () => ({
+  ExperienceHostAvatar: ({
+    initial,
+    photoUrl
+  }: {
+    initial: string;
+    photoUrl: string | null;
+  }) => (
+    <span className="experience-host-avatar" aria-hidden>
+      {photoUrl ? (
+        <img className="experience-host-avatar__image" alt="" src={photoUrl} />
+      ) : (
+        initial
+      )}
+    </span>
   )
 }));
 
@@ -95,7 +113,7 @@ const baseExperience: ExperienceCardViewModel = {
       slug: "kevin",
       displayName: "Kevin De Vlieger",
       roleTitle: "Mentor",
-      photoPath: null,
+      photoPath: "team/kevin-de-vlieger.webp",
       isPrimary: true,
       roleLabel: null
     }
@@ -132,10 +150,8 @@ describe("ExperienceCard", () => {
     const image = screen.getByRole("img", {
       name: "Private boat in a turquoise cove"
     });
-    expect(image.getAttribute("src") ?? "").toContain(
-      encodeURIComponent(
-        "https://example.supabase.co/storage/v1/object/public/experience-media/boat-experience/hero.png"
-      )
+    expect(image.getAttribute("src")).toBe(
+      "https://example.supabase.co/storage/v1/object/public/experience-media/boat-experience/hero.png"
     );
     expect(screen.getByText("Yacht Experience")).toBeTruthy();
     expect(
@@ -146,6 +162,12 @@ describe("ExperienceCard", () => {
     expect(screen.getByText("Altea +2")).toBeTruthy();
     expect(screen.getByText("Mon, Wed, Fri")).toBeTruthy();
     expect(screen.getByText("Hosted by Kevin De Vlieger")).toBeTruthy();
+    const hostAvatar = document.querySelector(
+      ".experience-host-avatar img"
+    ) as HTMLImageElement | null;
+    expect(hostAvatar?.getAttribute("src")).toBe(
+      "https://example.supabase.co/storage/v1/object/public/brand-assets/team/kevin-de-vlieger.webp"
+    );
     expect(screen.getByText("From")).toBeTruthy();
     expect(screen.getByText("€495")).toBeTruthy();
     expect(screen.getByText("per experience")).toBeTruthy();
@@ -214,6 +236,30 @@ describe("ExperienceCard", () => {
 
     expect(screen.getByText("Altea")).toBeTruthy();
     expect(screen.getByText("Hosted by CostaPulse Host")).toBeTruthy();
+    expect(screen.getByText("C")).toBeTruthy();
+    expect(document.querySelector(".experience-host-avatar img")).toBeNull();
+  });
+
+  it("shows host initial when team photo path is missing", async () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
+
+    render(
+      await ExperienceCard({
+        experience: {
+          ...baseExperience,
+          teamMembers: [
+            {
+              ...baseExperience.teamMembers[0]!,
+              photoPath: null
+            }
+          ]
+        }
+      })
+    );
+
+    expect(screen.getByText("Hosted by Kevin De Vlieger")).toBeTruthy();
+    expect(screen.getByText("K")).toBeTruthy();
+    expect(document.querySelector(".experience-host-avatar img")).toBeNull();
   });
 
   it("shows published ratings only when reviewCount is positive", async () => {

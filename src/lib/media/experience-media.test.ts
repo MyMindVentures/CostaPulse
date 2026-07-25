@@ -5,6 +5,7 @@ import {
   getExperienceHeroImageSrc,
   getExperienceMediaUrl,
   getPublicStorageUrl,
+  getTeamMemberPhotoUrl,
   resolveExperienceMediaUrl,
   resolvePublicImageSrc,
   selectSiteLogoAsset
@@ -63,6 +64,28 @@ describe("getExperienceMediaUrl", () => {
       )
     ).toBe(
       `https://example.supabase.co/storage/v1/object/public/${EXPERIENCE_MEDIA_BUCKET}/curated/private-charters.webp`
+    );
+  });
+});
+
+describe("getTeamMemberPhotoUrl", () => {
+  it("returns null when path or supabase url is missing", () => {
+    expect(
+      getTeamMemberPhotoUrl(null, "https://example.supabase.co")
+    ).toBeNull();
+    expect(
+      getTeamMemberPhotoUrl("team/kevin-de-vlieger.webp", undefined)
+    ).toBeNull();
+  });
+
+  it("builds a public brand-assets url from a photo path", () => {
+    expect(
+      getTeamMemberPhotoUrl(
+        "team/kevin-de-vlieger.webp",
+        "https://example.supabase.co/"
+      )
+    ).toBe(
+      `https://example.supabase.co/storage/v1/object/public/${BRAND_ASSETS_BUCKET}/team/kevin-de-vlieger.webp`
     );
   });
 });
