@@ -19,7 +19,10 @@ export function MapListToggle({
 
   return (
     <div
-      className={cn("map-view-toggle", className)}
+      className={cn(
+        "map-view-toggle border-border inline-flex gap-1 rounded-full border bg-white p-1",
+        className
+      )}
       role="group"
       aria-label={t("viewToggleLabel")}
     >

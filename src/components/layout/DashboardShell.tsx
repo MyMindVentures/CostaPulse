@@ -20,8 +20,8 @@ export function DashboardShell({
   labels
 }: Props) {
   return (
-    <div className="dashboard-shell">
-      <aside className="dashboard-sidebar">
+    <div className="dashboard-shell bg-panel grid min-h-dvh grid-cols-1 md:grid-cols-[minmax(15rem,18rem)_minmax(0,1fr)]">
+      <aside className="dashboard-sidebar bg-navy flex flex-col gap-6 p-5 text-white md:p-8">
         <BrandLink href="/" />
         <p className="dashboard-title">{title}</p>
         <DashboardSidebar
@@ -30,7 +30,7 @@ export function DashboardShell({
           labels={labels}
         />
       </aside>
-      <main className="dashboard-main">
+      <main className="dashboard-main min-w-0 p-[clamp(1.25rem,4vw,3rem)]">
         <Breadcrumbs
           items={items}
           labels={labels}

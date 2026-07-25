@@ -94,18 +94,23 @@ export function ExperienceMapFilters({
   }
 
   return (
-    <div className="map-filters-wrap">
-      <button
-        type="button"
-        className="button button-outline map-filters-open"
-        onClick={() => dialogRef.current?.showModal()}
-      >
-        {t("openFilters")}
-      </button>
+    <div className="map-filters-wrap col-span-full grid gap-3">
+      <div className="md:hidden">
+        <button
+          type="button"
+          className="button button-outline map-filters-open justify-self-start"
+          onClick={() => dialogRef.current?.showModal()}
+        >
+          {t("openFilters")}
+        </button>
+      </div>
 
-      <dialog ref={dialogRef} className="map-filters-dialog">
-        <div className="map-filters-dialog__inner">
-          <div className="map-filters-dialog__header">
+      <dialog
+        ref={dialogRef}
+        className="map-filters-dialog md:static md:block md:w-full md:max-w-none md:border-0 md:bg-transparent md:p-0"
+      >
+        <div className="map-filters-dialog__inner grid gap-4 p-5 md:p-0">
+          <div className="map-filters-dialog__header flex items-center justify-between gap-4 md:hidden">
             <h2>{t("filtersTitle")}</h2>
             <button
               type="button"
@@ -119,7 +124,7 @@ export function ExperienceMapFilters({
           <form
             key={filterKey}
             id={formId}
-            className="map-filters"
+            className="map-filters grid gap-4 md:grid-cols-4 md:items-end"
             onSubmit={handleSubmit}
             aria-label={t("filtersTitle")}
           >
@@ -191,7 +196,7 @@ export function ExperienceMapFilters({
               </select>
             </div>
 
-            <div className="map-filters__actions">
+            <div className="map-filters__actions flex flex-wrap gap-3 md:col-span-full">
               <button type="submit" className="button button-coral">
                 {t("filters.apply")}
               </button>

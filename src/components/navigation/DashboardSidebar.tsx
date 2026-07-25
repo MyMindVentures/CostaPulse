@@ -18,7 +18,10 @@ export function DashboardSidebar({
 }: DashboardSidebarProps) {
   const pathname = usePathname();
   return (
-    <nav className="dashboard-navigation" aria-label={ariaLabel}>
+    <nav
+      className="dashboard-navigation flex gap-2 overflow-x-auto md:grid md:overflow-visible"
+      aria-label={ariaLabel}
+    >
       {items.map((item) => {
         const active = isNavHrefActive(item.href, pathname);
         return (
@@ -26,7 +29,11 @@ export function DashboardSidebar({
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={active ? "is-active" : undefined}
+            className={
+              active
+                ? "is-active min-h-11 shrink-0 rounded-[var(--radius)] px-4 py-3 md:shrink"
+                : "min-h-11 shrink-0 rounded-[var(--radius)] px-4 py-3 md:shrink"
+            }
           >
             {labels[item.labelKey]}
           </Link>

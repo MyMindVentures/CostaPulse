@@ -82,15 +82,18 @@ export function Navbar({
           overlayTone && "is-overlay-tone"
         )}
       >
-        <div className="shell-navbar__inner">
+        <div className="shell-navbar__inner mx-auto flex min-h-[var(--shell-nav-height)] w-[min(100%-2rem,76rem)] min-w-0 items-center justify-between gap-4">
           <BrandLink
             href="/"
-            className="shell-brand"
+            className="shell-brand min-w-0 shrink"
             logoSrc={logoSrc}
             logoAlt={logoAlt}
           />
 
-          <nav className="shell-navbar__links" aria-label={t("primaryLabel")}>
+          <nav
+            className="shell-navbar__links nav:inline-flex hidden min-w-0 flex-1 items-center justify-center gap-[clamp(1rem,2vw,1.75rem)]"
+            aria-label={t("primaryLabel")}
+          >
             {items.map((item) => {
               if (item.children.length > 0) {
                 return (
@@ -117,16 +120,19 @@ export function Navbar({
             })}
           </nav>
 
-          <div className="shell-navbar__actions">
-            <LanguageSwitcher className="shell-lang-switch" />
-            <Link href={account.href} className="shell-account">
+          <div className="shell-navbar__actions inline-flex min-w-11 shrink-0 items-center gap-3 whitespace-nowrap">
+            <LanguageSwitcher className="shell-lang-switch nav:inline-flex hidden items-center gap-1.5 text-[0.72rem] font-extrabold tracking-wider" />
+            <Link
+              href={account.href}
+              className="shell-account nav:inline-flex hidden text-[0.82rem] font-bold opacity-[0.85] hover:opacity-100"
+            >
               {t(`account.${account.labelKey}`)}
             </Link>
             {cta ? (
               <Link
                 href={cta.href}
                 className={cn(
-                  "button button-coral shell-cta",
+                  "button button-coral shell-cta nav:inline-flex hidden",
                   isNavHrefActive(cta.href, pathname) && "is-active"
                 )}
               >
@@ -135,7 +141,7 @@ export function Navbar({
             ) : null}
             <button
               type="button"
-              className="shell-menu-button"
+              className="shell-menu-button nav:hidden inline-grid aspect-square min-h-11 w-11 shrink-0 place-items-center"
               aria-label={t("openMenu")}
               aria-expanded={menuOpen}
               aria-controls="mobile-navigation"

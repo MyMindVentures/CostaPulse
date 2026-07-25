@@ -89,31 +89,40 @@ export function MobileNavigation({
   if (!mounted) return null;
 
   return (
-    <div className={cn("mobile-nav", open && "is-open")} role="presentation">
+    <div
+      className={cn(
+        "mobile-nav pointer-events-none fixed inset-0 z-[60]",
+        open && "is-open pointer-events-auto"
+      )}
+      role="presentation"
+    >
       <button
         type="button"
-        className="mobile-nav__overlay"
+        className="mobile-nav__overlay z-0"
         aria-label={t("dismissMenu")}
         onClick={onClose}
       />
       <div
         ref={panelRef}
-        className={cn("mobile-nav__panel", overlayTone && "is-overlay-tone")}
+        className={cn(
+          "mobile-nav__panel relative z-[1]",
+          overlayTone && "is-overlay-tone"
+        )}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
       >
-        <div className="mobile-nav__header">
+        <div className="mobile-nav__header flex items-center justify-between gap-4">
           <BrandLink
             href="/"
-            className="shell-brand"
+            className="shell-brand min-w-0"
             logoSrc={logoSrc}
             logoAlt={logoAlt}
           />
           <button
             ref={closeRef}
             type="button"
-            className="mobile-nav__close"
+            className="mobile-nav__close inline-grid aspect-square min-h-11 w-11 place-items-center"
             aria-label={t("closeMenu")}
             onClick={onClose}
           >
@@ -125,7 +134,10 @@ export function MobileNavigation({
           {t("primaryLabel")}
         </p>
 
-        <nav className="mobile-nav__links" aria-label={t("primaryLabel")}>
+        <nav
+          className="mobile-nav__links relative z-2 grid gap-1.5"
+          aria-label={t("primaryLabel")}
+        >
           {items.map((item) => {
             if (item.children.length > 0) {
               const expanded =
@@ -193,15 +205,19 @@ export function MobileNavigation({
           })}
         </nav>
 
-        <div className="mobile-nav__actions">
-          <LanguageSwitcher className="shell-lang-switch" />
-          <Link href={account.href} className="shell-account" onClick={onClose}>
+        <div className="mobile-nav__actions mt-auto grid gap-3.5">
+          <LanguageSwitcher className="shell-lang-switch inline-flex items-center gap-1.5 text-[0.72rem] font-extrabold tracking-wider" />
+          <Link
+            href={account.href}
+            className="shell-account inline-flex text-[0.82rem] font-bold opacity-[0.85] hover:opacity-100"
+            onClick={onClose}
+          >
             {t(`account.${account.labelKey}`)}
           </Link>
           {cta ? (
             <Link
               href={cta.href}
-              className="button button-coral"
+              className="button button-coral justify-center"
               onClick={onClose}
             >
               {cta.label}

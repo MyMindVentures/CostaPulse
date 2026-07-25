@@ -52,19 +52,21 @@ export async function HomePageFeature() {
   };
 
   return (
-    <main className="home-page">
+    <main className="home-page overflow-x-clip">
       <section className="hero" id="top">
         <div className="hero-seascape" aria-hidden />
         <Container className="hero-shell">
-          <div className="hero-grid">
-            <div className="hero-copy">
+          <div className="hero-grid grid grid-cols-1 items-end gap-12 py-[clamp(4rem,9vw,8rem)_2rem] lg:grid-cols-[minmax(0,1fr)_minmax(18rem,26rem)]">
+            <div className="hero-copy min-w-0">
               <p className="eyebrow">
                 <span />
                 {t("eyebrow")}
               </p>
-              <h1>{t("title")}</h1>
+              <h1 className="mt-5 max-w-[12ch] text-[clamp(2.75rem,12vw,4.5rem)] leading-[0.92] sm:text-[clamp(3.4rem,8.7vw,5.5rem)] lg:text-[clamp(4.2rem,8.7vw,7.4rem)]">
+                {t("title")}
+              </h1>
               <p className="hero-description">{t("description")}</p>
-              <div className="hero-actions">
+              <div className="hero-actions mt-8 flex flex-wrap gap-3">
                 <a href="#experiences" className="button button-coral">
                   {t("browse")}
                   <ArrowRight size={18} aria-hidden />
@@ -76,7 +78,10 @@ export async function HomePageFeature() {
               </div>
             </div>
 
-            <div className="hero-feature-panel" aria-hidden>
+            <div
+              className="hero-feature-panel min-h-40 self-stretch lg:min-h-96"
+              aria-hidden
+            >
               <div className="hero-card">
                 <span>{t("heroCardKicker")}</span>
                 <strong>{t("heroCardTitle")}</strong>
@@ -84,7 +89,10 @@ export async function HomePageFeature() {
             </div>
           </div>
 
-          <div className="hero-trust-grid" aria-label={t("heroTrustLabel")}>
+          <div
+            className="hero-trust-grid mt-4 grid max-w-[46rem] grid-cols-2 sm:grid-cols-4"
+            aria-label={t("heroTrustLabel")}
+          >
             {heroTrustPoints.map((item, index) => (
               <article key={item.title}>
                 {index === 0 ? (
@@ -102,7 +110,10 @@ export async function HomePageFeature() {
             ))}
           </div>
 
-          <div className="location-pill-bar" id="locations">
+          <div
+            className="location-pill-bar mt-8 inline-flex max-w-full flex-wrap items-center gap-3.5"
+            id="locations"
+          >
             <MapPin size={16} aria-hidden />
             {locationPills.map((item) => (
               <span key={item.label}>{item.label}</span>
@@ -112,9 +123,9 @@ export async function HomePageFeature() {
       </section>
 
       <section className="intro" id="intro">
-        <Container className="intro-grid">
+        <Container className="intro-grid grid grid-cols-1 items-start gap-12 lg:grid-cols-[minmax(10rem,0.9fr)_minmax(0,2.4fr)_auto]">
           <SectionKicker>{t("introKicker")}</SectionKicker>
-          <div className="intro-copy">
+          <div className="intro-copy min-w-0">
             <h2>{t("introTitle")}</h2>
             <p>{t("introDescription")}</p>
           </div>
@@ -134,7 +145,7 @@ export async function HomePageFeature() {
       />
 
       <section className="trust" id="trust">
-        <Container className="trust-grid">
+        <Container className="trust-grid my-[clamp(4rem,8vw,6rem)] grid grid-cols-1 gap-4 sm:grid-cols-2">
           {trustPoints.map((item, index) => (
             <article key={item.title}>
               {index === 0 ? (
@@ -150,24 +161,24 @@ export async function HomePageFeature() {
       </section>
 
       <section className="readiness-strip" aria-label={t("readinessTitle")}>
-        <Container className="readiness-grid">
-          <article>
+        <Container className="readiness-grid grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <article className="border-border flex items-start gap-4 border-t pt-5">
             <Clock3 aria-hidden />
-            <div>
+            <div className="min-w-0">
               <strong>{t("readinessCards.backend.title")}</strong>
               <p>{t("readinessCards.backend.description")}</p>
             </div>
           </article>
-          <article>
+          <article className="border-border flex items-start gap-4 border-t pt-5">
             <Users aria-hidden />
-            <div>
+            <div className="min-w-0">
               <strong>{t("readinessCards.operations.title")}</strong>
               <p>{t("readinessCards.operations.description")}</p>
             </div>
           </article>
-          <article>
+          <article className="border-border flex items-start gap-4 border-t pt-5">
             <Compass aria-hidden />
-            <div>
+            <div className="min-w-0">
               <strong>{t("readinessCards.inventory.title")}</strong>
               <p>{t("readinessCards.inventory.description")}</p>
             </div>
@@ -190,7 +201,7 @@ export async function HomePageFeature() {
       </section>
 
       <footer className="footer">
-        <Container className="footer-grid">
+        <Container className="footer-grid grid grid-cols-1 items-center gap-4 text-center sm:grid-cols-3 sm:text-start">
           <BrandLink
             href="#top"
             logoSrc={siteLogo.url}

@@ -51,7 +51,7 @@ export function DetailsStep({
         onSubmit={handleSubmit((values) => onContinue(values))}
         noValidate
       >
-        <div className="bk-form-grid">
+        <div className="bk-form-grid grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="bk-field">
             <span>{t("details.firstName")}</span>
             <input

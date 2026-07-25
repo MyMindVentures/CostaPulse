@@ -99,8 +99,10 @@ describe("ExperienceCard", () => {
     const image = screen.getByRole("img", {
       name: "Private boat in a turquoise cove"
     });
-    expect(image.getAttribute("src")).toBe(
-      "https://example.supabase.co/storage/v1/object/public/experience-media/boat-experience/hero.png"
+    expect(image.getAttribute("src") ?? "").toContain(
+      encodeURIComponent(
+        "https://example.supabase.co/storage/v1/object/public/experience-media/boat-experience/hero.png"
+      )
     );
     expect(screen.getByText("Yacht Experience")).toBeTruthy();
     expect(

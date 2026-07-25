@@ -52,13 +52,13 @@ export function DetailHighlightsBar({ highlights }: DetailHighlightsBarProps) {
 
   return (
     <section className="xp-highlights" aria-label="Experience highlights">
-      <ul>
+      <ul className="m-0 grid list-none grid-cols-2 gap-4 p-0 sm:grid-cols-3 lg:grid-cols-6">
         {highlights.map((highlight, index) => {
           const Icon = HIGHLIGHT_ICONS[index % HIGHLIGHT_ICONS.length]!;
           const { title, subtitle } = splitHighlight(highlight);
 
           return (
-            <li key={highlight}>
+            <li key={highlight} className="grid justify-items-start gap-1.5">
               <span className="xp-highlight-icon" aria-hidden>
                 <Icon size={22} />
               </span>

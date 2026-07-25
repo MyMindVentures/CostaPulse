@@ -264,7 +264,7 @@ export function BookingWizard({
   return (
     <main className="bk-page">
       <Container className="bk-shell">
-        <header className="bk-topbar">
+        <header className="bk-topbar grid grid-cols-1 items-center gap-4 lg:grid-cols-[auto_1fr_auto]">
           <Link href="/" className="bk-brand">
             CostaPulse
           </Link>
@@ -272,8 +272,8 @@ export function BookingWizard({
           <LanguageSwitcher currentLocale="en" />
         </header>
 
-        <div className="bk-layout">
-          <div className="bk-main">
+        <div className="bk-layout grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(17rem,0.9fr)]">
+          <div className="bk-main min-w-0">
             {step === "experience" ? (
               <ExperienceStep
                 experiences={experiences}

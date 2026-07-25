@@ -23,10 +23,10 @@ export function PageContainer({
   return (
     <Container
       className={cn(
-        "page-container",
-        size === "wide" && "page-container--wide",
-        spacing === "none" && "page-container--spacing-none",
-        spacing === "comfortable" && "page-container--spacing-comfortable",
+        "relative z-1 py-10",
+        size === "wide" && "w-[min(100%-2rem,90rem)]",
+        spacing === "none" && "py-0",
+        spacing === "comfortable" && "py-16",
         className
       )}
     >

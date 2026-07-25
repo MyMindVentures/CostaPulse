@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { ConsentBanner } from "@/features/analytics/consent-banner";
 import { PostHogProvider } from "@/features/analytics/posthog-provider";
-import { BRAND_ASSETS_BUCKET, getPublicStorageUrl } from "@/lib/media/experience-media";
+import {
+  BRAND_ASSETS_BUCKET,
+  getPublicStorageUrl
+} from "@/lib/media/experience-media";
 import "./globals.css";
-import "./navbar-responsive.css";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.costapulse.club";
@@ -12,6 +14,12 @@ const siteUrl =
 const brandLogoUrl =
   getPublicStorageUrl(BRAND_ASSETS_BUCKET, "logos/CostaPulse Logo.png") ??
   "/brand/costapulse-mark.svg";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover"
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

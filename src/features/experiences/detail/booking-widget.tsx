@@ -220,7 +220,7 @@ export function BookingWidget({
       </div>
 
       {variants.length > 0 ? (
-        <fieldset className="xp-variant-toggle">
+        <fieldset className="xp-variant-toggle grid grid-cols-2 gap-2 sm:grid-cols-3">
           <legend className="visually-hidden">{t("widget.duration")}</legend>
           {variants.map((variant) => {
             const label = `${variant.name} ${formatMinorUnitAmount(variant.unitAmountMinor, variant.currency)}`;

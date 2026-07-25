@@ -27,7 +27,7 @@ export function DetailGalleryStrip({ media, title }: DetailGalleryStripProps) {
 
   return (
     <div
-      className="xp-gallery-strip"
+      className="xp-gallery-strip mt-3 grid w-full max-w-[42rem] grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6"
       role="list"
       aria-label={`${title} gallery`}
     >

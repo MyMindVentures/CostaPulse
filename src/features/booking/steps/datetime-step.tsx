@@ -318,7 +318,7 @@ export function DateTimeStep({
         </div>
 
         <div
-          className="bk-calendar-grid"
+          className="bk-calendar-grid grid grid-cols-7 gap-1.5"
           role="grid"
           aria-label={t("datetime.calendarLabel")}
         >

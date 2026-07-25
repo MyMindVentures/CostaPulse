@@ -12,9 +12,7 @@ type ExperienceDetailProps = {
   experience: ExperienceDetailViewModel;
 };
 
-export async function ExperienceDetail({
-  experience
-}: ExperienceDetailProps) {
+export async function ExperienceDetail({ experience }: ExperienceDetailProps) {
   return (
     <main className="xp-detail-page">
       <Container className="xp-detail-top">
@@ -25,12 +23,12 @@ export async function ExperienceDetail({
       <DetailHighlightsBar highlights={experience.highlights} />
 
       <section className="xp-detail-body">
-        <Container className="xp-detail-layout">
-          <div className="xp-detail-main">
+        <Container className="xp-detail-layout grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.7fr)_minmax(18rem,0.9fr)]">
+          <div className="xp-detail-main min-w-0">
             <DetailTabs experience={experience} />
           </div>
 
-          <aside className="xp-detail-sidebar">
+          <aside className="xp-detail-sidebar grid gap-4 lg:sticky lg:top-[calc(var(--shell-nav-height)+1rem)]">
             <BookingWidget
               experienceSlug={experience.slug}
               experienceId={experience.id}

@@ -230,7 +230,7 @@ export async function ExperiencePreview({
           </div>
         ) : null}
 
-        <div className="experience-card-footer">
+        <div className="experience-card-footer flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
           {price && priceUnit ? (
             <div className="experience-price">
               <span>{t("fromPrice")}</span>
@@ -241,7 +241,7 @@ export async function ExperiencePreview({
             <span />
           )}
 
-          <Link href={href} className="experience-card-cta">
+          <Link href={href} className="experience-card-cta w-full sm:w-auto">
             {t("viewDetails")}
             <ArrowRight size={16} aria-hidden />
           </Link>

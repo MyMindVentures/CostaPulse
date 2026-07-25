@@ -178,8 +178,8 @@ export function DetailTabs({ experience }: DetailTabsProps) {
         className="xp-tab-panel"
       >
         {active === "overview" ? (
-          <div className="xp-overview-grid">
-            <div>
+          <div className="xp-overview-grid grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(14rem,0.7fr)]">
+            <div className="min-w-0">
               <h2>About This Experience</h2>
               {experience.description ? (
                 experience.description

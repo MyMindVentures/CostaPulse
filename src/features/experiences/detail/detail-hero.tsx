@@ -36,7 +36,7 @@ export function DetailHero({ experience }: DetailHeroProps) {
     null;
 
   return (
-    <section className="xp-hero">
+    <section className="xp-hero mx-2.5 min-h-0 sm:mx-4 lg:mx-auto lg:min-h-[min(72svh,42rem)]">
       {hero?.url ? (
         <Image
           src={hero.url}
@@ -52,7 +52,7 @@ export function DetailHero({ experience }: DetailHeroProps) {
       )}
       <div className="xp-hero-overlay" aria-hidden />
 
-      <div className="xp-hero-content">
+      <div className="xp-hero-content min-h-0 w-auto p-6 sm:p-8 lg:min-h-[min(72svh,42rem)]">
         {badge ? <span className="xp-hero-badge">{badge}</span> : null}
         <h1>{experience.title}</h1>
         {experience.shortDescription ? (
