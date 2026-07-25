@@ -37,6 +37,28 @@
       "description": "Contactopties verschijnen hier zodra ze gepubliceerd zijn."
     }
   },
+  "TeamPage": {
+    "meta": {
+      "title": "Ontmoet het team | CostaPulse",
+      "description": "Maak kennis met de lokale hosts en specialisten achter CostaPulse-experiences aan de Costa Blanca."
+    },
+    "kicker": "De mensen achter CostaPulse",
+    "title": "Lokale kennis. Persoonlijke gastvrijheid.",
+    "description": "Ontmoet de mensen die ervaring, aandacht en het echte karakter van de Costa Blanca toevoegen aan elke dag die we hosten.",
+    "emptyTitle": "Onze teamprofielen komen binnenkort.",
+    "emptyDescription": "Actieve CostaPulse-teamleden verschijnen hier zodra hun profielen zijn gepubliceerd.",
+    "featured": "Uitgelichte host",
+    "basedIn": "Gevestigd in",
+    "speaks": "Spreekt",
+    "experience": "Ervaring",
+    "experienceYears": "{years}+ jaar",
+    "specialties": "Specialiteiten",
+    "certifications": "Certificeringen",
+    "loading": "Het CostaPulse-team laden",
+    "errorTitle": "Het team kon niet worden geladen",
+    "errorDescription": "Probeer opnieuw. Blijft het probleem bestaan, neem dan contact op met CostaPulse.",
+    "retry": "Opnieuw proberen"
+  },
   "HomePage": {
     "title": "Jouw Costa Blanca. Vanaf het water.",
     "description": "Privé-yachttrips, paddle-avonturen, sunset BBQ’s en persoonlijk gehoste Mediterrane experiences.",

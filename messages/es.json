@@ -37,6 +37,28 @@
       "description": "Las opciones de contacto aparecerán aquí cuando se publiquen."
     }
   },
+  "TeamPage": {
+    "meta": {
+      "title": "Conoce al equipo | CostaPulse",
+      "description": "Conoce a los anfitriones locales y especialistas detrás de las experiencias CostaPulse en la Costa Blanca."
+    },
+    "kicker": "Las personas detrás de CostaPulse",
+    "title": "Conocimiento local. Hospitalidad personal.",
+    "description": "Conoce a las personas que aportan experiencia, atención y el auténtico carácter de la Costa Blanca a cada jornada.",
+    "emptyTitle": "Nuestros perfiles de equipo estarán disponibles pronto.",
+    "emptyDescription": "Los miembros activos de CostaPulse aparecerán aquí cuando se publiquen sus perfiles.",
+    "featured": "Anfitrión destacado",
+    "basedIn": "Ubicación",
+    "speaks": "Idiomas",
+    "experience": "Experiencia",
+    "experienceYears": "{years}+ años",
+    "specialties": "Especialidades",
+    "certifications": "Certificaciones",
+    "loading": "Cargando el equipo de CostaPulse",
+    "errorTitle": "No se pudo cargar el equipo",
+    "errorDescription": "Inténtalo de nuevo. Si el problema continúa, contacta con CostaPulse.",
+    "retry": "Intentar de nuevo"
+  },
   "HomePage": {
     "title": "Tu Costa Blanca. Desde el agua.",
     "description": "Viajes privados en yate, aventuras de paddle, BBQ al atardecer y experiencias mediterráneas con anfitrión personal.",

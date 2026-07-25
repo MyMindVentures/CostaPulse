@@ -27,6 +27,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8
+    },
+    {
+      url: absolute("/team"),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7
     }
   ];
 }
