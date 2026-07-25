@@ -10,6 +10,9 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     pool: "forks",
+    // Windows pre-push: avoid pool startup timeouts when many workers spawn at once.
+    maxWorkers: 2,
+    fileParallelism: true,
     setupFiles: ["./vitest.setup.ts"],
     coverage: {
       provider: "v8",
