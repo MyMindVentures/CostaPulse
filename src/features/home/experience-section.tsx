@@ -2,8 +2,8 @@ import Link from "next/link";
 import { ArrowRight, Compass } from "lucide-react";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Container } from "@/components/ui/container";
-import type { ExperienceCardViewModel } from "@/lib/view-models/experience-card";
-import { ExperienceCard } from "@/features/experiences/components/experience-card";
+import type { ExperiencePreviewViewModel } from "@/lib/view-models/experience-preview";
+import { ExperiencePreview } from "@/features/experiences/preview/experience-preview";
 
 type CuratedCategory = {
   number: string;
@@ -12,7 +12,7 @@ type CuratedCategory = {
 };
 
 type ExperienceSectionProps = {
-  experiences: ExperienceCardViewModel[];
+  experiences: ExperiencePreviewViewModel[];
   curatedCategories: CuratedCategory[];
   kicker: string;
   title: string;
@@ -60,7 +60,7 @@ export function ExperienceSection({
         {experiences.length > 0 ? (
           <div className="experience-list">
             {experiences.map((experience, index) => (
-              <ExperienceCard
+              <ExperiencePreview
                 key={experience.id}
                 experience={experience}
                 fallbackIndex={index}
