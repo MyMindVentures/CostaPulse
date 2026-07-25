@@ -22,7 +22,6 @@ import { ExperienceCardImage } from "@/features/experiences/components/experienc
 import { FavoriteToggle } from "@/features/experiences/favorite-toggle";
 import { formatDurationLabel } from "@/components/shared/duration-display";
 import { formatPriceLabel } from "@/components/shared/price-display";
-import { getExperienceHeroImageSrc } from "@/lib/media/experience-media";
 import type { ExperienceCardViewModel } from "@/lib/view-models/experience-card";
 
 type ExperienceCardProps = {
@@ -127,7 +126,7 @@ export async function ExperienceCard({
     locale
   );
   const href = `/experiences/${experience.slug}`;
-  const imageSrc = getExperienceHeroImageSrc(experience.heroImagePath);
+  const imageSrc = experience.heroImageUrl;
   const imageAlt = experience.heroImageAlt?.trim() || experience.title;
   const tone = resolveExperienceCardTone(
     experience.experienceType,
@@ -162,6 +161,8 @@ export async function ExperienceCard({
           <ExperienceCardImage
             src={imageSrc}
             alt={imageAlt}
+            focalX={experience.heroFocalX}
+            focalY={experience.heroFocalY}
             priority={fallbackIndex < 3}
           />
         ) : null}

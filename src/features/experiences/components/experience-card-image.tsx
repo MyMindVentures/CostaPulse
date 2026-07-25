@@ -6,12 +6,16 @@ import { useState } from "react";
 type ExperienceCardImageProps = {
   src: string;
   alt: string;
+  focalX?: number;
+  focalY?: number;
   priority?: boolean;
 };
 
 export function ExperienceCardImage({
   src,
   alt,
+  focalX = 50,
+  focalY = 50,
   priority = false
 }: ExperienceCardImageProps) {
   const [failed, setFailed] = useState(false);
@@ -28,7 +32,7 @@ export function ExperienceCardImage({
       priority={priority}
       sizes="(max-width: 640px) 100vw, (max-width: 960px) 50vw, 33vw"
       className="experience-card-image"
-      style={{ objectFit: "cover", objectPosition: "center" }}
+      style={{ objectFit: "cover", objectPosition: `${focalX}% ${focalY}%` }}
       onError={() => setFailed(true)}
     />
   );
