@@ -447,13 +447,7 @@ const cardSelect = `
   location_name,
   category_label,
   experience_type,
-  highlights,
-  provider:profiles!experiences_provider_profile_id_fkey(display_name),
-  experience_variants(
-    id, slug, name, description, pricing_model, unit_amount_minor, currency,
-    min_party_size, max_party_size, is_default, is_active
-  ),
-  reviews(rating, status)
+  highlights
 `;
 
 const detailSelect = `
@@ -505,15 +499,67 @@ export async function getPublishedExperienceCards(
   const { data, error } = await query;
   if (error || !data) return [];
 
-  const rows = data as unknown as CardExperienceRow[];
-  const mediaBySlug = await getPublishedMediaPlacements(
-    "experience",
-    rows.map((row) => row.slug)
-  );
+  const baseRows = data as unknown as Array<
+    Omit<CardExperienceRow, "provider" | "experience_variants" | "reviews">
+  >;
+  const experienceIds = baseRows.map((row) => row.id);
+
+  const [mediaBySlug, variantsResult, reviewsResult] = await Promise.all([
+    getPublishedMediaPlacements(
+      "experience",
+      baseRows.map((row) => row.slug)
+    ),
+    experienceIds.length > 0
+      ? supabase
+          .from("experience_variants")
+          .select(
+            "id, experience_id, slug, name, description, pricing_model, unit_amount_minor, currency, min_party_size, max_party_size, is_default, is_active"
+          )
+          .in("experience_id", experienceIds)
+          .eq("is_active", true)
+      : Promise.resolve({ data: [], error: null }),
+    experienceIds.length > 0
+      ? supabase
+          .from("reviews")
+          .select("experience_id, rating, status")
+          .in("experience_id", experienceIds)
+          .eq("status", "published")
+      : Promise.resolve({ data: [], error: null })
+  ]);
+
+  const variants = variantsResult.error ? [] : (variantsResult.data ?? []);
+  const reviews = reviewsResult.error ? [] : (reviewsResult.data ?? []);
 
   try {
-    return rows.map((row) =>
-      mapCardExperience(row, mediaBySlug.get(row.slug) ?? [])
+    return baseRows.map((row) =>
+      mapCardExperience(
+        {
+          ...row,
+          provider: null,
+          experience_variants: variants
+            .filter((variant) => variant.experience_id === row.id)
+            .map((variant) => ({
+              id: variant.id,
+              slug: variant.slug,
+              name: variant.name,
+              description: variant.description,
+              pricing_model: variant.pricing_model,
+              unit_amount_minor: variant.unit_amount_minor,
+              currency: variant.currency,
+              min_party_size: variant.min_party_size,
+              max_party_size: variant.max_party_size,
+              is_default: variant.is_default,
+              is_active: variant.is_active
+            })),
+          reviews: reviews
+            .filter((review) => review.experience_id === row.id)
+            .map((review) => ({
+              rating: review.rating,
+              status: review.status
+            }))
+        },
+        mediaBySlug.get(row.slug) ?? []
+      )
     );
   } catch {
     return [];
