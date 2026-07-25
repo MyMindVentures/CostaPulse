@@ -7,6 +7,7 @@ const qualityDir = path.dirname(fileURLToPath(import.meta.url));
 const checks = [
   "check-i18n.mjs",
   "check-no-production-mocks.mjs",
+  "check-route-discoverability.mjs",
   "check-test-companion.mjs",
   "check-stack.mjs"
 ];

@@ -21,7 +21,7 @@ npm run test:coverage  # Vitest + coverage thresholds
 npm run test:e2e       # Playwright (tests/e2e)
 npm run format         # Prettier write
 npm run format:check   # Prettier check
-npm run guardrails     # i18n parity, no production mocks, stack, companion tests
+npm run guardrails     # i18n, mocks, route discoverability, stack, companion tests
 npm run build          # Production build + standalone prepare
 npm run check          # format:check + lint + typecheck + test + build
 npm run storybook      # Component catalog (ui + shared)
@@ -33,11 +33,11 @@ Agents must not remove, weaken, skip, or reintroduce `--passWithNoTests` to gree
 
 Local gates run automatically; do not bypass them to land broken work.
 
-| Hook         | Runs                                                                            |
-| ------------ | ------------------------------------------------------------------------------- |
-| `pre-commit` | Block staged secrets → `lint-staged` (Prettier + ESLint) → `npm run guardrails` |
-| `commit-msg` | Conventional Commits via commitlint                                             |
-| `pre-push`   | `npm run typecheck` + `npm run test`                                            |
+| Hook         | Runs                                                                                                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `pre-commit` | Block staged secrets → `lint-staged` (Prettier + ESLint) → guardrails, including new-page navigation + sitemap coverage |
+| `commit-msg` | Conventional Commits via commitlint                                                                                     |
+| `pre-push`   | `npm run typecheck` + `npm run test`                                                                                    |
 
 Build, Storybook, and Playwright stay in CI. Skipping hooks (`--no-verify` / `HUSKY=0`) is for emergencies only and must be called out in the PR.
 
@@ -98,6 +98,8 @@ Marketing routes (`/destinations`, `/about`, `/partners`) may still use i18n pla
 - [ ] Migrations, constraints, RLS, Storage policies updated when needed
 - [ ] No hardcoded business content or production mocks introduced
 - [ ] Every enabled locale covered; language switch preserves context
+- [ ] Every new page is reachable from navigation or a real navigated parent
+      flow; every new indexable public page is included in the sitemap
 - [ ] UI uses design-system tokens/primitives; shared states reused
 - [ ] Presentational components have no direct DB/Supabase access
 - [ ] `npm run lint`, `typecheck`, `test` (and `test:e2e` / `build` when relevant) pass
