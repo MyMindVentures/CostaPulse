@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { LoaderCircle, Trash2 } from "lucide-react";
 import {
   deleteMediaAction,
   detachMediaPlacementAction,
@@ -234,6 +235,7 @@ type LibraryProps = {
     page_size: number;
     total: number;
   };
+  canDelete: boolean;
   labels: {
     upload: string;
     delete: string;
@@ -247,13 +249,27 @@ type LibraryProps = {
     detach?: string;
     setPrimary?: string;
     replace?: string;
+    deleteTitle: string;
+    deleteDescription: string;
+    deleteInUse: string;
+    deleteCancel: string;
+    deleteConfirm: string;
+    deleteSuccess: string;
   };
 };
 
-export function MediaLibraryClient({ initial, labels }: LibraryProps) {
+export function MediaLibraryClient({
+  initial,
+  labels,
+  canDelete
+}: LibraryProps) {
   const [pending, startTransition] = useTransition();
   const [items, setItems] = useState(initial.items);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteCandidate, setDeleteCandidate] =
+    useState<AdminMediaAsset | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const deleteRequestInFlight = useRef(false);
   const editing = items.find((item) => item.id === editingId) ?? null;
 
   function onSaveMeta(formData: FormData) {
@@ -295,19 +311,24 @@ export function MediaLibraryClient({ initial, labels }: LibraryProps) {
   }
 
   function onDelete(item: AdminMediaAsset) {
-    if ((item.used_by?.length ?? 0) > 0) {
-      toast.error("Media is still in use — detach placements first");
-      return;
-    }
-    if (!window.confirm("Delete this media asset permanently?")) return;
+    if (deleteRequestInFlight.current) return;
+    deleteRequestInFlight.current = true;
+    setDeletingId(item.id);
     startTransition(async () => {
       const result = await deleteMediaAction({ id: item.id });
       if (!result.ok) {
-        toast.error(result.message);
+        toast.error(
+          (item.used_by?.length ?? 0) > 0 ? labels.deleteInUse : result.message
+        );
+        deleteRequestInFlight.current = false;
+        setDeletingId(null);
         return;
       }
       setItems((current) => current.filter((row) => row.id !== item.id));
-      toast.success(labels.delete);
+      setDeleteCandidate(null);
+      deleteRequestInFlight.current = false;
+      setDeletingId(null);
+      toast.success(labels.deleteSuccess);
     });
   }
 
@@ -518,14 +539,18 @@ export function MediaLibraryClient({ initial, labels }: LibraryProps) {
                   >
                     Edit
                   </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={pending || used}
-                    onClick={() => onDelete(item)}
-                  >
-                    {labels.delete}
-                  </Button>
+                  {canDelete ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      aria-label={`${labels.delete}: ${item.title || item.asset_key}`}
+                      disabled={pending || deletingId !== null}
+                      onClick={() => setDeleteCandidate(item)}
+                    >
+                      <Trash2 aria-hidden="true" />
+                      {labels.delete}
+                    </Button>
+                  ) : null}
                 </div>
               </div>
             </article>
@@ -584,6 +609,76 @@ export function MediaLibraryClient({ initial, labels }: LibraryProps) {
             </Button>
           </div>
         </form>
+      ) : null}
+
+      {deleteCandidate ? (
+        <div
+          className="bg-navy/60 fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center"
+          role="presentation"
+          onKeyDown={(event) => {
+            if (event.key === "Escape" && !deletingId) {
+              setDeleteCandidate(null);
+            }
+          }}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !deletingId) {
+              setDeleteCandidate(null);
+            }
+          }}
+        >
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-media-title"
+            aria-describedby="delete-media-description"
+            className="border-border bg-panel w-full max-w-md rounded-md border p-5 shadow-lg"
+          >
+            <h2
+              id="delete-media-title"
+              className="text-ink text-lg font-semibold"
+            >
+              {labels.deleteTitle}
+            </h2>
+            <p
+              id="delete-media-description"
+              className="text-muted mt-2 text-sm"
+            >
+              {labels.deleteDescription}
+            </p>
+            <p className="text-ink mt-3 font-medium break-words">
+              {deleteCandidate.title || deleteCandidate.asset_key}
+            </p>
+            {(deleteCandidate.used_by?.length ?? 0) > 0 ? (
+              <p className="text-destructive mt-3 text-sm" role="status">
+                {labels.deleteInUse} ({deleteCandidate.used_by?.length})
+              </p>
+            ) : null}
+            <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                autoFocus
+                disabled={deletingId !== null}
+                onClick={() => setDeleteCandidate(null)}
+              >
+                {labels.deleteCancel}
+              </Button>
+              <Button
+                type="button"
+                variant="coral"
+                disabled={deletingId !== null}
+                onClick={() => onDelete(deleteCandidate)}
+              >
+                {deletingId ? (
+                  <LoaderCircle className="animate-spin" aria-hidden="true" />
+                ) : (
+                  <Trash2 aria-hidden="true" />
+                )}
+                {labels.deleteConfirm}
+              </Button>
+            </div>
+          </div>
+        </div>
       ) : null}
     </div>
   );
