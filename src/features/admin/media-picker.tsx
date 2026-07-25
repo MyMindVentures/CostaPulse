@@ -236,6 +236,7 @@ type LibraryProps = {
     total: number;
   };
   canDelete: boolean;
+  canEdit: boolean;
   labels: {
     upload: string;
     delete: string;
@@ -255,13 +256,21 @@ type LibraryProps = {
     deleteCancel: string;
     deleteConfirm: string;
     deleteSuccess: string;
+    editTitle: string;
+    edit: string;
+    cancel: string;
+    saveChanges: string;
+    updateSuccess: string;
+    updateError: string;
+    discard: string;
   };
 };
 
 export function MediaLibraryClient({
   initial,
   labels,
-  canDelete
+  canDelete,
+  canEdit
 }: LibraryProps) {
   const [pending, startTransition] = useTransition();
   const [items, setItems] = useState(initial.items);
@@ -269,43 +278,72 @@ export function MediaLibraryClient({
   const [deleteCandidate, setDeleteCandidate] =
     useState<AdminMediaAsset | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editorDirty, setEditorDirty] = useState(false);
   const deleteRequestInFlight = useRef(false);
   const editing = items.find((item) => item.id === editingId) ?? null;
 
   function onSaveMeta(formData: FormData) {
-    if (!editing) return;
+    if (!editing || !editorDirty) return;
+    const text = (name: string) =>
+      String(formData.get(name) ?? "").trim() || null;
+    const number = (name: string) => Number(formData.get(name));
     startTransition(async () => {
       const tags = String(formData.get("tags") ?? "")
         .split(",")
         .map((tag) => tag.trim())
         .filter(Boolean);
+      const payload = {
+        title: text("title"),
+        alt_text: text("alt_text"),
+        caption: text("caption"),
+        description: text("description"),
+        tags,
+        status: String(formData.get("status")),
+        visibility: String(formData.get("visibility")),
+        is_active: formData.get("is_active") === "on",
+        published_at: text("published_at")
+          ? new Date(String(formData.get("published_at"))).toISOString()
+          : null,
+        starts_at: text("starts_at")
+          ? new Date(String(formData.get("starts_at"))).toISOString()
+          : null,
+        ends_at: text("ends_at")
+          ? new Date(String(formData.get("ends_at"))).toISOString()
+          : null,
+        focal_x: number("focal_x"),
+        focal_y: number("focal_y"),
+        dominant_color: text("dominant_color"),
+        display_order: number("display_order"),
+        is_primary: formData.get("is_primary") === "on",
+        link_url: text("link_url"),
+        open_in_new_tab: formData.get("open_in_new_tab") === "on",
+        placement_key: text("placement_key"),
+        scope_type: text("scope_type"),
+        scope_key: text("scope_key"),
+        page_path: text("page_path"),
+        section_key: text("section_key"),
+        component_key: text("component_key"),
+        locale: text("locale"),
+        breakpoint: String(formData.get("breakpoint")).trim(),
+        role: String(formData.get("role")).trim(),
+        variant: text("variant")
+      };
       const result = await upsertMediaAssetAction({
         id: editing.id,
-        payload: {
-          title: String(formData.get("title") ?? ""),
-          alt_text: String(formData.get("alt_text") ?? ""),
-          caption: String(formData.get("caption") ?? ""),
-          tags
-        }
+        payload
       });
       if (!result.ok) {
-        toast.error(result.message);
+        toast.error(labels.updateError);
         return;
       }
-      toast.success(labels.save);
+      const updated = result.data as AdminMediaAsset;
+      toast.success(labels.updateSuccess);
       setItems((current) =>
         current.map((item) =>
-          item.id === editing.id
-            ? {
-                ...item,
-                title: String(formData.get("title") ?? ""),
-                alt_text: String(formData.get("alt_text") ?? ""),
-                caption: String(formData.get("caption") ?? ""),
-                tags
-              }
-            : item
+          item.id === editing.id ? { ...item, ...updated } : item
         )
       );
+      setEditorDirty(false);
       setEditingId(null);
     });
   }
@@ -531,14 +569,16 @@ export function MediaLibraryClient({
                   </ul>
                 ) : null}
                 <div className="flex flex-wrap gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={pending}
-                    onClick={() => setEditingId(item.id)}
-                  >
-                    Edit
-                  </Button>
+                  {canEdit ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={pending}
+                      onClick={() => setEditingId(item.id)}
+                    >
+                      {labels.edit}
+                    </Button>
+                  ) : null}
                   {canDelete ? (
                     <Button
                       type="button"
@@ -560,52 +600,292 @@ export function MediaLibraryClient({
 
       {editing ? (
         <form
-          className="border-border bg-panel fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-lg flex-col gap-3 rounded-md border p-4 shadow-lg md:inset-x-auto"
+          className="border-border bg-panel fixed inset-4 z-50 mx-auto flex max-w-3xl flex-col gap-4 overflow-y-auto rounded-md border p-4 shadow-lg sm:p-6"
           action={onSaveMeta}
+          onChange={() => setEditorDirty(true)}
         >
-          <h2 className="font-semibold">Edit media</h2>
-          <label className="text-sm">
-            Title
-            <input
-              name="title"
-              defaultValue={editing.title ?? ""}
-              className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+          <h2 className="text-xl font-semibold">{labels.editTitle}</h2>
+          {getPublicStorageUrl(editing.bucket_id, editing.storage_path) &&
+          editing.media_type === "image" ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={
+                getPublicStorageUrl(editing.bucket_id, editing.storage_path)!
+              }
+              alt={editing.alt_text ?? ""}
+              className="max-h-64 w-full rounded-md object-contain"
             />
-          </label>
-          <label className="text-sm">
-            Alt text
-            <input
-              name="alt_text"
-              defaultValue={editing.alt_text ?? ""}
-              className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
-            />
-          </label>
-          <label className="text-sm">
-            Caption
-            <input
-              name="caption"
-              defaultValue={editing.caption ?? ""}
-              className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
-            />
-          </label>
-          <label className="text-sm">
-            Tags (comma separated)
-            <input
-              name="tags"
-              defaultValue={(editing.tags ?? []).join(", ")}
-              className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
-            />
-          </label>
+          ) : null}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="text-sm">
+              Title
+              <input
+                name="title"
+                defaultValue={editing.title ?? ""}
+                className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+              />
+            </label>
+            <label className="text-sm">
+              Description
+              <textarea
+                name="description"
+                defaultValue={editing.description ?? ""}
+                className="border-border mt-1 min-h-24 w-full rounded-md border px-3 py-2"
+              />
+            </label>
+            <label className="text-sm">
+              Alt text
+              <input
+                name="alt_text"
+                defaultValue={editing.alt_text ?? ""}
+                className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+              />
+            </label>
+            <label className="text-sm">
+              Caption
+              <input
+                name="caption"
+                defaultValue={editing.caption ?? ""}
+                className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+              />
+            </label>
+            <label className="text-sm">
+              Tags (comma separated)
+              <input
+                name="tags"
+                defaultValue={(editing.tags ?? []).join(", ")}
+                className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+              />
+            </label>
+          </div>
+          <fieldset className="grid gap-3 sm:grid-cols-2">
+            <legend className="mb-2 font-semibold">Publication</legend>
+            <label className="text-sm">
+              Status
+              <select
+                name="status"
+                defaultValue={editing.status ?? "draft"}
+                className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+              >
+                <option value="draft">draft</option>
+                <option value="published">published</option>
+                <option value="archived">archived</option>
+              </select>
+            </label>
+            <label className="text-sm">
+              Visibility
+              <select
+                name="visibility"
+                defaultValue={editing.visibility ?? "public"}
+                className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+              >
+                <option value="public">public</option>
+                <option value="authenticated">authenticated</option>
+                <option value="private">private</option>
+              </select>
+            </label>
+            {[
+              ["published_at", "Published at", editing.published_at],
+              ["starts_at", "Starts at", editing.starts_at],
+              ["ends_at", "Ends at", editing.ends_at]
+            ].map(([name, label, value]) => (
+              <label key={name as string} className="text-sm">
+                {label}
+                <input
+                  type="datetime-local"
+                  name={name as string}
+                  defaultValue={value ? String(value).slice(0, 16) : ""}
+                  className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+                />
+              </label>
+            ))}
+            <label className="flex min-h-11 items-center gap-2">
+              <input
+                type="checkbox"
+                name="is_active"
+                defaultChecked={editing.is_active}
+              />
+              Active
+            </label>
+          </fieldset>
+          <fieldset className="grid gap-3 sm:grid-cols-2">
+            <legend className="mb-2 font-semibold">Presentation</legend>
+            <label className="text-sm">
+              Focal X
+              <input
+                required
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                name="focal_x"
+                defaultValue={editing.focal_x ?? 50}
+                className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+              />
+            </label>
+            <label className="text-sm">
+              Focal Y
+              <input
+                required
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                name="focal_y"
+                defaultValue={editing.focal_y ?? 50}
+                className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+              />
+            </label>
+            <label className="text-sm">
+              Dominant color
+              <input
+                name="dominant_color"
+                pattern="#[0-9A-Fa-f]{6}"
+                placeholder="#RRGGBB"
+                defaultValue={editing.dominant_color ?? ""}
+                className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+              />
+            </label>
+            <label className="text-sm">
+              Display order
+              <input
+                required
+                type="number"
+                step="1"
+                name="display_order"
+                defaultValue={editing.display_order ?? 0}
+                className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+              />
+            </label>
+            <label className="text-sm sm:col-span-2">
+              Link URL
+              <input
+                type="url"
+                name="link_url"
+                defaultValue={editing.link_url ?? ""}
+                className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+              />
+            </label>
+            <label className="flex min-h-11 items-center gap-2">
+              <input
+                type="checkbox"
+                name="is_primary"
+                defaultChecked={editing.is_primary}
+              />
+              Primary
+            </label>
+            <label className="flex min-h-11 items-center gap-2">
+              <input
+                type="checkbox"
+                name="open_in_new_tab"
+                defaultChecked={editing.open_in_new_tab}
+              />
+              Open in new tab
+            </label>
+          </fieldset>
+          <details>
+            <summary className="min-h-11 cursor-pointer font-semibold">
+              Advanced placement metadata
+            </summary>
+            <div className="grid gap-3 pt-3 sm:grid-cols-2">
+              {[
+                ["placement_key", "Placement key"],
+                ["scope_type", "Scope type"],
+                ["scope_key", "Scope key"],
+                ["page_path", "Page path"],
+                ["section_key", "Section key"],
+                ["component_key", "Component key"],
+                ["locale", "Locale"],
+                ["breakpoint", "Breakpoint"],
+                ["role", "Role"],
+                ["variant", "Variant"]
+              ].map(([name, label]) => (
+                <label key={name} className="text-sm">
+                  {label}
+                  <input
+                    name={name}
+                    defaultValue={String(
+                      editing[name as keyof AdminMediaAsset] ?? ""
+                    )}
+                    className="border-border mt-1 min-h-11 w-full rounded-md border px-3"
+                  />
+                </label>
+              ))}
+            </div>
+          </details>
+          <details>
+            <summary className="min-h-11 cursor-pointer font-semibold">
+              Storage and file information
+            </summary>
+            <dl className="text-muted grid gap-2 pt-3 text-sm sm:grid-cols-2">
+              <div>
+                <dt>Asset key</dt>
+                <dd>{editing.asset_key}</dd>
+              </div>
+              <div>
+                <dt>Storage</dt>
+                <dd className="break-all">
+                  {editing.bucket_id}/{editing.storage_path}
+                </dd>
+              </div>
+              <div>
+                <dt>MIME type</dt>
+                <dd>{editing.mime_type ?? "—"}</dd>
+              </div>
+              <div>
+                <dt>Size</dt>
+                <dd>{editing.byte_size ?? "—"}</dd>
+              </div>
+              <div>
+                <dt>Dimensions</dt>
+                <dd>
+                  {editing.width ?? "—"} × {editing.height ?? "—"}
+                </dd>
+              </div>
+              <div>
+                <dt>Filename</dt>
+                <dd>{editing.original_filename ?? "—"}</dd>
+              </div>
+            </dl>
+          </details>
+          <section>
+            <h3 className="font-semibold">Usage</h3>
+            {editing.used_by.length ? (
+              <ul className="mt-2 space-y-2 text-sm">
+                {editing.used_by.map((entry) => (
+                  <li
+                    key={String(
+                      entry.placement_id ?? entry.label ?? entry.kind
+                    )}
+                    className="border-border rounded-md border p-3"
+                  >
+                    {entry.label ?? entry.kind} · {String(entry.usage ?? "—")} ·{" "}
+                    {String(entry.locale ?? "—")} ·{" "}
+                    {String(entry.breakpoint ?? "—")} ·{" "}
+                    {entry.is_primary ? "primary" : "secondary"} ·{" "}
+                    {String(entry.display_order ?? "—")}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted text-sm">Unused</p>
+            )}
+          </section>
           <div className="flex gap-2">
-            <Button type="submit" disabled={pending}>
-              {labels.save}
+            <Button type="submit" disabled={pending || !editorDirty}>
+              {labels.saveChanges}
             </Button>
             <Button
               type="button"
               variant="outline"
-              onClick={() => setEditingId(null)}
+              onClick={() => {
+                if (!editorDirty || window.confirm(labels.discard)) {
+                  setEditorDirty(false);
+                  setEditingId(null);
+                }
+              }}
             >
-              Cancel
+              {labels.cancel}
             </Button>
           </div>
         </form>

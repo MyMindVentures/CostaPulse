@@ -34,9 +34,13 @@ import {
   deleteMediaAction,
   prepareMediaUploadAction,
   publishExperienceAction,
+  upsertMediaAssetAction,
   upsertExperienceAction
 } from "./actions-cms";
-import { prepareAdminMediaUpload } from "@/server/repositories/admin-cms";
+import {
+  prepareAdminMediaUpload,
+  upsertAdminMediaAsset
+} from "@/server/repositories/admin-cms";
 
 describe("upsertExperienceAction", () => {
   beforeEach(() => {
@@ -122,6 +126,52 @@ describe("deleteMediaAction", () => {
         id: "11111111-1111-4111-8111-111111111111"
       })
     ).resolves.toEqual({ ok: false, message: "Forbidden", status: 403 });
+  });
+});
+
+describe("upsertMediaAssetAction", () => {
+  const id = "11111111-1111-4111-8111-111111111111";
+
+  it("rejects operations staff server-side", async () => {
+    vi.mocked(requireAreaAccess).mockResolvedValue({
+      userId: "user-1",
+      roles: ["operations_staff"]
+    });
+    await expect(
+      upsertMediaAssetAction({ id, payload: { title: "Title" } })
+    ).resolves.toEqual({ ok: false, message: "Forbidden", status: 403 });
+  });
+
+  it("rejects mass assignment and invalid metadata", async () => {
+    vi.mocked(requireAreaAccess).mockResolvedValue({
+      userId: "user-1",
+      roles: ["content_manager"]
+    });
+    await expect(
+      upsertMediaAssetAction({ id, payload: { storage_path: "changed" } })
+    ).resolves.toEqual({ ok: false, message: "Invalid media payload" });
+    await expect(
+      upsertMediaAssetAction({ id, payload: { focal_x: 101 } })
+    ).resolves.toEqual({ ok: false, message: "Invalid media payload" });
+  });
+
+  it("trims metadata and returns the updated asset", async () => {
+    vi.mocked(requireAreaAccess).mockResolvedValue({
+      userId: "user-1",
+      roles: ["content_manager"]
+    });
+    const asset = { id, asset_key: "hero" } as never;
+    vi.mocked(upsertAdminMediaAsset).mockResolvedValue(asset);
+    await expect(
+      upsertMediaAssetAction({
+        id,
+        payload: { title: "  Hero  ", caption: " " }
+      })
+    ).resolves.toEqual({ ok: true, data: asset });
+    expect(upsertAdminMediaAsset).toHaveBeenCalledWith({
+      id,
+      payload: { title: "Hero", caption: null }
+    });
   });
 });
 

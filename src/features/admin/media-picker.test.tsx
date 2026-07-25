@@ -56,7 +56,14 @@ const labels = {
   deleteInUse: "This media asset cannot be deleted because it is still in use.",
   deleteCancel: "Cancel",
   deleteConfirm: "Delete asset",
-  deleteSuccess: "Media asset deleted."
+  deleteSuccess: "Media asset deleted.",
+  editTitle: "Edit media asset",
+  edit: "Edit",
+  cancel: "Cancel",
+  saveChanges: "Save changes",
+  updateSuccess: "Media asset updated successfully.",
+  updateError: "The media asset could not be updated.",
+  discard: "You have unsaved changes. Discard them?"
 };
 
 function mediaAsset(
@@ -101,6 +108,7 @@ describe("MediaLibraryClient", () => {
         initial={mediaList([first])}
         labels={labels}
         canDelete
+        canEdit
       />
     );
 
@@ -112,6 +120,7 @@ describe("MediaLibraryClient", () => {
         initial={mediaList([second])}
         labels={labels}
         canDelete
+        canEdit
       />
     );
 
@@ -134,6 +143,7 @@ describe("MediaLibraryClient", () => {
         initial={mediaList([archived])}
         labels={labels}
         canDelete
+        canEdit
       />
     );
 
@@ -141,17 +151,19 @@ describe("MediaLibraryClient", () => {
     fireEvent.change(screen.getByLabelText("Title"), {
       target: { value: "Updated title" }
     });
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
 
     await waitFor(() =>
       expect(upsertMediaAssetAction).toHaveBeenCalledWith({
         id: archived.id,
-        payload: {
+        payload: expect.objectContaining({
           title: "Updated title",
-          alt_text: "",
-          caption: "",
-          tags: []
-        }
+          alt_text: null,
+          caption: null,
+          tags: [],
+          status: "archived",
+          visibility: "private"
+        })
       })
     );
   });
@@ -167,6 +179,7 @@ describe("MediaLibraryClient", () => {
         initial={mediaList([asset])}
         labels={labels}
         canDelete
+        canEdit
       />
     );
 
@@ -195,6 +208,7 @@ describe("MediaLibraryClient", () => {
         initial={mediaList([asset])}
         labels={labels}
         canDelete={false}
+        canEdit
       />
     );
 
