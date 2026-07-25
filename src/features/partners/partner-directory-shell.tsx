@@ -8,7 +8,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import posthog from "posthog-js";
 import {
   ArrowRight,
-  CalendarCheck,
   ChevronDown,
   Coffee,
   ExternalLink,
@@ -17,7 +16,6 @@ import {
   Map,
   MapPin,
   Phone,
-  QrCode,
   Search,
   Share2,
   SlidersHorizontal,
@@ -71,12 +69,11 @@ export function PartnerDirectoryShell({
   mapStyleUrl
 }: PartnerDirectoryShellProps) {
   const t = useTranslations("PartnerDirectory");
-  const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const current = useSearchParams();
   const [, startTransition] = useTransition();
-  const [defaultDetailDismissed, setDefaultDetailDismissed] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
   const filters = parsePartnerDirectoryFilters(
     current.size ? current : initialSearchParams
   );
@@ -84,32 +81,13 @@ export function PartnerDirectoryShell({
     () => filterItems(data.items, filters),
     [data.items, filters]
   );
-  const explicitSelection = items.find((item) => item.slug === filters.partner);
-  const defaultSelection =
-    items.find(
-      (item) =>
-        item.phone &&
-        item.location.addressLine1 &&
-        (item.websiteUrl || item.location.directionsUrl)
-    ) ?? items[0];
-  const selected =
-    explicitSelection ?? (!defaultDetailDismissed ? defaultSelection : null);
+  const selected = items.find((item) => item.slug === filters.partner) ?? null;
 
   useEffect(() => {
     posthog.capture("partners_page_viewed", {
       partner_count: data.totals.partners
     });
   }, [data.totals.partners]);
-
-  useEffect(() => {
-    if (!filters.partner || !selected) return;
-    document.getElementById(`partner-card-${selected.slug}`)?.scrollIntoView({
-      block: "nearest",
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "auto"
-        : "smooth"
-    });
-  }, [filters.partner, selected]);
 
   const patch = (next: Partial<PartnerDirectoryFilters>, event?: string) => {
     const params = applyPartnerDirectoryFilters(
@@ -125,186 +103,174 @@ export function PartnerDirectoryShell({
   };
 
   const select = (slug: string, event = "partner_card_selected") => {
-    setDefaultDetailDismissed(false);
     patch({ partner: slug }, event);
   };
-  const closeDetail = () => {
-    setDefaultDetailDismissed(true);
-    patch({ partner: null });
-  };
+
+  const closeDetail = () => patch({ partner: null });
 
   return (
     <main className="bg-background min-h-svh overflow-x-clip">
-      <section className="border-border bg-sand/35 border-b">
-        <WideContainer className="grid gap-5 py-6 lg:grid-cols-[minmax(21rem,1fr)_auto] lg:items-center">
-          <div>
-            <h1 className="text-navy max-w-xl font-serif text-4xl leading-[1.02] sm:text-5xl">
+      <section className="relative isolate overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(20,169,180,0.16),transparent_34%),linear-gradient(135deg,#f8f1e6_0%,#fffaf4_56%,#eef8f7_100%)]">
+        <div className="absolute inset-y-0 right-0 hidden w-1/3 bg-[linear-gradient(180deg,rgba(2,28,43,0.08),transparent)] lg:block" />
+        <WideContainer className="relative py-16 sm:py-20 lg:py-28">
+          <div className="max-w-3xl">
+            <p className="text-turquoise-deep text-xs font-semibold tracking-[0.22em] uppercase">
+              {t("kicker")}
+            </p>
+            <h1 className="text-navy mt-4 max-w-2xl font-serif text-5xl leading-[0.98] sm:text-6xl lg:text-7xl">
               {t.rich("title", {
                 accent: (chunks) => (
                   <span className="text-turquoise block">{chunks}</span>
                 )
               })}
             </h1>
-            <p className="text-muted mt-3 max-w-xl text-sm leading-6">
+            <p className="text-muted mt-6 max-w-2xl text-base leading-7 sm:text-lg">
               {t("description")}
             </p>
           </div>
-          <dl className="border-border bg-panel grid grid-cols-3 rounded-xl border px-2 py-4 shadow-sm sm:px-4">
-            <HeroMetric
-              icon={<Users />}
-              value={data.totals.partners}
-              label={t("trustedPartners")}
-              locale={locale}
-            />
-            <HeroMetric
-              icon={<QrCode />}
-              value={data.totals.scans}
-              label={t("scans")}
-              locale={locale}
-            />
-            <HeroMetric
-              icon={<CalendarCheck />}
-              value={data.totals.bookings}
-              label={t("experienceBookings")}
-              locale={locale}
-            />
-          </dl>
         </WideContainer>
       </section>
 
-      <WideContainer className="py-4 pb-10">
-        <DirectoryToolbar
-          categories={data.categories}
-          areas={data.areas}
-          filters={filters}
-          patch={patch}
-        />
+      <WideContainer className="py-10 sm:py-14 lg:py-16">
+        <div className="rounded-[2rem] border border-white/70 bg-white/80 p-4 shadow-[0_24px_80px_rgba(2,28,43,0.08)] backdrop-blur sm:p-6">
+          <DirectoryToolbar
+            categories={data.categories}
+            areas={data.areas}
+            filters={filters}
+            patch={patch}
+          />
+        </div>
+
+        <div className="mt-10 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-turquoise-deep text-xs font-semibold tracking-[0.18em] uppercase">
+              {t("trustedPartners")}
+            </p>
+            <h2 className="text-navy mt-2 font-serif text-3xl sm:text-4xl">
+              {t("results", { count: items.length })}
+            </h2>
+          </div>
+          <button
+            type="button"
+            className="button button-outline hidden items-center gap-2 sm:inline-flex"
+            onClick={() => setMapOpen((value) => !value)}
+            aria-expanded={mapOpen}
+          >
+            <Map className="size-4" aria-hidden />
+            {t("map")}
+          </button>
+        </div>
 
         {loadError ? (
-          <ErrorState
-            title={t("errorTitle")}
-            description={t("errorDescription")}
-            retryLabel={t("retry")}
-            onRetry={() => router.refresh()}
-          />
+          <div className="mt-8">
+            <ErrorState
+              title={t("errorTitle")}
+              description={t("errorDescription")}
+              retryLabel={t("retry")}
+              onRetry={() => router.refresh()}
+            />
+          </div>
         ) : items.length === 0 ? (
-          <EmptyState
-            title={t("emptyTitle")}
-            description={t("emptyDescription")}
-          >
-            <button
-              type="button"
-              className="button button-outline"
-              onClick={() =>
-                patch({
-                  category: null,
-                  area: null,
-                  featured: false,
-                  query: null,
-                  partner: null
-                })
-              }
+          <div className="mt-8">
+            <EmptyState
+              title={t("emptyTitle")}
+              description={t("emptyDescription")}
             >
-              {t("clearFilters")}
-            </button>
-          </EmptyState>
+              <button
+                type="button"
+                className="button button-outline"
+                onClick={() =>
+                  patch({
+                    category: null,
+                    area: null,
+                    featured: false,
+                    query: null,
+                    partner: null
+                  })
+                }
+              >
+                {t("clearFilters")}
+              </button>
+            </EmptyState>
+          </div>
         ) : (
           <>
-            <div className="mb-3 flex items-center justify-between xl:hidden">
-              <p className="text-muted text-sm" aria-live="polite">
-                {t("results", { count: items.length })}
-              </p>
-              <ViewToggle
-                view={filters.view}
-                onChange={(view) =>
-                  patch({ view }, "partner_map_list_mode_changed")
-                }
-              />
-            </div>
+            <section
+              className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3"
+              aria-label={t("listLabel")}
+            >
+              {items.map((item) => (
+                <PartnerCard
+                  key={item.id}
+                  item={item}
+                  selected={item.slug === selected?.slug}
+                  onSelect={select}
+                />
+              ))}
+            </section>
 
-            <div className="border-border bg-panel grid min-h-0 overflow-hidden rounded-xl border shadow-[var(--shadow)] xl:grid-cols-[23rem_minmax(0,1fr)_23rem]">
-              <section
-                className={cn(
-                  "bg-panel min-h-0 border-r",
-                  filters.view === "map" ? "hidden xl:block" : ""
-                )}
-                aria-label={t("listLabel")}
-              >
-                <div className="border-border border-b p-3">
-                  <label className="relative block">
-                    <span className="sr-only">{t("search")}</span>
-                    <Search
-                      className="text-navy absolute top-1/2 left-3 size-4 -translate-y-1/2"
-                      aria-hidden
-                    />
-                    <input
-                      type="search"
-                      value={filters.query ?? ""}
-                      placeholder={t("searchPlaceholder")}
-                      className="border-border min-h-11 w-full rounded-lg border bg-white pr-3 pl-9 text-sm"
-                      onChange={(event) =>
-                        patch({
-                          query: event.target.value || null,
-                          partner: null
-                        })
-                      }
-                    />
-                  </label>
-                </div>
-                <div className="max-h-[42rem] overflow-y-auto p-1.5">
-                  <div className="grid gap-1.5">
-                    {items.map((item) => (
-                      <PartnerCard
-                        key={item.id}
-                        item={item}
-                        selected={item.slug === selected?.slug}
-                        onSelect={select}
-                      />
-                    ))}
+            <button
+              type="button"
+              className="button button-outline mt-8 flex w-full items-center justify-center gap-2 sm:hidden"
+              onClick={() => setMapOpen((value) => !value)}
+              aria-expanded={mapOpen}
+            >
+              <Map className="size-4" aria-hidden />
+              {t("map")}
+            </button>
+
+            {mapOpen ? (
+              <section className="mt-10 overflow-hidden rounded-[2rem] border border-white/70 bg-white shadow-[0_28px_90px_rgba(2,28,43,0.12)]">
+                <div className="flex items-center justify-between border-b border-border px-5 py-4 sm:px-7">
+                  <div>
+                    <p className="text-turquoise-deep text-xs font-semibold tracking-[0.18em] uppercase">
+                      {t("map")}
+                    </p>
+                    <h3 className="text-navy mt-1 font-serif text-2xl">
+                      {t("mapLabel")}
+                    </h3>
                   </div>
+                  <button
+                    type="button"
+                    className="bg-sand text-navy flex size-10 items-center justify-center rounded-full"
+                    onClick={() => setMapOpen(false)}
+                    aria-label={t("close")}
+                  >
+                    <X className="size-4" aria-hidden />
+                  </button>
+                </div>
+                <div className="bg-sand h-[32rem]">
+                  <PartnerMapCanvas
+                    items={items}
+                    selectedSlug={selected?.slug ?? null}
+                    onSelect={(slug) => select(slug, "partner_marker_selected")}
+                    styleUrl={mapStyleUrl}
+                  />
                 </div>
               </section>
-
-              <section
-                className={cn(
-                  "bg-sand relative h-[34rem] min-h-[34rem] xl:h-[42rem] xl:min-h-[42rem]",
-                  filters.view === "list" ? "hidden xl:block" : ""
-                )}
-                aria-label={t("mapLabel")}
-              >
-                <PartnerMapCanvas
-                  items={items}
-                  selectedSlug={selected?.slug ?? null}
-                  onSelect={(slug) => select(slug, "partner_marker_selected")}
-                  styleUrl={mapStyleUrl}
-                />
-              </section>
-
-              {selected ? (
-                <PartnerDetailPanel
-                  item={selected}
-                  nearbyExperiences={nearbyExperiences}
-                  onClose={closeDetail}
-                  className="hidden xl:flex"
-                />
-              ) : (
-                <div className="bg-panel hidden xl:block" />
-              )}
-            </div>
-
-            {selected ? (
-              <PartnerDetailPanel
-                item={selected}
-                nearbyExperiences={nearbyExperiences}
-                onClose={closeDetail}
-                className="border-border mt-4 flex overflow-hidden rounded-xl border xl:hidden"
-              />
             ) : null}
           </>
         )}
 
         <PartnerCallout />
       </WideContainer>
+
+      {selected ? (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-navy/55 p-0 backdrop-blur-sm sm:items-center sm:p-6">
+          <button
+            type="button"
+            className="absolute inset-0"
+            aria-label={t("close")}
+            onClick={closeDetail}
+          />
+          <PartnerDetailPanel
+            item={selected}
+            nearbyExperiences={nearbyExperiences}
+            onClose={closeDetail}
+            className="relative z-10 flex max-h-[92svh] w-full max-w-3xl overflow-y-auto rounded-t-[2rem] bg-white shadow-2xl sm:rounded-[2rem]"
+          />
+        </div>
+      ) : null}
     </main>
   );
 }
@@ -322,83 +288,106 @@ function DirectoryToolbar({
 }) {
   const t = useTranslations("PartnerDirectory");
   return (
-    <div className="mb-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-      <div
-        className="flex max-w-full gap-2 overflow-x-auto pb-1"
-        aria-label={t("category")}
-      >
-        <CategoryButton
-          active={!filters.category}
-          label={t("allPartners")}
-          icon={<Users />}
-          onClick={() =>
-            patch({ category: null, partner: null }, "partner_filter_changed")
+    <div className="space-y-4">
+      <label className="relative block">
+        <span className="sr-only">{t("search")}</span>
+        <Search
+          className="text-navy absolute top-1/2 left-4 size-5 -translate-y-1/2"
+          aria-hidden
+        />
+        <input
+          type="search"
+          value={filters.query ?? ""}
+          placeholder={t("searchPlaceholder")}
+          className="border-border min-h-14 w-full rounded-2xl border bg-white pr-4 pl-12 text-sm shadow-sm"
+          onChange={(event) =>
+            patch({
+              query: event.target.value || null,
+              partner: null
+            })
           }
         />
-        {categories.map((category) => (
+      </label>
+
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div
+          className="flex max-w-full gap-2 overflow-x-auto pb-1"
+          aria-label={t("category")}
+        >
           <CategoryButton
-            key={category}
-            active={filters.category === category}
-            label={formatPartnerCategory(category)}
-            icon={categoryIcon(category)}
+            active={!filters.category}
+            label={t("allPartners")}
+            icon={<Users />}
             onClick={() =>
+              patch({ category: null, partner: null }, "partner_filter_changed")
+            }
+          />
+          {categories.map((category) => (
+            <CategoryButton
+              key={category}
+              active={filters.category === category}
+              label={formatPartnerCategory(category)}
+              icon={categoryIcon(category)}
+              onClick={() =>
+                patch(
+                  {
+                    category: filters.category === category ? null : category,
+                    partner: null
+                  },
+                  "partner_filter_changed"
+                )
+              }
+            />
+          ))}
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-3 lg:flex">
+          <FilterSelect
+            icon={<MapPin />}
+            label={t("area")}
+            value={filters.area ?? ""}
+            onChange={(value) =>
               patch(
-                {
-                  category: filters.category === category ? null : category,
-                  partner: null
-                },
+                { area: value || null, partner: null },
                 "partner_filter_changed"
               )
             }
+            options={areas.map((value) => ({ value, label: value }))}
+            allLabel={t("allAreas")}
           />
-        ))}
-      </div>
-      <div className="grid gap-2 sm:grid-cols-3 lg:flex">
-        <FilterSelect
-          icon={<MapPin />}
-          label={t("area")}
-          value={filters.area ?? ""}
-          onChange={(value) =>
-            patch(
-              { area: value || null, partner: null },
-              "partner_filter_changed"
-            )
-          }
-          options={areas.map((value) => ({ value, label: value }))}
-          allLabel={t("allAreas")}
-        />
-        <FilterSelect
-          icon={<TrendingUp />}
-          label={t("sort")}
-          value={filters.sort}
-          onChange={(value) =>
-            patch({ sort: value as PartnerSort }, "partner_filter_changed")
-          }
-          options={[
-            ["bookings", t("sortBookings")],
-            ["scans", t("sortScans")],
-            ["conversion", t("sortConversion")],
-            ["newest", t("sortNewest")],
-            ["alphabetical", t("sortAlphabetical")]
-          ].map(([value, label]) => ({ value, label }))}
-        />
-        <button
-          type="button"
-          className={cn(
-            "border-border flex min-h-11 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-semibold",
-            filters.featured ? "bg-navy text-white" : "bg-panel text-navy"
-          )}
-          aria-pressed={filters.featured}
-          onClick={() =>
-            patch(
-              { featured: !filters.featured, partner: null },
-              "partner_filter_changed"
-            )
-          }
-        >
-          <SlidersHorizontal className="size-4" aria-hidden />
-          {t("filters")}
-        </button>
+          <FilterSelect
+            icon={<TrendingUp />}
+            label={t("sort")}
+            value={filters.sort}
+            onChange={(value) =>
+              patch({ sort: value as PartnerSort }, "partner_filter_changed")
+            }
+            options={[
+              ["bookings", t("sortBookings")],
+              ["scans", t("sortScans")],
+              ["conversion", t("sortConversion")],
+              ["newest", t("sortNewest")],
+              ["alphabetical", t("sortAlphabetical")]
+            ].map(([value, label]) => ({ value, label }))}
+          />
+          <button
+            type="button"
+            className={cn(
+              "border-border flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-semibold",
+              filters.featured ? "bg-navy text-white" : "bg-white text-navy"
+            )}
+            aria-pressed={filters.featured}
+            onClick={() =>
+              patch(
+                { featured: !filters.featured, partner: null },
+                "partner_filter_changed"
+              )
+            }
+          >
+            <SlidersHorizontal className="size-4" aria-hidden />
+            {t("filters")}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -419,11 +408,13 @@ function CategoryButton({
     <button
       type="button"
       className={cn(
-        "border-border flex min-h-11 shrink-0 items-center gap-2 rounded-lg border px-4 text-xs font-semibold",
-        active ? "bg-navy text-white" : "bg-panel text-navy hover:bg-sand/50"
+        "flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition-colors",
+        active
+          ? "border-navy bg-navy text-white"
+          : "border-border bg-white text-navy hover:border-turquoise"
       )}
-      aria-pressed={active}
       onClick={onClick}
+      aria-pressed={active}
     >
       <span className="[&>svg]:size-4">{icon}</span>
       {label}
@@ -431,48 +422,39 @@ function CategoryButton({
   );
 }
 
-function categoryIcon(category: string) {
-  if (category.includes("beach")) return <Waves />;
-  if (category.includes("ice")) return <IceCreamBowl />;
-  if (category.includes("cafe")) return <Coffee />;
-  if (category.includes("restaurant")) return <Utensils />;
-  return <Store />;
-}
-
-function ViewToggle({
-  view,
+function FilterSelect({
+  icon,
+  label,
+  value,
+  options,
+  allLabel,
   onChange
 }: {
-  view: "map" | "list";
-  onChange: (view: "map" | "list") => void;
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  options: { value: string; label: string }[];
+  allLabel?: string;
+  onChange: (value: string) => void;
 }) {
-  const t = useTranslations("PartnerDirectory");
   return (
-    <div
-      className="border-border bg-panel flex rounded-lg border p-1"
-      role="group"
-      aria-label={t("viewToggle")}
-    >
-      {(["list", "map"] as const).map((option) => (
-        <button
-          key={option}
-          type="button"
-          className={cn(
-            "flex min-h-11 items-center gap-2 rounded-md px-3 text-sm font-semibold",
-            view === option ? "bg-navy text-white" : "text-navy"
-          )}
-          aria-pressed={view === option}
-          onClick={() => onChange(option)}
-        >
-          {option === "map" ? (
-            <Map className="size-4" aria-hidden />
-          ) : (
-            <Store className="size-4" aria-hidden />
-          )}
-          {option === "map" ? t("map") : t("list")}
-        </button>
-      ))}
-    </div>
+    <label className="border-border bg-white text-navy relative flex min-h-11 items-center gap-2 rounded-xl border px-3 text-sm font-semibold">
+      <span className="[&>svg]:size-4">{icon}</span>
+      <span className="sr-only">{label}</span>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="min-w-0 appearance-none bg-transparent pr-5 outline-none"
+      >
+        {allLabel ? <option value="">{allLabel}</option> : null}
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown className="pointer-events-none absolute right-3 size-3.5" />
+    </label>
   );
 }
 
@@ -488,28 +470,10 @@ function PartnerDetailPanel({
   className?: string;
 }) {
   const t = useTranslations("PartnerDirectory");
-  const locale = useLocale();
-  const number = new Intl.NumberFormat(locale);
-  const percent = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
-  const tel = item.phone?.replace(/[^\d+]/g, "") ?? null;
-
-  const share = async () => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("partner", item.slug);
-    if (navigator.share) {
-      await navigator.share({ title: item.name, url: url.toString() });
-    } else {
-      await navigator.clipboard.writeText(url.toString());
-    }
-    posthog.capture("partner_detail_shared", { partner_id: item.id });
-  };
 
   return (
-    <aside
-      className={cn("bg-panel min-h-0 flex-col", className)}
-      aria-label={t("selectedPartner")}
-    >
-      <div className="bg-sand relative h-36 shrink-0 overflow-hidden">
+    <aside className={cn("flex-col", className)}>
+      <div className="relative aspect-[16/7] overflow-hidden bg-sand">
         {item.image.url ? (
           // eslint-disable-next-line @next/next/no-img-element -- canonical Supabase media URL
           <img
@@ -518,219 +482,112 @@ function PartnerDetailPanel({
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="from-navy-soft via-turquoise-deep to-navy flex h-full items-center justify-center bg-gradient-to-br text-white">
-            <Store className="size-11 opacity-80" aria-hidden />
-          </div>
+          <div className="from-navy-soft via-turquoise-deep to-navy h-full bg-gradient-to-br" />
         )}
         <button
           type="button"
-          className="absolute top-2 right-2 grid size-11 place-items-center rounded-full bg-black/35 text-white backdrop-blur"
+          className="absolute top-4 right-4 flex size-10 items-center justify-center rounded-full bg-white/90 text-navy shadow-lg backdrop-blur"
           onClick={onClose}
           aria-label={t("close")}
         >
-          <X className="size-5" aria-hidden />
+          <X className="size-4" aria-hidden />
         </button>
       </div>
 
-      <div className="border-border relative border-b px-4 pt-4 pb-3">
-        <div className="flex items-start gap-3">
-          <div className="border-border bg-panel -mt-10 grid size-14 shrink-0 place-items-center overflow-hidden rounded-full border shadow-md">
-            {item.logo.url ? (
-              // eslint-disable-next-line @next/next/no-img-element -- canonical Supabase media URL
-              <img
-                src={item.logo.url}
-                alt={item.logo.alt}
-                className="h-full w-full object-contain p-1.5"
-              />
-            ) : (
-              <span className="text-navy font-serif text-lg" aria-hidden>
-                {item.name.charAt(0)}
-              </span>
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-navy font-serif text-xl leading-tight">
-              {item.name}
-            </h2>
-            <p className="text-muted mt-1 text-xs">
-              {item.category
-                ? formatPartnerCategory(item.category)
-                : t("trustedPartner")}{" "}
-              <span aria-hidden>•</span> {item.location.city}
-            </p>
-          </div>
+      <div className="space-y-6 p-6 sm:p-8">
+        <div>
+          <p className="text-turquoise-deep text-xs font-semibold tracking-[0.18em] uppercase">
+            {item.category
+              ? formatPartnerCategory(item.category)
+              : t("trustedPartner")}
+          </p>
+          <h2 className="text-navy mt-2 font-serif text-4xl leading-tight">
+            {item.name}
+          </h2>
+          <p className="text-muted mt-4 text-base leading-7">
+            {item.description || t("noActivityTitle")}
+          </p>
         </div>
-        <span className="bg-gold/20 text-navy mt-3 inline-flex rounded px-2 py-1 text-[0.6rem] font-bold tracking-wide uppercase">
-          {item.isFeatured ? t("featured") : t("trustedPartner")}
-        </span>
-      </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <dl className="border-border grid grid-cols-3 divide-x border-b px-3 py-3">
-          <DetailMetric
-            icon={<QrCode />}
-            value={number.format(item.metrics.scans)}
-            label={t("scans")}
-          />
-          <DetailMetric
-            icon={<CalendarCheck />}
-            value={number.format(item.metrics.bookings)}
-            label={t("bookings")}
-          />
-          <DetailMetric
-            icon={<TrendingUp />}
-            value={`${percent.format(item.metrics.conversionRate)}%`}
-            label={t("conversion")}
-          />
-        </dl>
-
-        <div className="space-y-4 p-4">
-          {item.mostBookedExperience ? (
-            <Link
-              href={`/experiences/${item.mostBookedExperience.slug}`}
-              className="border-border flex min-h-14 items-center justify-between rounded-lg border p-3"
+        <div className="flex flex-wrap gap-3">
+          {item.websiteUrl ? (
+            <a
+              href={item.websiteUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="button button-primary inline-flex items-center gap-2"
             >
-              <span className="min-w-0">
-                <span className="text-muted block text-[0.65rem]">
-                  {t("mostBooked")}
-                </span>
-                <span className="text-navy line-clamp-1 text-sm font-semibold">
-                  {item.mostBookedExperience.name}
-                </span>
-              </span>
-              <ArrowRight className="size-4 shrink-0" aria-hidden />
-            </Link>
-          ) : (
-            <div className="bg-sand/55 rounded-lg p-3">
-              <p className="text-navy text-sm font-semibold">
-                {t("noActivityTitle")}
-              </p>
-              <p className="text-muted mt-1 text-xs leading-5">
-                {t("noBookingsYet")}
-              </p>
-            </div>
-          )}
-
-          {item.description ? (
-            <p className="text-ink text-sm leading-5">{item.description}</p>
+              <Globe2 className="size-4" aria-hidden />
+              {t("website")}
+              <ExternalLink className="size-3.5" aria-hidden />
+            </a>
           ) : null}
-
-          <address className="text-muted flex items-start gap-2 text-xs leading-5 not-italic">
-            <MapPin
-              className="text-turquoise mt-0.5 size-4 shrink-0"
-              aria-hidden
-            />
-            <span>
-              {item.location.addressLine1 ? (
-                <span className="block">{item.location.addressLine1}</span>
-              ) : null}
-              <span>
-                {[item.location.postalCode, item.location.city]
-                  .filter(Boolean)
-                  .join(" ")}
-                {item.location.province ? `, ${item.location.province}` : ""}
-              </span>
-            </span>
-          </address>
-
-          <div className="grid grid-cols-2 gap-2">
-            {item.websiteUrl ? (
-              <a
-                href={item.websiteUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="button button-navy min-h-11 justify-center text-xs"
-              >
-                <ExternalLink className="size-4" aria-hidden />
-                {t("website")}
-              </a>
-            ) : null}
-            {item.location.directionsUrl ? (
-              <a
-                href={item.location.directionsUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="button button-outline min-h-11 justify-center text-xs"
-                onClick={() =>
-                  posthog.capture("partner_directions_clicked", {
-                    partner_id: item.id
-                  })
-                }
-              >
-                <MapPin className="size-4" aria-hidden />
-                {t("directions")}
-              </a>
-            ) : null}
-          </div>
-
-          <div className="grid grid-cols-3 gap-2">
-            {item.websiteUrl ? (
-              <SmallAction
-                href={item.websiteUrl}
-                label={t("website")}
-                icon={<Globe2 />}
-              />
-            ) : null}
-            {tel ? (
-              <SmallAction
-                href={`tel:${tel}`}
-                label={t("call")}
-                icon={<Phone />}
-              />
-            ) : null}
-            <button
-              type="button"
-              className="border-border text-navy flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg border text-[0.65rem] font-medium"
-              onClick={() => void share().catch(() => undefined)}
+          {item.location.directionsUrl ? (
+            <a
+              href={item.location.directionsUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="button button-outline inline-flex items-center gap-2"
             >
-              <Share2 className="size-4" aria-hidden />
-              {t("share")}
-            </button>
-          </div>
+              <MapPin className="size-4" aria-hidden />
+              {t("directions")}
+            </a>
+          ) : null}
+          {item.phone ? (
+            <a
+              href={`tel:${item.phone}`}
+              className="button button-outline inline-flex items-center gap-2"
+            >
+              <Phone className="size-4" aria-hidden />
+              {t("call")}
+            </a>
+          ) : null}
+          <button
+            type="button"
+            className="button button-outline inline-flex items-center gap-2"
+            onClick={() => navigator.share?.({ title: item.name, url: window.location.href })}
+          >
+            <Share2 className="size-4" aria-hidden />
+            {t("share")}
+          </button>
+        </div>
+
+        <div className="border-border rounded-2xl border bg-sand/45 p-5">
+          <p className="text-navy flex items-center gap-2 text-sm font-semibold">
+            <MapPin className="text-turquoise size-4" aria-hidden />
+            {item.location.addressLine1}
+          </p>
+          <p className="text-muted mt-1 text-sm">
+            {[item.location.postalCode, item.location.city]
+              .filter(Boolean)
+              .join(" ")}
+          </p>
         </div>
 
         {nearbyExperiences.length ? (
-          <div className="border-border border-t p-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-navy text-sm font-semibold">
+          <div>
+            <div className="flex items-center justify-between gap-4">
+              <h3 className="text-navy font-serif text-2xl">
                 {t("nearbyExperiences")}
               </h3>
-              <Link
-                href="/experiences"
-                className="text-turquoise-deep text-xs font-semibold"
-              >
+              <Link href="/experiences" className="text-navy text-sm font-semibold">
                 {t("seeAll")}
               </Link>
             </div>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              {nearbyExperiences.slice(0, 3).map((experience) => (
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              {nearbyExperiences.map((experience) => (
                 <Link
-                  key={experience.id}
+                  key={experience.slug}
                   href={`/experiences/${experience.slug}`}
-                  className="group min-w-0"
+                  className="border-border rounded-2xl border bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-sm"
                 >
-                  <div className="bg-sand aspect-[4/3] overflow-hidden rounded-lg">
-                    {experience.heroImageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element -- canonical Supabase media URL
-                      <img
-                        src={experience.heroImageUrl}
-                        alt={experience.heroImageAlt ?? experience.title}
-                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="from-turquoise/35 to-navy-soft flex h-full items-center justify-center bg-gradient-to-br">
-                        <Waves className="size-5 text-white" aria-hidden />
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-navy mt-1 line-clamp-2 text-[0.65rem] leading-tight font-semibold">
+                  <p className="text-navy line-clamp-2 font-serif text-lg leading-tight">
                     {experience.title}
                   </p>
-                  {experience.averageRating ? (
-                    <p className="text-gold mt-1 text-[0.6rem]">
-                      ★ {experience.averageRating.toFixed(1)}
-                    </p>
-                  ) : null}
+                  <span className="text-turquoise-deep mt-3 inline-flex items-center gap-1 text-sm font-semibold">
+                    {t("seeAll")}
+                    <ArrowRight className="size-3.5" aria-hidden />
+                  </span>
                 </Link>
               ))}
             </div>
@@ -741,170 +598,27 @@ function PartnerDetailPanel({
   );
 }
 
-function DetailMetric({
-  icon,
-  value,
-  label
-}: {
-  icon: React.ReactNode;
-  value: string;
-  label: string;
-}) {
-  return (
-    <div className="px-2 text-center">
-      <dt className="text-navy flex items-center justify-center gap-1.5 text-sm font-semibold">
-        <span className="text-turquoise [&>svg]:size-4">{icon}</span>
-        {value}
-      </dt>
-      <dd className="text-muted mt-1 text-[0.58rem]">{label}</dd>
-    </div>
-  );
-}
-
-function SmallAction({
-  href,
-  label,
-  icon
-}: {
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <a
-      href={href}
-      target={href.startsWith("http") ? "_blank" : undefined}
-      rel={href.startsWith("http") ? "noreferrer" : undefined}
-      className="border-border text-navy flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg border text-[0.65rem] font-medium"
-    >
-      <span className="[&>svg]:size-4">{icon}</span>
-      {label}
-    </a>
-  );
-}
-
 function PartnerCallout() {
   const t = useTranslations("PartnerDirectory");
-  const benefits = [
-    ["benefitReach", <Users key="reach" />],
-    ["benefitBookings", <QrCode key="bookings" />],
-    ["benefitBenefits", <Store key="benefits" />],
-    ["benefitFamily", <Waves key="family" />]
-  ] as const;
   return (
-    <section className="border-border bg-sand/35 mt-4 rounded-xl border px-5 py-5 sm:px-7">
-      <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
-        <div>
-          <h2 className="text-navy font-serif text-2xl">{t("becomeTitle")}</h2>
-          <p className="text-muted mt-1 max-w-2xl text-sm leading-5">
-            {t("becomeDescription")}
-          </p>
-        </div>
-        <Link
-          href="/contact?subject=partner"
-          className="button button-navy min-h-12 justify-center px-7"
-        >
+    <section className="from-navy to-navy-soft relative mt-16 overflow-hidden rounded-[2rem] bg-gradient-to-br p-8 text-white sm:p-10 lg:p-14">
+      <div className="absolute -top-20 -right-20 size-64 rounded-full border border-white/10" />
+      <div className="relative max-w-3xl">
+        <p className="text-turquoise text-xs font-semibold tracking-[0.18em] uppercase">
+          CostaPulse
+        </p>
+        <h2 className="mt-3 font-serif text-4xl leading-tight sm:text-5xl">
+          {t("becomeTitle")}
+        </h2>
+        <p className="mt-4 max-w-2xl text-white/75 leading-7">
+          {t("becomeDescription")}
+        </p>
+        <Link href="/contact" className="button button-primary mt-7 inline-flex items-center gap-2">
           {t("partnerCta")}
           <ArrowRight className="size-4" aria-hidden />
         </Link>
       </div>
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {benefits.map(([key, icon]) => (
-          <div key={key} className="flex items-center gap-3">
-            <span className="border-border text-navy grid size-10 shrink-0 place-items-center rounded-full border bg-white [&>svg]:size-4">
-              {icon}
-            </span>
-            <p className="text-navy text-xs font-medium">{t(key)}</p>
-          </div>
-        ))}
-      </div>
     </section>
-  );
-}
-
-function HeroMetric({
-  icon,
-  value,
-  label,
-  locale
-}: {
-  icon: React.ReactNode;
-  value: number;
-  label: string;
-  locale: string;
-}) {
-  return (
-    <div className="border-border flex min-w-0 items-center gap-2 border-r px-2 last:border-r-0 sm:min-w-40 sm:px-4">
-      <dt className="text-navy shrink-0 [&>svg]:size-6">{icon}</dt>
-      <dd className="min-w-0">
-        <span className="text-navy block font-serif text-xl font-semibold">
-          {new Intl.NumberFormat(locale).format(value)}
-        </span>
-        <span className="text-muted block truncate text-[0.65rem]">
-          {label}
-        </span>
-      </dd>
-    </div>
-  );
-}
-
-function FilterSelect({
-  icon,
-  label,
-  value,
-  onChange,
-  options,
-  allLabel
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: Array<{ value: string; label: string }>;
-  allLabel?: string;
-}) {
-  return (
-    <label className="relative">
-      <span className="sr-only">{label}</span>
-      <span className="text-navy pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 [&>svg]:size-4">
-        {icon}
-      </span>
-      <select
-        className="border-border text-navy min-h-11 w-full appearance-none rounded-lg border bg-white pr-9 pl-9 text-xs font-medium lg:min-w-44"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-      >
-        {allLabel ? <option value="">{allLabel}</option> : null}
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <ChevronDown
-        className="text-navy pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2"
-        aria-hidden
-      />
-    </label>
-  );
-}
-
-function WideContainer({
-  children,
-  className
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <Container
-      className={cn(
-        "w-[min(100%-1.25rem,92rem)] sm:w-[min(100%-2rem,92rem)]",
-        className
-      )}
-    >
-      {children}
-    </Container>
   );
 }
 
@@ -912,33 +626,24 @@ function filterItems(
   items: PartnerDirectoryItem[],
   filters: PartnerDirectoryFilters
 ) {
-  const query = filters.query?.toLocaleLowerCase();
-  return items
-    .filter((item) => !filters.category || item.category === filters.category)
-    .filter((item) => !filters.area || item.location.city === filters.area)
-    .filter((item) => !filters.featured || item.isFeatured)
-    .filter(
-      (item) =>
-        !query ||
-        `${item.name} ${item.location.city} ${item.category ?? ""}`
-          .toLocaleLowerCase()
-          .includes(query)
-    )
-    .toSorted((a, b) => {
-      if (filters.sort === "scans")
-        return (
-          b.metrics.scans - a.metrics.scans || a.name.localeCompare(b.name)
-        );
-      if (filters.sort === "conversion")
-        return (
-          b.metrics.conversionRate - a.metrics.conversionRate ||
-          a.name.localeCompare(b.name)
-        );
-      if (filters.sort === "newest")
-        return Date.parse(b.publishedAt) - Date.parse(a.publishedAt);
-      if (filters.sort === "alphabetical") return a.name.localeCompare(b.name);
-      return (
-        b.metrics.bookings - a.metrics.bookings || a.name.localeCompare(b.name)
-      );
-    });
+  return applyPartnerDirectoryFilters(items, filters);
+}
+
+function categoryIcon(category: string) {
+  const normalized = category.toLowerCase();
+  if (normalized.includes("beach")) return <Waves />;
+  if (normalized.includes("coffee") || normalized.includes("cafe")) return <Coffee />;
+  if (normalized.includes("ice")) return <IceCreamBowl />;
+  if (normalized.includes("restaurant")) return <Utensils />;
+  return <Store />;
+}
+
+function WideContainer({
+  className,
+  children
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return <Container className={cn("max-w-[90rem]", className)}>{children}</Container>;
 }
