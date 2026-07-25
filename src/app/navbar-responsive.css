@@ -3,12 +3,12 @@
   min-width: 0;
 }
 
-.shell-brand {
+.shell-navbar__inner > .shell-brand {
   min-width: 0;
   flex: 0 1 auto;
 }
 
-.shell-brand .brand-logo {
+.shell-navbar__inner > .shell-brand .brand-logo {
   max-width: min(13rem, calc(100vw - 5.75rem));
 }
 
@@ -20,6 +20,47 @@
 
 .shell-menu-button {
   flex: 0 0 2.75rem;
+}
+
+.mobile-nav {
+  pointer-events: none;
+}
+
+.mobile-nav.is-open {
+  pointer-events: auto;
+}
+
+.mobile-nav__overlay {
+  z-index: 0;
+}
+
+.mobile-nav__panel {
+  z-index: 1;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.mobile-nav.is-open .mobile-nav__panel {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mobile-nav__links,
+.mobile-nav__links a,
+.mobile-nav__group,
+.mobile-nav__group-trigger,
+.mobile-nav__sublinks {
+  position: relative;
+  z-index: 2;
+}
+
+.mobile-nav__links a,
+.mobile-nav__group-trigger {
+  display: flex;
+  width: 100%;
+  min-height: 2.75rem;
+  align-items: center;
+  touch-action: manipulation;
 }
 
 @media (max-width: 67.999rem) {
