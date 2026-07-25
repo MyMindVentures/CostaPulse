@@ -1,12 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { canAccessAdminArea } from "@/server/auth/role-access";
+import { canAccessAdminArea, isTeamRole } from "@/server/auth/role-access";
 import type { Database } from "@/types/database";
 
-function redirectToHome(request: NextRequest) {
+function redirectToHome(request: NextRequest, reason = "required") {
   const url = request.nextUrl.clone();
   url.pathname = "/";
-  url.searchParams.set("admin", "locked");
+  url.searchParams.set("auth", reason);
   return NextResponse.redirect(url);
 }
 
@@ -56,13 +56,19 @@ export async function proxy(request: NextRequest) {
     .select("role")
     .eq("profile_id", user.id);
 
-  if (error || !canAccessAdminArea(roles.map((entry) => entry.role))) {
-    return redirectToHome(request);
+  const userRoles = (roles ?? []).map((entry) => entry.role);
+  const path = request.nextUrl.pathname;
+  const authorized =
+    path.startsWith("/account") ||
+    (path.startsWith("/partner") && userRoles.some(isTeamRole)) ||
+    (path.startsWith("/admin") && canAccessAdminArea(userRoles));
+  if (error || !authorized) {
+    return redirectToHome(request, "forbidden");
   }
 
   return response;
 }
 
 export const config = {
-  matcher: ["/admin/:path*"]
+  matcher: ["/account/:path*", "/partner/:path*", "/admin/:path*"]
 };

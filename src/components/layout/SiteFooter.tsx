@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { SiteNavigationViewModel } from "@/lib/view-models/site-navigation";
 import styles from "./SiteFooter.module.css";
 
@@ -44,7 +45,9 @@ function FooterLink({ href, label, isExternal = false }: FooterLinkItem) {
         rel={isExternal ? "noreferrer" : undefined}
       >
         {label}
-        {isExternal ? <span className="sr-only"> (opens in a new tab)</span> : null}
+        {isExternal ? (
+          <span className="sr-only"> (opens in a new tab)</span>
+        ) : null}
       </Link>
     </li>
   );
@@ -74,9 +77,20 @@ export function SiteFooter({
       <div className={styles.inner}>
         <section className={styles.lead} aria-labelledby="footer-heading">
           <div className={styles.brandBlock}>
-            <Link className={styles.brand} href="/" aria-label="CostaPulse home">
+            <Link
+              className={styles.brand}
+              href="/"
+              aria-label="CostaPulse home"
+            >
               {logoSrc ? (
-                <img src={logoSrc} alt={logoAlt} className={styles.logo} />
+                <Image
+                  src={logoSrc}
+                  alt={logoAlt}
+                  className={styles.logo}
+                  width={180}
+                  height={54}
+                  unoptimized
+                />
               ) : (
                 <span className={styles.brandFallback}>CostaPulse</span>
               )}
@@ -86,15 +100,17 @@ export function SiteFooter({
               Make your next Mediterranean day unforgettable.
             </h2>
             <p className={styles.intro}>
-              Exceptional yacht, water and local experiences, selected with care and
-              delivered by people who know the coast.
+              Exceptional yacht, water and local experiences, selected with care
+              and delivered by people who know the coast.
             </p>
           </div>
 
           <div className={styles.ctaCard}>
             <p className={styles.ctaKicker}>Ready when you are</p>
             <h3>Find your Costa Blanca experience.</h3>
-            <p>Browse live experiences, compare options and book with confidence.</p>
+            <p>
+              Browse live experiences, compare options and book with confidence.
+            </p>
             <Link className={styles.cta} href="/experiences">
               Explore experiences
               <span aria-hidden="true">↗</span>
@@ -135,10 +151,15 @@ export function SiteFooter({
           <div className={`${styles.column} ${styles.contact}`}>
             <p className={styles.columnTitle}>Local support</p>
             <p>Planning something special or travelling with a group?</p>
-            <a className={styles.contactLink} href="mailto:hello@costapulse.club">
+            <a
+              className={styles.contactLink}
+              href="mailto:hello@costapulse.club"
+            >
               hello@costapulse.club
             </a>
-            <p className={styles.microcopy}>Based on the Costa Blanca, Spain.</p>
+            <p className={styles.microcopy}>
+              Based on the Costa Blanca, Spain.
+            </p>
           </div>
         </nav>
 

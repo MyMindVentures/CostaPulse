@@ -42,7 +42,7 @@ test("admin redirects unauthenticated visitors back to the homepage", async ({
   page
 }) => {
   await page.goto("/admin");
-  await expect(page).toHaveURL(/admin=locked/);
+  await expect(page).toHaveURL(/auth=required/);
   await page.getByRole("button", { name: /Decline/i }).click();
   await expect(
     page.getByRole("heading", {
