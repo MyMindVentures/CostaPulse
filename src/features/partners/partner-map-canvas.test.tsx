@@ -1,4 +1,4 @@
-import { render, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PartnerDirectoryItem } from "@/lib/view-models/partner-directory";
 import { PartnerMapCanvas } from "./partner-map-canvas";
@@ -22,6 +22,9 @@ vi.mock("maplibre-gl", () => ({
   LngLatBounds: undefined,
   default: {
     Map: class {
+      constructor({ container }: { container: HTMLElement }) {
+        container.classList.add("maplibregl-map");
+      }
       addControl() {}
       addSource = mapMocks.addSource;
       addLayer = mapMocks.addLayer;
@@ -124,6 +127,13 @@ describe("PartnerMapCanvas", () => {
 
     await waitFor(() => expect(mapMocks.addSource).toHaveBeenCalledOnce());
 
+    const mapRegion = screen.getByRole("region", { name: "mapLabel" });
+    expect(mapRegion).toHaveClass("map-canvas", "maplibregl-map");
+    expect(mapRegion.parentElement).toHaveClass(
+      "map-canvas-wrap",
+      "relative",
+      "min-h-0"
+    );
     expect(mapMocks.addSource).toHaveBeenCalledWith(
       "partner-points",
       expect.objectContaining({
