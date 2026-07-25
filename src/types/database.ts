@@ -2222,6 +2222,9 @@ export type Database = {
           country_code: string;
           created_at: string;
           description: string | null;
+          google_maps_url: string | null;
+          google_place_id: string | null;
+          google_plus_code: string | null;
           id: string;
           is_active: boolean;
           latitude: number;
@@ -2235,6 +2238,7 @@ export type Database = {
           short_name: string | null;
           slug: string;
           updated_at: string;
+          what3words: string | null;
         };
         Insert: {
           address_line_1?: string | null;
@@ -2243,6 +2247,9 @@ export type Database = {
           country_code?: string;
           created_at?: string;
           description?: string | null;
+          google_maps_url?: string | null;
+          google_place_id?: string | null;
+          google_plus_code?: string | null;
           id?: string;
           is_active?: boolean;
           latitude: number;
@@ -2256,6 +2263,7 @@ export type Database = {
           short_name?: string | null;
           slug: string;
           updated_at?: string;
+          what3words?: string | null;
         };
         Update: {
           address_line_1?: string | null;
@@ -2264,6 +2272,9 @@ export type Database = {
           country_code?: string;
           created_at?: string;
           description?: string | null;
+          google_maps_url?: string | null;
+          google_place_id?: string | null;
+          google_plus_code?: string | null;
           id?: string;
           is_active?: boolean;
           latitude?: number;
@@ -2277,6 +2288,7 @@ export type Database = {
           short_name?: string | null;
           slug?: string;
           updated_at?: string;
+          what3words?: string | null;
         };
         Relationships: [];
       };
@@ -2707,11 +2719,14 @@ export type Database = {
           created_at: string;
           email: string | null;
           id: string;
+          is_featured: boolean;
+          location_id: string | null;
           name: string;
           owner_profile_id: string | null;
           phone: string | null;
           postal_code: string | null;
           province: string | null;
+          published_at: string;
           referral_code: string;
           slug: string;
           status: Database["public"]["Enums"]["partner_status"];
@@ -2730,11 +2745,14 @@ export type Database = {
           created_at?: string;
           email?: string | null;
           id?: string;
+          is_featured?: boolean;
+          location_id?: string | null;
           name: string;
           owner_profile_id?: string | null;
           phone?: string | null;
           postal_code?: string | null;
           province?: string | null;
+          published_at?: string;
           referral_code?: string;
           slug: string;
           status?: Database["public"]["Enums"]["partner_status"];
@@ -2753,11 +2771,14 @@ export type Database = {
           created_at?: string;
           email?: string | null;
           id?: string;
+          is_featured?: boolean;
+          location_id?: string | null;
           name?: string;
           owner_profile_id?: string | null;
           phone?: string | null;
           postal_code?: string | null;
           province?: string | null;
+          published_at?: string;
           referral_code?: string;
           slug?: string;
           status?: Database["public"]["Enums"]["partner_status"];
@@ -2766,6 +2787,13 @@ export type Database = {
           website_url?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "partners_location_id_fkey";
+            columns: ["location_id"];
+            isOneToOne: false;
+            referencedRelation: "locations";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "partners_owner_profile_id_fkey";
             columns: ["owner_profile_id"];
@@ -5359,6 +5387,46 @@ export type Database = {
           p_offset?: number;
         };
         Returns: Json;
+      };
+      get_public_partner_directory: {
+        Args: { p_locale?: string };
+        Returns: {
+          address_line_1: string | null;
+          attributed_booking_count: number;
+          category: string | null;
+          city: string;
+          conversion_rate: number;
+          country_code: string;
+          directions_url: string | null;
+          image_alt_text: string | null;
+          image_bucket_id: string | null;
+          image_storage_path: string | null;
+          is_featured: boolean;
+          latitude: number;
+          location_id: string;
+          location_name: string;
+          location_slug: string;
+          logo_alt_text: string | null;
+          logo_bucket_id: string | null;
+          logo_storage_path: string | null;
+          longitude: number;
+          map_zoom: number;
+          most_booked_experience_name: string | null;
+          most_booked_experience_slug: string | null;
+          name: string;
+          partner_id: string;
+          phone: string | null;
+          postal_code: string | null;
+          province: string | null;
+          published_at: string;
+          qr_scan_count: number;
+          short_description: string | null;
+          slug: string;
+          total_booking_count: number;
+          total_partner_count: number;
+          total_qr_scan_count: number;
+          website_url: string | null;
+        }[];
       };
       get_public_referral_landing: {
         Args: { p_locale?: string; p_visit_token: string };
