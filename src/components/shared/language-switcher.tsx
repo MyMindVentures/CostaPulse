@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { ENABLED_LOCALES, type AppLocale } from "@/i18n/locales";
 import { cn } from "@/lib/utils";
@@ -32,16 +31,15 @@ export function LanguageSwitcher({
         const active = locale === currentLocale;
 
         return (
-          <Link
+          <a
             key={locale}
             href={href}
             hrefLang={locale}
-            prefetch={false}
             className={active ? "is-active" : undefined}
             aria-current={active ? "true" : undefined}
           >
             {locale.toUpperCase()}
-          </Link>
+          </a>
         );
       })}
     </nav>
