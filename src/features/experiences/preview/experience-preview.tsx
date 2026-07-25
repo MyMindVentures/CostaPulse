@@ -19,10 +19,12 @@ import {
   resolveExperienceCardTone,
   takeHighlightFeatures
 } from "@/features/experiences/from-price";
+import { ExperienceHostAvatar } from "./experience-host-avatar";
 import { ExperiencePreviewImage } from "./experience-preview-image";
 import { FavoriteToggle } from "@/features/experiences/favorite-toggle";
 import { formatDurationLabel } from "@/components/shared/duration-display";
 import { formatPriceLabel } from "@/components/shared/price-display";
+import { getTeamMemberPhotoUrl } from "@/lib/media/experience-media";
 import type { ExperiencePreviewViewModel } from "@/lib/view-models/experience-preview";
 
 type ExperiencePreviewProps = {
@@ -188,6 +190,8 @@ export async function ExperiencePreview({
   );
   const hostName = resolveHostName(experience);
   const hostInitial = hostName?.slice(0, 1).toUpperCase() ?? null;
+  const primaryHost = experience.teamMembers[0] ?? null;
+  const hostPhotoUrl = getTeamMemberPhotoUrl(primaryHost?.photoPath);
   const showRating =
     experience.reviewCount > 0 &&
     experience.averageRating != null &&
@@ -271,9 +275,10 @@ export async function ExperiencePreview({
 
         {hostName && hostInitial ? (
           <div className="experience-host-row">
-            <span className="experience-host-avatar" aria-hidden>
-              {hostInitial}
-            </span>
+            <ExperienceHostAvatar
+              initial={hostInitial}
+              photoUrl={hostPhotoUrl}
+            />
             <div>
               <strong>{t("hostedBy", { name: hostName })}</strong>
             </div>
