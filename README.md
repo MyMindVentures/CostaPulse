@@ -1,100 +1,241 @@
-# CostaPulse — Premium AI-First Webapp Stack
+# CostaPulse
 
-Production-oriented foundation for CostaPulse, a premium Costa Blanca experience platform. The repository follows a secure, maintainable stack designed for fast product development and reliable collaboration with coding agents.
+CostaPulse is a premium Costa Blanca experience platform for discovering, booking and managing curated local experiences such as yacht trips, paddlesurf mentoring, kayak sessions and private BBQ services.
 
-## Premium stack
+The project is built as a production-ready Next.js application with Supabase as the operational backend, Stripe for payments and Railway for hosting.
 
-### Application framework
+## Core product architecture
 
-- **Next.js 16 + React 19** — builds the website, application screens, server-rendered pages and server-side endpoints in one codebase.
-- **TypeScript** — catches many programming mistakes before deployment and makes data structures explicit for developers and coding agents.
-- **Next.js App Router** — is the single source of truth for pages, layouts, URLs and navigation. Do not introduce React Router alongside it.
-- **next-intl** — handles multilingual routes and translated interface text.
+Every experience is rendered through three reusable, dynamic presentation components:
 
-### Interface and forms
+```text
+Experience data + published media assets
+                ↓
+       shared repositories and view models
+                ↓
+     ExperiencePreview
+     ExperienceDetail
+     ExperienceBooking
+```
 
-- **Tailwind CSS 4** — provides responsive, consistent styling without scattered custom CSS.
-- **Radix UI primitives + shadcn-style components** — provide accessible building blocks such as dialogs, menus, buttons and form controls while keeping the component source under project control.
-- **Lucide React** — supplies a consistent icon set.
-- **React Hook Form** — manages forms with little boilerplate and avoids unnecessary rerenders.
-- **Zod** — validates user input and external data at runtime on both client and server boundaries.
+### ExperiencePreview
 
-### Supabase backend
+Used on the homepage, experience catalog, related experiences, map results and other compact discovery surfaces.
 
-- **Supabase PostgreSQL** — is the central source of truth for operational application data.
-- **Supabase Auth** — handles registration, login, sessions and identity. Protected access must also be verified server-side.
-- **Supabase Data API** — supports authenticated, policy-controlled database access without a separate Prisma or Express layer by default.
-- **Row Level Security (RLS)** — enforces which rows each user or role may read or change, even when frontend code is bypassed.
-- **Supabase Storage** — stores images and documents; every bucket and object operation requires explicit access policies.
-- **Supabase Realtime** — is reserved for features that genuinely need live updates.
-- **Supabase Edge Functions or trusted Next.js server code** — run privileged logic, integrations and secret-bearing operations that must never execute in the browser.
+It renders dynamic data such as:
 
-See [SUPABASE.md](SUPABASE.md) for security requirements, client boundaries and the database baseline.
+- title and short description;
+- category and location;
+- duration and capacity;
+- starting price and pricing model;
+- rating and review count;
+- host information;
+- preview or hero media with focal-point positioning.
 
-### Integrations and observability
+### ExperienceDetail
 
-- **Stripe** — processes payments and subscription-related workflows; webhook verification and secret operations remain server-side.
-- **Resend** — sends transactional email from trusted server code.
-- **Sentry** — records application errors and production diagnostics.
-- **PostHog** — measures product usage and user journeys without becoming a source of business-critical state.
+Used on `/experiences/[slug]` as the complete public profile page for an experience.
 
-### Testing and code quality
+It composes:
 
-- **Vitest** — tests functions, validation rules and application logic quickly.
-- **React Testing Library** — tests components through user-visible behaviour rather than implementation details.
-- **Playwright** — tests complete browser flows such as authentication, navigation and future booking journeys.
-- **ESLint + Prettier** — keep code quality and formatting consistent.
-- **`npm run check`** — runs formatting checks, linting, type checking, unit tests and a production build as the local quality gate.
-- **`npm run test:coverage`** — Vitest with thresholds on bookings pricing/schema, view-models, URL filters and pricing helpers.
-- **`npm run storybook`** — component catalog for `src/components/ui` and `src/components/shared`.
-- Agent guidance: [AGENTS.md](AGENTS.md), [docs/AGENT-PLAYBOOK.md](docs/AGENT-PLAYBOOK.md).
+- hero media;
+- image and video gallery;
+- highlights and inclusions;
+- variants and pricing;
+- itinerary;
+- requirements and policies;
+- meeting points and map data;
+- availability;
+- reviews;
+- booking CTA and booking widget.
 
-### Hosting and delivery
+### ExperienceBooking
 
-- **Railway** — hosts the complete Next.js application using Railpack, exposes the health endpoint and terminates public TLS.
-- **Supabase** — hosts PostgreSQL, Auth, Storage, the Data API, Realtime and optional Edge Functions.
-- **GitHub** — is the source of truth for version control and reviewable changes.
-- **GitHub Actions** — should run the same quality gate automatically before changes are accepted or deployed.
+Used in the booking flow on `/book` and `/book/[slug]`.
+
+It renders the selected experience, booking draft, date, timeslot, party size, location, language, variant and estimated price while the user progresses through the booking workflow.
+
+## Technology stack
+
+### Application
+
+- **Next.js 16** with the App Router
+- **React 19**
+- **TypeScript**
+- **next-intl** for translated UI
+- **Zod** for runtime validation
+- **React Hook Form** for forms
+
+The App Router is the only routing system. Do not introduce React Router or route state through custom `activePage` logic.
+
+### Interface
+
+- **Tailwind CSS 4**
+- **Radix UI primitives**
+- **shadcn-style owned components**
+- **Lucide React** icons
+- responsive layouts and accessible interaction patterns
+
+### Backend
+
+- **Supabase PostgreSQL** as the source of truth
+- **Supabase Auth** for identity and sessions
+- **Supabase Storage** for public and protected media
+- **Row Level Security** for authorization
+- **Supabase Data API** for typed application access
+- trusted Next.js server code or Edge Functions for privileged operations
+
+See [SUPABASE.md](SUPABASE.md) for database, RLS and client-boundary rules.
+
+### Payments and integrations
+
+- **Stripe** for checkout and payment processing
+- **Resend** for transactional email
+- **Sentry** for production diagnostics
+- **PostHog** for product analytics
+
+Secrets, webhooks, service-role access and payment mutations remain server-only.
+
+## Media architecture
+
+Website media has one canonical database source of truth:
+
+```text
+public.media_assets
+```
+
+The table stores both the physical Storage reference and the website placement metadata, including:
+
+```text
+bucket_id
+storage_path
+asset_key
+media_type
+mime_type
+alt_text
+caption
+width
+height
+focal_x
+focal_y
+status
+visibility
+scope_type
+scope_key
+placement_key
+role
+breakpoint
+display_order
+is_primary
+is_active
+starts_at
+ends_at
+metadata
+```
+
+Public frontend reads use:
+
+```text
+public.published_media_assets
+```
+
+This is a filtered view, not a second media-management table. It exposes only active, public and published media within a valid publication window.
+
+Typical experience media records use:
+
+```text
+scope_type = experience
+scope_key = <experience slug>
+placement_key = preview | hero | gallery | booking
+```
+
+Frontend components never guess bucket names or hardcode filenames. They resolve media by scope and placement and use the stored focal point, alt text and public Storage path.
+
+## Repository structure
+
+```text
+src/
+├── app/
+│   ├── (public)/
+│   ├── (booking)/
+│   ├── admin/
+│   └── api/
+├── components/
+│   ├── layout/
+│   ├── shared/
+│   └── ui/
+├── features/
+│   ├── experiences/
+│   │   ├── preview/
+│   │   ├── detail/
+│   │   └── booking/
+│   ├── booking/
+│   ├── home/
+│   └── map/
+├── lib/
+│   ├── media/
+│   ├── supabase/
+│   └── view-models/
+├── server/
+│   └── repositories/
+└── types/
+```
+
+Compatibility aliases may exist for older component names, but new code should use:
+
+```text
+ExperiencePreview
+ExperiencePreviewViewModel
+ExperienceDetail
+ExperienceBooking
+```
+
+## Main routes
+
+- `/` — public landing page with featured experience previews
+- `/experiences` — public experience catalog
+- `/experiences/[slug]` — full experience detail page
+- `/experiences/map` — map-based experience discovery
+- `/book` — standalone booking flow
+- `/book/[slug]` — booking flow for a selected experience
+- `/admin` — administration area
+- `/api/health` — Railway health endpoint
+- `/sitemap.xml` and `/robots.txt` — search-engine controls
 
 ## Architecture rules
 
 1. PostgreSQL is the source of truth for persistent business data.
-2. Next.js App Router is the only routing system; navigation must use framework links and route layouts rather than custom `activePage` state.
-3. Supabase Auth identifies users, while server-side checks and RLS enforce authorization.
-4. Every exposed table and Storage bucket uses deny-by-default policies.
-5. Secrets, service-role access, payments, webhooks and privileged mutations remain server-only.
-6. Server data is not copied into a global UI store without a specific reason.
-7. Zod validates input at every trust boundary; TypeScript alone is not runtime validation.
-8. Realtime is added only where live updates improve the product.
-9. New functionality is delivered as a complete, tested userflow rather than as disconnected frontend screens.
-10. Prisma, Express and a second router are not added by default because Supabase and Next.js already cover those responsibilities.
+2. Next.js App Router is the only routing system.
+3. Supabase Auth identifies users; server checks and RLS enforce authorization.
+4. Exposed tables and Storage buckets use deny-by-default policies.
+5. Secrets, payments, webhooks and privileged mutations remain server-only.
+6. Server data is not copied into global client state without a concrete need.
+7. Zod validates input and external data at trust boundaries.
+8. Realtime is introduced only where live updates improve the product.
+9. Features are delivered as complete userflows: database, backend and frontend.
+10. Prisma, Express and an additional router are not introduced by default.
+11. Website media is managed through the single canonical `media_assets` table.
+12. Experience UI is implemented through the reusable preview, detail and booking presentations.
 
-## Standard build order per userflow
+## Standard implementation order
 
-1. Describe the user goal, happy path, failure cases and permissions.
-2. Design or extend the PostgreSQL schema through a migration.
-3. Add indexes, constraints and deny-by-default RLS policies.
-4. Define trusted server operations, Edge Functions or external integrations where needed.
-5. Implement authentication and authorization checks.
-6. Define the App Router route, layout and navigation entry.
-7. Build accessible components and forms.
-8. Connect data through the appropriate Supabase client or trusted server layer.
-9. Validate inputs and outputs with Zod.
-10. Test logic, permissions, navigation, refresh behaviour and the complete browser flow.
-11. Finish responsive styling, loading states, empty states and error handling.
-
-## Current routes
-
-- `/` — public landing page
-- `/admin` — non-indexed dashboard shell (placeholder data only)
-- `/api/health` — Railway health probe
-- `/sitemap.xml` and `/robots.txt` — search-engine controls
-
-No booking or payment feature is implemented in this initialization.
+1. Define the user goal, happy path, failures and permissions.
+2. Design or update the PostgreSQL schema through a migration.
+3. Add constraints, indexes and RLS policies.
+4. Implement trusted backend operations and integrations.
+5. Add repository queries and validated view models.
+6. Define App Router routes and layouts.
+7. Build reusable frontend components.
+8. Connect dynamic data and media.
+9. Add loading, empty and error states.
+10. Test authorization, navigation and the complete browser flow.
 
 ## Local development
 
-Requirements: Node.js 22 and npm 10 or newer.
+Requirements:
+
+- Node.js 22
+- npm 10 or newer
 
 ```bash
 cp .env.example .env.local
@@ -102,14 +243,56 @@ npm install
 npm run dev
 ```
 
-The landing page and health endpoint work without integration credentials. Add only the values needed for integrations being developed. Run the complete local gate with `npm run check`.
+For reproducible installations, use:
 
-The repository includes a committed `package-lock.json`, so use `npm ci` where reproducible installs are required.
+```bash
+npm ci
+```
 
-## Production
+Run the complete quality gate with:
 
-CostaPulse is hosted exclusively on **Railway** using **Railpack**, not Docker. Railway reads `railway.json`, uses Railpack's Node detection with the `package.json` scripts, injects `PORT`, checks `/api/health`, and terminates public TLS.
+```bash
+npm run check
+```
 
-The repository default branch and Railway production deployment branch are both `main`.
+Useful commands include:
 
-See [DEPLOYMENT.md](DEPLOYMENT.md), [RAILWAY.md](RAILWAY.md), [ENVIRONMENT.md](ENVIRONMENT.md), and [SUPABASE.md](SUPABASE.md).
+```bash
+npm run test:coverage
+npm run storybook
+npm run build
+```
+
+## Testing and quality
+
+- **Vitest** for application logic and validation
+- **React Testing Library** for user-visible component behaviour
+- **Playwright** for complete browser journeys
+- **ESLint** and **Prettier** for consistency
+- `npm run check` as the local quality gate
+
+Agent guidance:
+
+- [AGENTS.md](AGENTS.md)
+- [docs/AGENT-PLAYBOOK.md](docs/AGENT-PLAYBOOK.md)
+
+## Deployment
+
+CostaPulse is hosted on **Railway** using **Railpack**, not Docker.
+
+Railway:
+
+- deploys from the `main` branch;
+- detects the Node.js application through `package.json`;
+- injects `PORT`;
+- checks `/api/health`;
+- terminates public TLS.
+
+Supabase hosts PostgreSQL, Auth, Storage, the Data API and optional Edge Functions.
+
+See:
+
+- [DEPLOYMENT.md](DEPLOYMENT.md)
+- [RAILWAY.md](RAILWAY.md)
+- [ENVIRONMENT.md](ENVIRONMENT.md)
+- [SUPABASE.md](SUPABASE.md)
