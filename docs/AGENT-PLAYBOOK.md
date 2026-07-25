@@ -34,15 +34,23 @@ Agents must not remove, weaken, skip, or reintroduce `--passWithNoTests` to gree
 
 Local gates run automatically; do not bypass them to land broken work.
 
-| Hook         | Runs                                                                                                             |
-| ------------ | ---------------------------------------------------------------------------------------------------------------- |
-| `pre-commit` | Secrets → staged formatting/lint → guardrails (including route + sitemap coverage) → full production-parity check |
-| `commit-msg` | Conventional Commits via commitlint                                                                              |
-| `pre-push`   | `npm run typecheck` + `npm run test`                                                                             |
+| Hook         | Runs                                                                                    |
+| ------------ | --------------------------------------------------------------------------------------- |
+| `pre-commit` | Secrets → staged formatting/lint → fast guardrails (including route + sitemap coverage) |
+| `commit-msg` | Conventional Commits via commitlint                                                     |
+| `pre-push`   | `npm run typecheck` + `npm run test`                                                    |
 
-The pre-commit production-parity check formats and lints staged files, then runs repository-wide linting, type checking, unit/component tests, and the same `npm run build` command used by production. Storybook and Playwright stay in CI. Skipping hooks (`--no-verify` / `HUSKY=0`) is for emergencies only and must be called out in the PR.
+Pre-commit is intentionally fast and deterministic: it checks secrets, formats
+and lints staged files, and runs repository guardrails. Pre-push owns the full
+TypeScript and Vitest checks. CI owns formatting verification, coverage,
+repository-wide linting, the production build, Storybook, and Playwright.
+Skipping hooks (`--no-verify` / `HUSKY=0`) is for emergencies only and must be
+called out in the PR.
 
-This gate proves that the committed source can pass the production build path. It cannot prove parity of mutable live data, secret values, Railway dashboard overrides, DNS, external services, or a deployment that has not happened yet; those remain release-time checks.
+Local hooks provide fast feedback; CI remains the authoritative production
+quality gate. Neither can prove parity of mutable live data, Railway dashboard
+overrides, DNS, external services, or a deployment that has not happened yet;
+those remain release-time checks.
 
 ## File map
 

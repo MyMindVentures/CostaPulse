@@ -46,6 +46,16 @@ const rows: SiteNavigationRow[] = [
     label: "Services"
   },
   {
+    id: "a1000000-0000-4000-8000-000000000009",
+    item_key: "team",
+    href: "/team",
+    parent_id: null,
+    placement: "primary",
+    sort_order: 45,
+    is_external: false,
+    label: "Team"
+  },
+  {
     id: "a1000000-0000-4000-8000-000000000008",
     item_key: "book_experience",
     href: "/experiences",
@@ -61,13 +71,18 @@ describe("buildSiteNavigationViewModel", () => {
   it("nests children under primary roots and exposes CTA", () => {
     const model = buildSiteNavigationViewModel(rows);
 
-    expect(model.primary).toHaveLength(2);
+    expect(model.primary).toHaveLength(3);
     expect(model.primary[0]?.key).toBe("experiences");
     expect(model.primary[0]?.children.map((child) => child.key)).toEqual([
       "experiences_all",
       "experiences_map"
     ]);
     expect(model.primary[1]?.key).toBe("services");
+    expect(model.primary[2]).toMatchObject({
+      key: "team",
+      href: "/team",
+      label: "Team"
+    });
     expect(model.cta?.label).toBe("Book Experience");
     expect(model.cta?.href).toBe("/experiences");
   });
