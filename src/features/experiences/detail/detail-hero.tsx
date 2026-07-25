@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { Clock3, MapPin, Users } from "lucide-react";
-import { getExperienceHeroImageSrc } from "@/lib/media/experience-media";
 import type { ExperienceDetailViewModel } from "@/server/repositories/catalog";
 import { DetailGalleryStrip } from "./detail-gallery-strip";
 import { RatingStars } from "./rating-stars";
@@ -26,14 +25,10 @@ function formatDurationLabel(experience: ExperienceDetailViewModel) {
 }
 
 export function DetailHero({ experience }: DetailHeroProps) {
-  const heroFromMedia = experience.media.find(
-    (item) => item.isHero && item.url
-  )?.url;
-  const imageSrc =
-    heroFromMedia ??
-    experience.media.find((item) => item.mediaType === "image" && item.url)
-      ?.url ??
-    getExperienceHeroImageSrc(experience.heroImagePath);
+  const hero =
+    experience.media.find((item) => item.placementKey === "hero" && item.url) ??
+    experience.media.find((item) => item.mediaType === "image" && item.url) ??
+    null;
 
   const badge =
     experience.variants.find((variant) => variant.badgeLabel)?.badgeLabel ??
@@ -42,14 +37,15 @@ export function DetailHero({ experience }: DetailHeroProps) {
 
   return (
     <section className="xp-hero">
-      {imageSrc ? (
+      {hero?.url ? (
         <Image
-          src={imageSrc}
-          alt=""
+          src={hero.url}
+          alt={hero.altText?.trim() || experience.title}
           fill
           priority
           className="xp-hero-image"
           sizes="100vw"
+          style={{ objectPosition: `${hero.focalX}% ${hero.focalY}%` }}
         />
       ) : (
         <div className="xp-hero-fallback" aria-hidden />
