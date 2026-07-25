@@ -9,7 +9,7 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
-    pool: "threads",
+    pool: "forks",
     setupFiles: ["./vitest.setup.ts"],
     coverage: {
       provider: "v8",

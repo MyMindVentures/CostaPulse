@@ -12,6 +12,7 @@ Copy `.env.example` to `.env.local` for development. Never commit real values.
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`   | Build   | Public     | Client payments only   | Stripe.js initialization              |
 | `STRIPE_WEBHOOK_SECRET`                | Runtime | Secret     | Webhooks only          | Signature verification                |
 | `RESEND_API_KEY`                       | Runtime | Secret     | Email only             | Transactional email                   |
+| `RESEND_FROM_EMAIL`                    | Runtime | Secret     | Email only             | Verified From address for Resend      |
 | `NEXT_PUBLIC_SENTRY_DSN`               | Build   | Public     | Optional               | Error event destination               |
 | `SENTRY_AUTH_TOKEN`                    | Build   | Secret     | Source-map upload only | Build authentication                  |
 | `NEXT_PUBLIC_POSTHOG_KEY`              | Build   | Public     | Optional               | Consent-gated analytics               |
