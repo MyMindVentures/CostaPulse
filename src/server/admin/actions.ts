@@ -19,7 +19,7 @@ import {
 } from "@/server/auth/role-access";
 
 export type AdminActionResult =
-  | { ok: true }
+  | { ok: true; id?: string; data?: unknown }
   | { ok: false; message: string; status?: number };
 
 function toActionError(error: unknown): AdminActionResult {

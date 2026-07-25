@@ -14,7 +14,28 @@ export type AdminApiAction =
   | "upsert_slot"
   | "assign_slot_team"
   | "list_customers"
-  | "customer_detail";
+  | "customer_detail"
+  | "list_experiences"
+  | "experience_detail"
+  | "upsert_experience"
+  | "upsert_variant"
+  | "replace_experience_collection"
+  | "upsert_addon"
+  | "list_locations"
+  | "upsert_location"
+  | "list_partners"
+  | "partner_detail"
+  | "upsert_partner"
+  | "list_team_members"
+  | "team_member_detail"
+  | "upsert_team_member"
+  | "replace_team_collection"
+  | "list_media"
+  | "upsert_media_asset"
+  | "link_media_to_scope"
+  | "delete_media"
+  | "create_signed_upload"
+  | "delete_entity";
 
 type AdminApiBody = {
   action: AdminApiAction;

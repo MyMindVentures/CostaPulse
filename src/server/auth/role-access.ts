@@ -18,12 +18,30 @@ const teamRoles = new Set<AppRole>([
   "partner"
 ]);
 
+const contentRoles = new Set<AppRole>([
+  "content_manager",
+  "administrator",
+  "super_administrator"
+]);
+
+const opsContentRoles = new Set<AppRole>([
+  "operations_staff",
+  "content_manager",
+  "administrator",
+  "super_administrator"
+]);
+
 /** Mirrors admin-api / RPC role gates for operations dashboard sections. */
 export type AdminNavSection =
   | "overview"
   | "bookings"
   | "calendar"
-  | "customers";
+  | "customers"
+  | "experiences"
+  | "media"
+  | "partners"
+  | "locations"
+  | "team";
 
 const adminNavRoles: Record<AdminNavSection, ReadonlySet<AppRole>> = {
   overview: adminRoles,
@@ -47,7 +65,24 @@ const adminNavRoles: Record<AdminNavSection, ReadonlySet<AppRole>> = {
     "finance_manager",
     "administrator",
     "super_administrator"
-  ])
+  ]),
+  experiences: new Set<AppRole>([
+    "operations_staff",
+    "customer_support",
+    "content_manager",
+    "administrator",
+    "super_administrator"
+  ]),
+  media: opsContentRoles,
+  partners: new Set<AppRole>([
+    "operations_staff",
+    "content_manager",
+    "finance_manager",
+    "administrator",
+    "super_administrator"
+  ]),
+  locations: opsContentRoles,
+  team: opsContentRoles
 };
 
 const slotMutationRoles = new Set<AppRole>([
@@ -95,6 +130,18 @@ export function canMutateAdminSlots(roles: readonly AppRole[]): boolean {
 
 export function canMutateBookingStatus(roles: readonly AppRole[]): boolean {
   return hasAnyRole(roles, bookingStatusMutationRoles);
+}
+
+export function canMutateAdminContent(roles: readonly AppRole[]): boolean {
+  return hasAnyRole(roles, contentRoles);
+}
+
+export function canMutateAdminOpsContent(roles: readonly AppRole[]): boolean {
+  return hasAnyRole(roles, opsContentRoles);
+}
+
+export function canDeleteAdminMedia(roles: readonly AppRole[]): boolean {
+  return hasAnyRole(roles, contentRoles);
 }
 
 export function filterAdminNavSections(

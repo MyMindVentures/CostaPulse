@@ -93,6 +93,30 @@ describe("admin section capabilities", () => {
         ["overview", "bookings", "calendar", "customers"]
       )
     ).toEqual(["overview", "calendar"]);
+    expect(
+      filterAdminNavSections(
+        ["content_manager"],
+        [
+          "overview",
+          "experiences",
+          "media",
+          "partners",
+          "locations",
+          "team",
+          "bookings",
+          "calendar",
+          "customers"
+        ]
+      )
+    ).toEqual([
+      "overview",
+      "experiences",
+      "media",
+      "partners",
+      "locations",
+      "team",
+      "calendar"
+    ]);
   });
 });
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { experienceCardSchema } from "./experience-card";
+import { experiencePreviewSchema } from "./experience-preview";
 
-const validCard = {
+const validPreview = {
   id: "11111111-1111-4111-8111-111111111111",
   slug: "sunset-cruise",
   title: "Sunset Cruise",
@@ -46,35 +46,19 @@ const validCard = {
   reviewCount: 12
 };
 
-describe("experienceCardSchema", () => {
-  it("parses a complete card view model", () => {
-    expect(experienceCardSchema.parse(validCard)).toMatchObject({
+describe("experiencePreviewSchema", () => {
+  it("parses locations, hosts, and availability summary", () => {
+    expect(experiencePreviewSchema.parse(validPreview)).toMatchObject({
       slug: "sunset-cruise",
-      currency: "EUR",
       availabilitySummary: "Mon, Wed, Fri",
       locations: [{ name: "Altea", isPrimary: true }],
       teamMembers: [{ displayName: "Alex" }]
     });
   });
 
-  it("accepts empty locations, team, and availability", () => {
-    expect(
-      experienceCardSchema.parse({
-        ...validCard,
-        locations: [],
-        teamMembers: [],
-        availabilitySummary: null
-      })
-    ).toMatchObject({
-      locations: [],
-      teamMembers: [],
-      availabilitySummary: null
-    });
-  });
-
-  it("rejects missing required fields", () => {
+  it("rejects empty slug", () => {
     expect(() =>
-      experienceCardSchema.parse({ ...validCard, slug: "" })
+      experiencePreviewSchema.parse({ ...validPreview, slug: "" })
     ).toThrow();
   });
 });

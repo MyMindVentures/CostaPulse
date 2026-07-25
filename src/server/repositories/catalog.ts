@@ -6,6 +6,11 @@ import {
   experienceCardSchema,
   type ExperienceCardViewModel
 } from "@/lib/view-models/experience-card";
+import type { ExperiencePreviewLocation } from "@/lib/view-models/experience-preview";
+import {
+  parseTeamMemberSummaries,
+  type TeamMemberSummary
+} from "@/lib/view-models/team-member";
 import { selectPreferredPlacement } from "@/lib/media/media-placement";
 import { getPublishedMediaPlacements } from "@/server/repositories/media";
 import { summarizeAvailabilityFromSlots } from "@/server/availability/summarize";
@@ -17,6 +22,9 @@ import {
 } from "@/lib/i18n/pick-localized";
 
 export type { ExperienceCardViewModel };
+
+const DEFAULT_EXPERIENCE_TIMEZONE = "Europe/Madrid";
+const CARD_SLOT_LOOKAHEAD_LIMIT = 90;
 
 export type ExperienceDetailVariant = {
   id: string;
@@ -68,7 +76,10 @@ export type ExperienceDetailLocation = {
   displayOrder: number;
 };
 
-export type ExperienceDetailViewModel = ExperienceCardViewModel & {
+export type ExperienceDetailViewModel = Omit<
+  ExperienceCardViewModel,
+  "locations" | "availabilitySummary"
+> & {
   highlights: string[];
   inclusions: string[];
   timezone: string;
@@ -120,6 +131,32 @@ export type ExperienceDetailViewModel = ExperienceCardViewModel & {
 
 type NestedTranslations = LocalizedTextRow | LocalizedTextRow[] | null;
 
+type CardLocationLink = {
+  is_primary: boolean;
+  display_order: number;
+  is_active: boolean;
+  location: {
+    id: string;
+    name: string;
+    slug: string;
+    is_active: boolean;
+  } | null;
+};
+
+type CardTeamMemberLink = {
+  role_label: string | null;
+  is_primary: boolean;
+  display_order: number;
+  team_member: {
+    id: string;
+    slug: string;
+    display_name: string;
+    role_title: string | null;
+    photo_path: string | null;
+    is_active: boolean;
+  } | null;
+};
+
 type CardExperienceRow = {
   id: string;
   slug: string;
@@ -129,6 +166,7 @@ type CardExperienceRow = {
   duration_minutes: number;
   base_capacity: number;
   location_name: string | null;
+  timezone?: string | null;
   category_label: string | null;
   experience_type?: string | null;
   highlights?: unknown;
@@ -159,11 +197,18 @@ type CardExperienceRow = {
     status: string;
     published_at?: string | null;
   }> | null;
+  experience_locations?: CardLocationLink[] | null;
+  team_member_experiences?: CardTeamMemberLink[] | null;
+  slot_starts_at?: string[] | null;
 };
 
 type DetailExperienceRow = Omit<
   CardExperienceRow,
-  "experience_variants" | "reviews"
+  | "experience_variants"
+  | "reviews"
+  | "experience_locations"
+  | "team_member_experiences"
+  | "slot_starts_at"
 > & {
   timezone: string;
   inclusions: unknown;
@@ -251,6 +296,57 @@ function getProviderName(
   return provider?.display_name ?? null;
 }
 
+function mapCardLocations(
+  links: CardLocationLink[] | null | undefined
+): ExperiencePreviewLocation[] {
+  return [...(links ?? [])]
+    .filter((entry) => entry.is_active && entry.location?.is_active)
+    .sort((left, right) => {
+      if (left.is_primary !== right.is_primary) return left.is_primary ? -1 : 1;
+      return left.display_order - right.display_order;
+    })
+    .map((entry) => ({
+      id: entry.location!.id,
+      name: entry.location!.name,
+      slug: entry.location!.slug,
+      isPrimary: entry.is_primary
+    }));
+}
+
+function mapCardTeamMembers(
+  links: CardTeamMemberLink[] | null | undefined
+): TeamMemberSummary[] {
+  const raw = [...(links ?? [])]
+    .filter((entry) => entry.team_member?.is_active)
+    .sort((left, right) => {
+      if (left.is_primary !== right.is_primary) return left.is_primary ? -1 : 1;
+      return left.display_order - right.display_order;
+    })
+    .map((entry) => ({
+      id: entry.team_member!.id,
+      slug: entry.team_member!.slug,
+      displayName: entry.team_member!.display_name,
+      roleTitle: entry.team_member!.role_title,
+      photoPath: entry.team_member!.photo_path,
+      isPrimary: entry.is_primary,
+      roleLabel: entry.role_label
+    }));
+
+  return parseTeamMemberSummaries(raw);
+}
+
+function resolveCardLocationName(
+  locations: ExperiencePreviewLocation[],
+  denormalizedLocationName: string | null
+): string | null {
+  const primary =
+    locations.find((location) => location.isPrimary)?.name ??
+    locations[0]?.name ??
+    null;
+  const fallback = denormalizedLocationName?.trim() || null;
+  return primary || fallback;
+}
+
 function parseStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.filter(
@@ -319,6 +415,13 @@ function mapCardExperience(
   const cheapestVariant = variants[0] ?? null;
   const hero = selectPreferredPlacement(media ?? [], ["card", "hero"]);
   const ratingSummary = aggregatePublishedRatings(row.reviews ?? []);
+  const locations = mapCardLocations(row.experience_locations);
+  const teamMembers = mapCardTeamMembers(row.team_member_experiences);
+  const timezone = row.timezone?.trim() || DEFAULT_EXPERIENCE_TIMEZONE;
+  const availabilitySummary = summarizeAvailabilityFromSlots(
+    row.slot_starts_at ?? [],
+    timezone
+  );
 
   return experienceCardSchema.parse({
     id: row.id,
@@ -328,7 +431,10 @@ function mapCardExperience(
     description: copy.description,
     durationMinutes: row.duration_minutes,
     baseCapacity: row.base_capacity,
-    locationName: copy.location_name,
+    locationName: resolveCardLocationName(locations, copy.location_name),
+    locations,
+    teamMembers,
+    availabilitySummary,
     heroImagePath: hero?.storagePath ?? null,
     heroImageUrl: hero?.url ?? null,
     heroImageAlt: hero?.altText ?? null,
@@ -553,6 +659,7 @@ const cardSelect = `
   duration_minutes,
   base_capacity,
   location_name,
+  timezone,
   category_label,
   experience_type,
   highlights,
@@ -630,7 +737,14 @@ export async function getPublishedExperienceCards(
   >;
   const experienceIds = baseRows.map((row) => row.id);
 
-  const [mediaBySlug, variantsResult, reviewsResult] = await Promise.all([
+  const [
+    mediaBySlug,
+    variantsResult,
+    reviewsResult,
+    locationsResult,
+    teamResult,
+    slotsResult
+  ] = await Promise.all([
     getPublishedMediaPlacements(
       "experience",
       baseRows.map((row) => row.slug)
@@ -650,11 +764,50 @@ export async function getPublishedExperienceCards(
           .select("experience_id, rating, status")
           .in("experience_id", experienceIds)
           .eq("status", "published")
+      : Promise.resolve({ data: [], error: null }),
+    experienceIds.length > 0
+      ? supabase
+          .from("experience_locations")
+          .select(
+            "experience_id, is_primary, display_order, is_active, location:locations(id, name, slug, is_active)"
+          )
+          .in("experience_id", experienceIds)
+          .eq("is_active", true)
+      : Promise.resolve({ data: [], error: null }),
+    experienceIds.length > 0
+      ? supabase
+          .from("team_member_experiences")
+          .select(
+            "experience_id, role_label, is_primary, display_order, team_member:team_members(id, slug, display_name, role_title, photo_path, is_active)"
+          )
+          .in("experience_id", experienceIds)
+      : Promise.resolve({ data: [], error: null }),
+    experienceIds.length > 0
+      ? supabase
+          .from("availability_slots")
+          .select("experience_id, starts_at")
+          .in("experience_id", experienceIds)
+          .eq("status", "scheduled")
+          .gte("starts_at", new Date().toISOString())
+          .order("starts_at", { ascending: true })
       : Promise.resolve({ data: [], error: null })
   ]);
 
   const variants = variantsResult.error ? [] : (variantsResult.data ?? []);
   const reviews = reviewsResult.error ? [] : (reviewsResult.data ?? []);
+  const locationLinks = locationsResult.error
+    ? []
+    : (locationsResult.data ?? []);
+  const teamLinks = teamResult.error ? [] : (teamResult.data ?? []);
+  const slots = slotsResult.error ? [] : (slotsResult.data ?? []);
+
+  const slotStartsByExperience = new Map<string, string[]>();
+  for (const slot of slots) {
+    const existing = slotStartsByExperience.get(slot.experience_id) ?? [];
+    if (existing.length >= CARD_SLOT_LOOKAHEAD_LIMIT) continue;
+    existing.push(slot.starts_at);
+    slotStartsByExperience.set(slot.experience_id, existing);
+  }
 
   try {
     return baseRows.map((row) =>
@@ -684,7 +837,24 @@ export async function getPublishedExperienceCards(
             .map((review) => ({
               rating: review.rating,
               status: review.status
-            }))
+            })),
+          experience_locations: locationLinks
+            .filter((link) => link.experience_id === row.id)
+            .map((link) => ({
+              is_primary: link.is_primary,
+              display_order: link.display_order,
+              is_active: link.is_active,
+              location: link.location as CardLocationLink["location"]
+            })),
+          team_member_experiences: teamLinks
+            .filter((link) => link.experience_id === row.id)
+            .map((link) => ({
+              role_label: link.role_label,
+              is_primary: link.is_primary,
+              display_order: link.display_order,
+              team_member: link.team_member as CardTeamMemberLink["team_member"]
+            })),
+          slot_starts_at: slotStartsByExperience.get(row.id) ?? []
         },
         mediaBySlug.get(row.slug) ?? [],
         resolvedLocale

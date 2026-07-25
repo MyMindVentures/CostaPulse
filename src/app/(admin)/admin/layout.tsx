@@ -15,6 +15,11 @@ export default async function AdminLayout({
   const t = await getTranslations("Dashboards");
   const sections = filterAdminNavSections(roles, [
     "overview",
+    "experiences",
+    "media",
+    "partners",
+    "locations",
+    "team",
     "bookings",
     "calendar",
     "customers"
@@ -28,6 +33,11 @@ export default async function AdminLayout({
       items={items}
       labels={{
         overview: t("overview"),
+        experiences: t("experiences"),
+        media: t("media"),
+        partners: t("partners"),
+        locations: t("locations"),
+        team: t("team"),
         bookings: t("bookings"),
         calendar: t("calendar"),
         customers: t("customers")

@@ -286,3 +286,192 @@ export class AdminApiError extends Error {
     this.code = code;
   }
 }
+
+export const publicationStatusSchema = z.enum([
+  "draft",
+  "published",
+  "archived"
+]);
+
+export const partnerStatusSchema = z.enum(["draft", "active", "disabled"]);
+
+export const mediaTypeSchema = z.enum([
+  "image",
+  "video",
+  "audio",
+  "document",
+  "vector",
+  "animation",
+  "other"
+]);
+
+export const mediaAssetStatusSchema = z.enum([
+  "draft",
+  "published",
+  "archived"
+]);
+
+export const mediaVisibilitySchema = z.enum([
+  "public",
+  "authenticated",
+  "private"
+]);
+
+export const adminExperienceHealthSchema = z
+  .object({
+    id: z.string().uuid(),
+    slug: z.string(),
+    title: z.string(),
+    status: publicationStatusSchema,
+    experience_type: z.string().nullable().optional(),
+    is_featured: z.boolean().optional(),
+    sort_order: z.coerce.number().int().optional(),
+    variants_count: z.coerce.number().int().nonnegative().optional(),
+    media_count: z.coerce.number().int().nonnegative().optional(),
+    locations_count: z.coerce.number().int().nonnegative().optional(),
+    upcoming_slots_count: z.coerce.number().int().nonnegative().optional(),
+    next_slot_at: isoDateTimeSchema.nullable().optional(),
+    bookings_count: z.coerce.number().int().nonnegative().optional(),
+    paid_revenue_minor: z.coerce.number().int().optional()
+  })
+  .passthrough();
+
+export type AdminExperienceHealth = z.infer<typeof adminExperienceHealthSchema>;
+
+export const adminExperienceListSchema = z.array(adminExperienceHealthSchema);
+
+export const adminExperienceDetailSchema = z
+  .object({
+    id: z.string().uuid(),
+    slug: z.string(),
+    title: z.string(),
+    status: publicationStatusSchema,
+    variants: z.array(z.record(z.string(), z.unknown())).default([]),
+    media: z.array(z.record(z.string(), z.unknown())).default([]),
+    locations: z.array(z.record(z.string(), z.unknown())).default([]),
+    itinerary: z.array(z.record(z.string(), z.unknown())).default([]),
+    requirements: z.array(z.record(z.string(), z.unknown())).default([]),
+    policies: z.array(z.record(z.string(), z.unknown())).default([]),
+    languages: z.array(z.record(z.string(), z.unknown())).default([]),
+    addons: z.array(z.record(z.string(), z.unknown())).default([]),
+    team_members: z.array(z.record(z.string(), z.unknown())).default([])
+  })
+  .passthrough();
+
+export type AdminExperienceDetail = z.infer<typeof adminExperienceDetailSchema>;
+
+export const adminPartnerSchema = z
+  .object({
+    id: z.string().uuid(),
+    slug: z.string(),
+    name: z.string(),
+    referral_code: z.string(),
+    status: partnerStatusSchema,
+    attribution_window_hours: z.coerce.number().int().positive(),
+    voucher_percent_basis_points: z.coerce.number().int().nonnegative(),
+    website_url: z.string().nullable().optional(),
+    business_type: z.string().nullable().optional(),
+    contact_name: z.string().nullable().optional(),
+    phone: z.string().nullable().optional(),
+    email: z.string().nullable().optional(),
+    address_line_1: z.string().nullable().optional(),
+    address_line_2: z.string().nullable().optional(),
+    postal_code: z.string().nullable().optional(),
+    city: z.string().nullable().optional(),
+    province: z.string().nullable().optional(),
+    country_code: z.string().nullable().optional()
+  })
+  .passthrough();
+
+export type AdminPartner = z.infer<typeof adminPartnerSchema>;
+
+export const adminPartnerDetailSchema = adminPartnerSchema.extend({
+  media: z.array(z.record(z.string(), z.unknown())).default([]),
+  performance: z.record(z.string(), z.unknown()).nullable().optional()
+});
+
+export type AdminPartnerDetail = z.infer<typeof adminPartnerDetailSchema>;
+
+export const adminLocationSchema = z
+  .object({
+    id: z.string().uuid(),
+    slug: z.string(),
+    name: z.string(),
+    city: z.string(),
+    latitude: z.coerce.number(),
+    longitude: z.coerce.number(),
+    is_active: z.boolean()
+  })
+  .passthrough();
+
+export type AdminLocation = z.infer<typeof adminLocationSchema>;
+
+export const adminTeamMemberSchema = z
+  .object({
+    id: z.string().uuid(),
+    slug: z.string(),
+    first_name: z.string(),
+    last_name: z.string(),
+    role_title: z.string(),
+    is_active: z.boolean(),
+    display_order: z.coerce.number().int().optional()
+  })
+  .passthrough();
+
+export type AdminTeamMember = z.infer<typeof adminTeamMemberSchema>;
+
+export const adminMediaUsedBySchema = z.array(
+  z
+    .object({
+      kind: z.string(),
+      label: z.string().optional()
+    })
+    .passthrough()
+);
+
+export const adminMediaAssetSchema = z
+  .object({
+    id: z.string().uuid(),
+    bucket_id: z.string(),
+    storage_path: z.string(),
+    asset_key: z.string(),
+    media_type: z.string(),
+    mime_type: z.string().nullable().optional(),
+    byte_size: z.coerce.number().int().nullable().optional(),
+    title: z.string().nullable().optional(),
+    alt_text: z.string().nullable().optional(),
+    caption: z.string().nullable().optional(),
+    tags: z.array(z.string()).optional().default([]),
+    width: z.coerce.number().int().nullable().optional(),
+    height: z.coerce.number().int().nullable().optional(),
+    status: mediaAssetStatusSchema.optional(),
+    visibility: mediaVisibilitySchema.optional(),
+    scope_type: z.string().nullable().optional(),
+    scope_key: z.string().nullable().optional(),
+    role: z.string().nullable().optional(),
+    display_order: z.coerce.number().int().optional(),
+    is_primary: z.boolean().optional(),
+    is_active: z.boolean().optional(),
+    used_by: adminMediaUsedBySchema.optional().default([])
+  })
+  .passthrough();
+
+export type AdminMediaAsset = z.infer<typeof adminMediaAssetSchema>;
+
+export const adminMediaListSchema = z.object({
+  items: z.array(adminMediaAssetSchema),
+  page: z.coerce.number().int().positive(),
+  page_size: z.coerce.number().int().positive(),
+  total: z.coerce.number().int().nonnegative()
+});
+
+export type AdminMediaList = z.infer<typeof adminMediaListSchema>;
+
+export const signedUploadSchema = z
+  .object({
+    signedUrl: z.string().optional(),
+    signed_url: z.string().optional(),
+    path: z.string().optional(),
+    token: z.string().optional()
+  })
+  .passthrough();

@@ -2200,11 +2200,21 @@ export type Database = {
       };
       partners: {
         Row: {
+          address_line_1: string | null;
+          address_line_2: string | null;
           attribution_window_hours: number;
+          business_type: string | null;
+          city: string | null;
+          contact_name: string | null;
+          country_code: string | null;
           created_at: string;
+          email: string | null;
           id: string;
           name: string;
           owner_profile_id: string | null;
+          phone: string | null;
+          postal_code: string | null;
+          province: string | null;
           referral_code: string;
           slug: string;
           status: Database["public"]["Enums"]["partner_status"];
@@ -2213,11 +2223,21 @@ export type Database = {
           website_url: string | null;
         };
         Insert: {
+          address_line_1?: string | null;
+          address_line_2?: string | null;
           attribution_window_hours?: number;
+          business_type?: string | null;
+          city?: string | null;
+          contact_name?: string | null;
+          country_code?: string | null;
           created_at?: string;
+          email?: string | null;
           id?: string;
           name: string;
           owner_profile_id?: string | null;
+          phone?: string | null;
+          postal_code?: string | null;
+          province?: string | null;
           referral_code?: string;
           slug: string;
           status?: Database["public"]["Enums"]["partner_status"];
@@ -2226,11 +2246,21 @@ export type Database = {
           website_url?: string | null;
         };
         Update: {
+          address_line_1?: string | null;
+          address_line_2?: string | null;
           attribution_window_hours?: number;
+          business_type?: string | null;
+          city?: string | null;
+          contact_name?: string | null;
+          country_code?: string | null;
           created_at?: string;
+          email?: string | null;
           id?: string;
           name?: string;
           owner_profile_id?: string | null;
+          phone?: string | null;
+          postal_code?: string | null;
+          province?: string | null;
           referral_code?: string;
           slug?: string;
           status?: Database["public"]["Enums"]["partner_status"];
@@ -3918,6 +3948,10 @@ export type Database = {
         Args: { p_entity_id: string; p_entity_type: string; p_reason?: string };
         Returns: boolean;
       };
+      admin_delete_media: {
+        Args: { p_id: string; p_reason?: string };
+        Returns: boolean;
+      };
       admin_experience_detail: {
         Args: { p_experience_id: string };
         Returns: Json;
@@ -3925,6 +3959,15 @@ export type Database = {
       admin_expire_vouchers: { Args: never; Returns: number };
       admin_finance_summary: {
         Args: { p_from: string; p_to: string };
+        Returns: Json;
+      };
+      admin_link_media_to_scope: {
+        Args: {
+          p_items?: Json;
+          p_role: string;
+          p_scope_key: string;
+          p_scope_type: string;
+        };
         Returns: Json;
       };
       admin_list_bookings: {
@@ -3953,6 +3996,24 @@ export type Database = {
       };
       admin_list_customers: {
         Args: { p_page?: number; p_page_size?: number; p_search?: string };
+        Returns: Json;
+      };
+      admin_list_experiences: {
+        Args: {
+          p_search?: string;
+          p_status?: Database["public"]["Enums"]["publication_status"];
+        };
+        Returns: Json;
+      };
+      admin_list_media: {
+        Args: {
+          p_media_type?: string;
+          p_page?: number;
+          p_page_size?: number;
+          p_scope_type?: string;
+          p_search?: string;
+          p_usage?: string;
+        };
         Returns: Json;
       };
       admin_moderate_review: {
@@ -4177,6 +4238,66 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      admin_upsert_media_asset: {
+        Args: { p_id: string; p_payload?: Json };
+        Returns: {
+          alt_text: string | null;
+          alt_text_override: string | null;
+          asset_key: string;
+          blurhash: string | null;
+          breakpoint: string;
+          bucket_id: string;
+          byte_size: number | null;
+          caption: string | null;
+          caption_override: string | null;
+          component_key: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          display_order: number;
+          dominant_color: string | null;
+          duration_seconds: number | null;
+          ends_at: string | null;
+          etag: string | null;
+          focal_unit: Database["public"]["Enums"]["media_focal_unit"];
+          focal_x: number;
+          focal_y: number;
+          folder_path: string | null;
+          height: number | null;
+          id: string;
+          is_active: boolean;
+          is_primary: boolean;
+          link_url: string | null;
+          locale: string | null;
+          media_type: string;
+          metadata: Json;
+          mime_type: string | null;
+          open_in_new_tab: boolean;
+          page_path: string | null;
+          placement_key: string | null;
+          published_at: string | null;
+          role: string;
+          scope_key: string | null;
+          scope_type: string | null;
+          section_key: string | null;
+          starts_at: string | null;
+          status: Database["public"]["Enums"]["media_asset_status"];
+          storage_object_id: string | null;
+          storage_path: string;
+          tags: string[];
+          title: string | null;
+          updated_at: string;
+          variant: string | null;
+          visibility: Database["public"]["Enums"]["media_visibility"];
+          width: number | null;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "media_assets";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       admin_upsert_navigation_item: {
         Args: { p_id?: string; p_payload?: Json };
         Returns: Json;
@@ -4184,11 +4305,21 @@ export type Database = {
       admin_upsert_partner: {
         Args: { p_id?: string; p_payload?: Json };
         Returns: {
+          address_line_1: string | null;
+          address_line_2: string | null;
           attribution_window_hours: number;
+          business_type: string | null;
+          city: string | null;
+          contact_name: string | null;
+          country_code: string | null;
           created_at: string;
+          email: string | null;
           id: string;
           name: string;
           owner_profile_id: string | null;
+          phone: string | null;
+          postal_code: string | null;
+          province: string | null;
           referral_code: string;
           slug: string;
           status: Database["public"]["Enums"]["partner_status"];

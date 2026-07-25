@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import {
   Anchor,
   ArrowRight,
+  CalendarDays,
   Camera,
   Clock3,
   Flame,
@@ -76,32 +77,77 @@ function featureIconForLabel(label: string): LucideIcon {
   return Waves;
 }
 
+function resolveLocationLabel(
+  experience: ExperiencePreviewViewModel,
+  locationMore: (values: { name: string; count: number }) => string
+): string | null {
+  const primary =
+    experience.locations.find((location) => location.isPrimary) ??
+    experience.locations[0] ??
+    null;
+
+  if (primary) {
+    const extraCount = experience.locations.length - 1;
+    if (extraCount > 0) {
+      return locationMore({ name: primary.name, count: extraCount });
+    }
+    return primary.name;
+  }
+
+  return experience.locationName?.trim() || null;
+}
+
+function resolveHostName(
+  experience: ExperiencePreviewViewModel
+): string | null {
+  const teamNames = experience.teamMembers
+    .map((member) => member.displayName.trim())
+    .filter(Boolean)
+    .slice(0, 2);
+
+  if (teamNames.length > 0) {
+    return teamNames.join(", ");
+  }
+
+  return experience.providerName?.trim() || null;
+}
+
 function buildFeatureItems(
   experience: ExperiencePreviewViewModel,
   durationLabel: string,
-  capacityLabel: string
+  capacityLabel: string,
+  locationLabel: string | null
 ): FeatureItem[] {
   const items: FeatureItem[] = [
     { key: "duration", icon: Clock3, label: durationLabel },
     { key: "capacity", icon: Users, label: capacityLabel }
   ];
 
+  if (locationLabel) {
+    items.push({
+      key: "location",
+      icon: MapPin,
+      label: locationLabel
+    });
+  }
+
+  if (experience.availabilitySummary) {
+    items.push({
+      key: "availability",
+      icon: CalendarDays,
+      label: experience.availabilitySummary
+    });
+  }
+
+  const remainingSlots = Math.max(0, 4 - items.length);
   for (const [index, highlight] of takeHighlightFeatures(
     experience.highlights,
-    2
+    remainingSlots
   ).entries()) {
     items.push({
       key: `highlight-${index}`,
       icon: featureIconForLabel(highlight),
       label: highlight
-    });
-  }
-
-  if (experience.locationName && items.length < 4) {
-    items.push({
-      key: "location",
-      icon: MapPin,
-      label: experience.locationName
     });
   }
 
@@ -131,11 +177,17 @@ export async function ExperiencePreview({
     hoursMinutes: (values) => t("meta.durationHoursMinutes", values),
     minutes: (values) => t("meta.durationValue", values)
   });
+  const locationLabel = resolveLocationLabel(experience, (values) =>
+    t("locationMore", values)
+  );
   const features = buildFeatureItems(
     experience,
     durationLabel,
-    t("meta.capacityValue", { count: experience.baseCapacity })
+    t("meta.capacityValue", { count: experience.baseCapacity }),
+    locationLabel
   );
+  const hostName = resolveHostName(experience);
+  const hostInitial = hostName?.slice(0, 1).toUpperCase() ?? null;
   const showRating =
     experience.reviewCount > 0 &&
     experience.averageRating != null &&
@@ -217,15 +269,13 @@ export async function ExperiencePreview({
           </ul>
         ) : null}
 
-        {experience.providerName ? (
+        {hostName && hostInitial ? (
           <div className="experience-host-row">
             <span className="experience-host-avatar" aria-hidden>
-              {experience.providerName.slice(0, 1).toUpperCase()}
+              {hostInitial}
             </span>
             <div>
-              <strong>
-                {t("hostedBy", { name: experience.providerName })}
-              </strong>
+              <strong>{t("hostedBy", { name: hostName })}</strong>
             </div>
           </div>
         ) : null}

@@ -33,6 +33,7 @@ vi.mock("next-intl/server", () => ({
     const messages: Record<string, string> = {
       favoriteLabel: "Save this experience",
       hostedBy: "Hosted by {name}",
+      locationMore: "{name} +{count}",
       viewDetails: "View details",
       fromPrice: "From",
       priceUnitPerPerson: "per person",
@@ -68,6 +69,38 @@ const baseExperience: ExperienceCardViewModel = {
   durationMinutes: 240,
   baseCapacity: 8,
   locationName: "Altea",
+  locations: [
+    {
+      id: "22222222-2222-4222-8222-222222222222",
+      name: "Altea",
+      slug: "altea",
+      isPrimary: true
+    },
+    {
+      id: "33333333-3333-4333-8333-333333333333",
+      name: "Calpe",
+      slug: "calpe",
+      isPrimary: false
+    },
+    {
+      id: "44444444-4444-4444-8444-444444444444",
+      name: "Moraira",
+      slug: "moraira",
+      isPrimary: false
+    }
+  ],
+  teamMembers: [
+    {
+      id: "55555555-5555-4555-8555-555555555555",
+      slug: "kevin",
+      displayName: "Kevin De Vlieger",
+      roleTitle: "Mentor",
+      photoPath: null,
+      isPrimary: true,
+      roleLabel: null
+    }
+  ],
+  availabilitySummary: "Mon, Wed, Fri",
   heroImagePath: "boat-experience/hero.png",
   heroImageUrl:
     "https://example.supabase.co/storage/v1/object/public/experience-media/boat-experience/hero.png",
@@ -110,12 +143,13 @@ describe("ExperienceCard", () => {
     ).toBeTruthy();
     expect(screen.getByText("4 hours")).toBeTruthy();
     expect(screen.getByText("Up to 8 guests")).toBeTruthy();
-    expect(screen.getByText("Professional local skipper")).toBeTruthy();
-    expect(screen.getByText("Fuel options")).toBeTruthy();
-    expect(screen.getByText("Hosted by CostaPulse Host")).toBeTruthy();
+    expect(screen.getByText("Altea +2")).toBeTruthy();
+    expect(screen.getByText("Mon, Wed, Fri")).toBeTruthy();
+    expect(screen.getByText("Hosted by Kevin De Vlieger")).toBeTruthy();
     expect(screen.getByText("From")).toBeTruthy();
     expect(screen.getByText("€495")).toBeTruthy();
     expect(screen.getByText("per experience")).toBeTruthy();
+    expect(screen.queryByText("Professional local skipper")).toBeNull();
     expect(screen.queryByText("Personally hosted")).toBeNull();
     expect(screen.queryByText("Guest favourite")).toBeNull();
     expect(screen.queryByText("On request")).toBeNull();
@@ -131,6 +165,9 @@ describe("ExperienceCard", () => {
           categoryLabel: null,
           providerName: null,
           locationName: null,
+          locations: [],
+          teamMembers: [],
+          availabilitySummary: null,
           highlights: [],
           heroImagePath: null,
           heroImageUrl: null,
@@ -147,10 +184,36 @@ describe("ExperienceCard", () => {
     expect(
       screen.queryByText("Skippered boat time on the Costa Blanca.")
     ).toBeNull();
-    expect(screen.queryByText("Hosted by CostaPulse Host")).toBeNull();
+    expect(screen.queryByText("Hosted by Kevin De Vlieger")).toBeNull();
+    expect(screen.queryByText("Altea +2")).toBeNull();
+    expect(screen.queryByText("Mon, Wed, Fri")).toBeNull();
     expect(screen.queryByText("From")).toBeNull();
     expect(screen.getByText("4 hours")).toBeTruthy();
     expect(screen.getByText("Up to 8 guests")).toBeTruthy();
+  });
+
+  it("falls back to provider name when team members are absent", async () => {
+    render(
+      await ExperienceCard({
+        experience: {
+          ...baseExperience,
+          teamMembers: [],
+          locations: [
+            {
+              id: "22222222-2222-4222-8222-222222222222",
+              name: "Altea",
+              slug: "altea",
+              isPrimary: true
+            }
+          ],
+          availabilitySummary: null,
+          highlights: []
+        }
+      })
+    );
+
+    expect(screen.getByText("Altea")).toBeTruthy();
+    expect(screen.getByText("Hosted by CostaPulse Host")).toBeTruthy();
   });
 
   it("shows published ratings only when reviewCount is positive", async () => {

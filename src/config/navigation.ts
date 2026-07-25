@@ -23,6 +23,11 @@ export const DASHBOARD_NAVIGATION = {
   partner: [{ labelKey: "overview", href: "/partner" }],
   admin: [
     { labelKey: "overview", href: "/admin" },
+    { labelKey: "experiences", href: "/admin/experiences" },
+    { labelKey: "media", href: "/admin/media" },
+    { labelKey: "partners", href: "/admin/partners" },
+    { labelKey: "locations", href: "/admin/locations" },
+    { labelKey: "team", href: "/admin/team" },
     { labelKey: "bookings", href: "/admin/bookings" },
     { labelKey: "calendar", href: "/admin/calendar" },
     { labelKey: "customers", href: "/admin/customers" }
@@ -34,6 +39,11 @@ export type AdminDashboardNavKey =
 
 const adminNavHrefBySection = {
   overview: "/admin",
+  experiences: "/admin/experiences",
+  media: "/admin/media",
+  partners: "/admin/partners",
+  locations: "/admin/locations",
+  team: "/admin/team",
   bookings: "/admin/bookings",
   calendar: "/admin/calendar",
   customers: "/admin/customers"
