@@ -58,6 +58,7 @@ export async function ExperienceDetail({
       {bookingStories && bookingStories.items.length > 0 ? (
         <ExperienceBookingStories
           experienceSlug={experience.slug}
+          experienceTitle={experience.title}
           initialPage={bookingStories}
         />
       ) : null}

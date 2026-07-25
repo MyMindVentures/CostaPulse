@@ -10,6 +10,7 @@ import type {
   AdminBookingStoryDetail,
   BookingFootageUploadPolicy
 } from "@/server/repositories/admin-booking-stories";
+import { upsertMediaAssetAction } from "@/server/admin/actions-cms";
 import {
   attachUploadedBookingStoryMediaAction,
   removeBookingStoryMediaAction,
@@ -18,6 +19,25 @@ import {
 
 type Media = AdminBookingStoryDetail["media"][number];
 type Role = Media["media_role"];
+
+function sortMedia(items: Media[]) {
+  return [...items].sort((a, b) => a.display_order - b.display_order);
+}
+
+function getMediaVersion(items: Media[]) {
+  return items
+    .map((item) =>
+      [
+        item.id,
+        item.media_role,
+        item.caption,
+        item.display_order,
+        item.is_primary,
+        item.signedUrl
+      ].join(":")
+    )
+    .join("|");
+}
 
 function uploadWithProgress(
   url: string,
@@ -49,14 +69,34 @@ export function BookingStoryMediaManager({
   uploadPolicy: BookingFootageUploadPolicy;
 }) {
   const router = useRouter();
-  const [media, setMedia] = useState(
-    [...initialMedia].sort((a, b) => a.display_order - b.display_order)
-  );
+  const serverVersion = getMediaVersion(initialMedia);
+  const [mediaState, setMediaState] = useState(() => ({
+    version: serverVersion,
+    items: sortMedia(initialMedia)
+  }));
+  const media =
+    mediaState.version === serverVersion
+      ? mediaState.items
+      : sortMedia(initialMedia);
   const [progress, setProgress] = useState<number | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [failedFile, setFailedFile] = useState<File | null>(null);
+
+  function updateMedia(next: Media[] | ((current: Media[]) => Media[])) {
+    setMediaState((current) => {
+      const base =
+        current.version === serverVersion
+          ? current.items
+          : sortMedia(initialMedia);
+      return {
+        version: serverVersion,
+        items: typeof next === "function" ? next(base) : next
+      };
+    });
+  }
 
   async function persistOrder(next: Media[]) {
-    setMedia(next);
+    updateMedia(next);
     const results = await Promise.all(
       next.map((item, index) =>
         updateBookingStoryMediaAction({
@@ -74,6 +114,7 @@ export function BookingStoryMediaManager({
   }
 
   async function upload(file: File) {
+    setFailedFile(null);
     if (!uploadPolicy.allowedMimeTypes.includes(file.type)) {
       toast.error("This file type is not allowed in booking-footage");
       return;
@@ -99,6 +140,7 @@ export function BookingStoryMediaManager({
       .createSignedUploadUrl(storagePath);
     if (error || !data?.signedUrl) {
       setProgress(null);
+      setFailedFile(file);
       toast.error(error?.message ?? "Could not prepare upload");
       return;
     }
@@ -109,6 +151,7 @@ export function BookingStoryMediaManager({
     );
     if (!uploaded) {
       setProgress(null);
+      setFailedFile(file);
       toast.error("Upload failed. You can retry the file.");
       return;
     }
@@ -120,9 +163,11 @@ export function BookingStoryMediaManager({
     });
     setProgress(null);
     if (!result.ok) {
+      setFailedFile(file);
       toast.error(result.message);
       return;
     }
+    setFailedFile(null);
     toast.success("Media uploaded");
     router.refresh();
   }
@@ -164,6 +209,24 @@ export function BookingStoryMediaManager({
           <p className="text-muted mt-1 text-sm">Uploading {progress}%</p>
         </div>
       ) : null}
+      {failedFile && progress === null ? (
+        <div
+          className="border-border mt-4 flex flex-wrap items-center justify-between gap-3 rounded-md border p-3"
+          role="alert"
+        >
+          <p className="text-muted min-w-0 truncate text-sm">
+            Upload failed: {failedFile.name}
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11"
+            onClick={() => void upload(failedFile)}
+          >
+            Retry upload
+          </Button>
+        </div>
+      ) : null}
       {media.length === 0 ? (
         <p className="text-muted mt-5">No media has been attached.</p>
       ) : (
@@ -202,12 +265,18 @@ export function BookingStoryMediaManager({
                     className="h-full w-full object-cover"
                   />
                 ) : null}
+                {item.is_primary ? (
+                  <span className="bg-gold text-navy absolute top-2 left-2 rounded-sm px-2 py-1 text-xs font-semibold">
+                    Primary cover
+                  </span>
+                ) : null}
               </div>
               <div className="grid gap-2">
                 <label className="text-sm">
                   Role
                   <select
                     value={item.media_role}
+                    disabled={item.is_primary}
                     className="border-input mt-1 block min-h-11 w-full rounded-md border px-3"
                     onChange={async (event) => {
                       const role = event.target.value as Role;
@@ -219,7 +288,22 @@ export function BookingStoryMediaManager({
                         displayOrder: index
                       });
                       if (!result.ok) toast.error(result.message);
-                      else router.refresh();
+                      else {
+                        updateMedia((current) =>
+                          current.map((row) => ({
+                            ...row,
+                            media_role:
+                              row.id === item.id ? role : row.media_role,
+                            is_primary:
+                              role === "cover"
+                                ? row.id === item.id
+                                : row.id === item.id
+                                  ? false
+                                  : row.is_primary
+                          }))
+                        );
+                        router.refresh();
+                      }
                     }}
                   >
                     {(
@@ -236,6 +320,11 @@ export function BookingStoryMediaManager({
                       </option>
                     ))}
                   </select>
+                  {item.is_primary ? (
+                    <span className="text-muted mt-1 block text-xs">
+                      Select another cover before changing this media role.
+                    </span>
+                  ) : null}
                 </label>
                 <label className="text-sm">
                   Caption
@@ -243,14 +332,57 @@ export function BookingStoryMediaManager({
                     defaultValue={item.caption ?? ""}
                     className="border-input mt-1 min-h-11 w-full rounded-md border px-3"
                     onBlur={async (event) => {
+                      const caption = event.currentTarget.value.trim();
                       const result = await updateBookingStoryMediaAction({
                         storyId,
                         mediaAssetId: item.media_asset_id,
                         role: item.media_role,
-                        caption: event.currentTarget.value.trim(),
+                        caption,
                         displayOrder: index
                       });
                       if (!result.ok) toast.error(result.message);
+                      else {
+                        updateMedia((current) =>
+                          current.map((row) =>
+                            row.id === item.id
+                              ? {
+                                  ...row,
+                                  caption: caption || null
+                                }
+                              : row
+                          )
+                        );
+                      }
+                    }}
+                  />
+                </label>
+                <label className="text-sm">
+                  Public alt text
+                  <input
+                    defaultValue={item.asset.altText ?? ""}
+                    className="border-input mt-1 min-h-11 w-full rounded-md border px-3"
+                    onBlur={async (event) => {
+                      const altText = event.currentTarget.value.trim();
+                      const result = await upsertMediaAssetAction({
+                        id: item.media_asset_id,
+                        payload: { alt_text: altText || null }
+                      });
+                      if (!result.ok) toast.error(result.message);
+                      else {
+                        updateMedia((current) =>
+                          current.map((row) =>
+                            row.id === item.id
+                              ? {
+                                  ...row,
+                                  asset: {
+                                    ...row.asset,
+                                    altText: altText || null
+                                  }
+                                }
+                              : row
+                          )
+                        );
+                      }
                     }}
                   />
                 </label>
@@ -305,7 +437,7 @@ export function BookingStoryMediaManager({
                     setPendingId(null);
                     if (!result.ok) toast.error(result.message);
                     else {
-                      setMedia((current) =>
+                      updateMedia((current) =>
                         current.filter((row) => row.id !== item.id)
                       );
                       router.refresh();

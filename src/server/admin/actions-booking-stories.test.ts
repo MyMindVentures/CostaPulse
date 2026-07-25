@@ -26,8 +26,15 @@ vi.mock("@/server/repositories/admin-booking-stories", () => ({
 import { revalidatePath } from "next/cache";
 import { requireAreaAccess } from "@/server/auth/protected-area";
 import { canMutateAdminContent } from "@/server/auth/role-access";
-import { createBookingStory } from "@/server/repositories/admin-booking-stories";
-import { createBookingStoryAction } from "./actions-booking-stories";
+import {
+  attachBookingStoryMedia,
+  createBookingStory,
+  setBookingStoryCover
+} from "@/server/repositories/admin-booking-stories";
+import {
+  createBookingStoryAction,
+  updateBookingStoryMediaAction
+} from "./actions-booking-stories";
 
 describe("booking story admin actions", () => {
   beforeEach(() => {
@@ -77,5 +84,28 @@ describe("booking story admin actions", () => {
     form.set("title", "Summer at sea");
 
     await expect(createBookingStoryAction(form)).rejects.toThrow("Forbidden");
+  });
+
+  it("returns the backend cover error when attaching succeeds but cover selection fails", async () => {
+    vi.mocked(attachBookingStoryMedia).mockResolvedValue({
+      ok: true,
+      data: { id: "story-media-1" }
+    } as never);
+    vi.mocked(setBookingStoryCover).mockResolvedValue({
+      ok: false,
+      message: "Media asset is not linked to this story"
+    });
+
+    await expect(
+      updateBookingStoryMediaAction({
+        storyId: "11111111-1111-4111-8111-111111111111",
+        mediaAssetId: "22222222-2222-4222-8222-222222222222",
+        role: "cover",
+        displayOrder: 0
+      })
+    ).resolves.toEqual({
+      ok: false,
+      message: "Media asset is not linked to this story"
+    });
   });
 });

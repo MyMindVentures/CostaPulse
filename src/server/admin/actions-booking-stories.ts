@@ -126,7 +126,8 @@ export async function updateBookingStoryMediaAction(input: {
     p_is_primary: input.role === "cover"
   });
   if (result.ok && input.role === "cover") {
-    await setBookingStoryCover(input.storyId, input.mediaAssetId);
+    const cover = await setBookingStoryCover(input.storyId, input.mediaAssetId);
+    if (!cover.ok) return cover;
   }
   revalidatePath(`/admin/booking-stories/${input.storyId}`);
   return result;

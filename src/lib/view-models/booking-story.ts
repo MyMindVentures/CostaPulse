@@ -138,7 +138,7 @@ export function getBookingStoryStoragePaths(stories: RawBookingStory[]) {
   return Array.from(
     new Set(
       stories.flatMap((story) =>
-        [story.cover_media, ...story.media_items]
+        story.media_items
           .filter(
             (media): media is NonNullable<typeof media> =>
               media?.bucket_id === "booking-footage"
@@ -159,7 +159,7 @@ export function mapPublicBookingStories(
       .filter((media): media is BookingStoryMedia => media !== null)
       .sort((a, b) => a.displayOrder - b.displayOrder);
     const mappedCover = story.cover_media
-      ? mapMedia(story.cover_media, signedUrls, story.title)
+      ? (items.find((item) => item.id === story.cover_media?.id) ?? null)
       : null;
     const cover =
       mappedCover ??

@@ -7,12 +7,16 @@ import type { BookingStoryMedia as Media } from "@/lib/view-models/booking-story
 export function BookingStoryMedia({
   media,
   active = true,
+  preview = false,
   priority = false,
+  sizes = "(max-width: 640px) 88vw, (max-width: 1024px) 55vw, 38vw",
   className
 }: {
   media: Media;
   active?: boolean;
+  preview?: boolean;
   priority?: boolean;
+  sizes?: string;
   className?: string;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -27,9 +31,10 @@ export function BookingStoryMedia({
         ref={videoRef}
         className={className}
         src={media.url}
-        controls={active}
+        controls={active && !preview}
+        muted={preview}
         playsInline
-        preload={active ? "metadata" : "none"}
+        preload={active || preview ? "metadata" : "none"}
         aria-label={media.altText}
       />
     );
@@ -41,7 +46,7 @@ export function BookingStoryMedia({
       alt={media.altText}
       fill
       priority={priority}
-      sizes="(max-width: 640px) 88vw, (max-width: 1024px) 55vw, 38vw"
+      sizes={sizes}
       className={className}
     />
   );

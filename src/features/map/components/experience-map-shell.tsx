@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useEffect, useMemo, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -14,19 +13,11 @@ import {
 } from "@/lib/url/catalog-filters";
 import type { ExperienceMapItem } from "@/lib/view-models/experience-map";
 import type { MapFilterOptions } from "@/lib/view-models/experience-map";
+import { ExperienceMapCanvas } from "./experience-map-canvas";
 import { ExperienceMapFilters } from "./experience-map-filters";
 import { ExperienceMapList } from "./experience-map-list";
 import { ExperienceMapSelectedCard } from "./experience-map-selected-card";
 import { MapListToggle } from "./map-list-toggle";
-
-const ExperienceMapCanvas = dynamic(
-  () =>
-    import("./experience-map-canvas").then((mod) => mod.ExperienceMapCanvas),
-  {
-    ssr: false,
-    loading: () => <div className="map-canvas map-canvas--skeleton" />
-  }
-);
 
 type ExperienceMapShellProps = {
   items: ExperienceMapItem[];

@@ -119,7 +119,6 @@ export function ExperienceMapCanvas({
 
       try {
         const maplibregl = await import("maplibre-gl");
-        await import("maplibre-gl/dist/maplibre-gl.css");
         if (cancelled || !containerRef.current) return;
 
         maplibreglRef.current = maplibregl;
