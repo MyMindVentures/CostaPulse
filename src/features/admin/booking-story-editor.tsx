@@ -250,6 +250,7 @@ export function BookingStoryEditor({
             />
             <BookingStoryViewer
               story={previewStory}
+              experienceTitle={detail.experience.title}
               open={previewOpen}
               onClose={() => setPreviewOpen(false)}
             />

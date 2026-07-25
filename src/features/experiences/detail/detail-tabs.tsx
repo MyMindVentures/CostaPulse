@@ -151,6 +151,7 @@ export function DetailTabs({ experience }: DetailTabsProps) {
               id={`${baseId}-${tab.id}`}
               aria-selected={selected}
               aria-controls={`${baseId}-panel-${tab.id}`}
+              data-experience-tab={tab.id}
               className={selected ? "is-active" : undefined}
               onClick={() => {
                 setActive(tab.id);
