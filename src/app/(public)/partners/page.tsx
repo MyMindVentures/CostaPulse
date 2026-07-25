@@ -1,33 +1,43 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { PageContainer } from "@/components/layout/PageContainer";
-import { SectionKicker } from "@/components/shared/section-kicker";
-import { REFERRAL_FLOW_ENTRY } from "@/config/navigation";
+import { PartnerDirectoryPage } from "@/features/partners/partner-directory-page";
+import { DEFAULT_LOCALE, ENABLED_LOCALES } from "@/i18n/locales";
 
-export const metadata: Metadata = {
-  title: "Partners | CostaPulse",
-  description: "Partner with CostaPulse on Costa Blanca experiences."
+type PartnersPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function PartnersPage() {
-  const t = await getTranslations("MarketingPages.partners");
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("PartnerDirectory.meta");
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.costapulse.club";
+  const canonical = `${siteUrl.replace(/\/+$/, "")}/partners`;
 
-  return (
-    <main>
-      <PageContainer spacing="comfortable">
-        <article className="marketing-stub">
-          <SectionKicker>{t("kicker")}</SectionKicker>
-          <h1>{t("title")}</h1>
-          <p>{t("description")}</p>
-          <Link
-            href={REFERRAL_FLOW_ENTRY.href}
-            className="button button-outline mt-6"
-          >
-            {t("referralCta")}
-          </Link>
-        </article>
-      </PageContainer>
-    </main>
-  );
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: {
+      canonical,
+      languages: {
+        ...Object.fromEntries(
+          ENABLED_LOCALES.map((locale) => [locale, canonical])
+        ),
+        "x-default": canonical
+      }
+    },
+    openGraph: {
+      title: t("title"),
+      description: t("description"),
+      url: canonical,
+      locale: DEFAULT_LOCALE,
+      type: "website"
+    },
+    robots: { index: true, follow: true }
+  };
+}
+
+export default async function PartnersPage({
+  searchParams
+}: PartnersPageProps) {
+  return <PartnerDirectoryPage searchParams={await searchParams} />;
 }
