@@ -21,8 +21,32 @@ export const DASHBOARD_NAVIGATION = {
     { labelKey: "bookings", href: "/account/bookings" }
   ],
   partner: [{ labelKey: "overview", href: "/partner" }],
-  admin: [{ labelKey: "overview", href: "/admin" }]
+  admin: [
+    { labelKey: "overview", href: "/admin" },
+    { labelKey: "bookings", href: "/admin/bookings" },
+    { labelKey: "calendar", href: "/admin/calendar" },
+    { labelKey: "customers", href: "/admin/customers" }
+  ]
 } as const satisfies Record<string, readonly NavigationItem[]>;
+
+export type AdminDashboardNavKey =
+  (typeof DASHBOARD_NAVIGATION.admin)[number]["labelKey"];
+
+const adminNavHrefBySection = {
+  overview: "/admin",
+  bookings: "/admin/bookings",
+  calendar: "/admin/calendar",
+  customers: "/admin/customers"
+} as const;
+
+export function getAdminDashboardNavItems(
+  sections: readonly (keyof typeof adminNavHrefBySection)[]
+): NavigationItem[] {
+  const allowed = new Set(
+    sections.map((section) => adminNavHrefBySection[section])
+  );
+  return DASHBOARD_NAVIGATION.admin.filter((item) => allowed.has(item.href));
+}
 
 export type AccountNavConfig = {
   href: string;
@@ -33,10 +57,9 @@ export type AccountNavConfig = {
 /**
  * Account slot per audience. Guest/customer/team share primary links;
  * only the account entry changes until dedicated portals exist.
- * `/admin` is the existing authenticated surface (no separate login route yet).
  */
 export const ACCOUNT_NAV_BY_AUDIENCE: Record<NavAudience, AccountNavConfig> = {
-  guest: { href: "/admin", labelKey: "login" },
+  guest: { href: "/login", labelKey: "login" },
   customer: { href: "/experiences", labelKey: "account" },
   team: { href: "/admin", labelKey: "account" },
   admin: { href: "/admin", labelKey: "admin" }
@@ -60,6 +83,11 @@ export function isNavHrefActive(
 ): boolean {
   if (href === "/") {
     return pathname === "/";
+  }
+
+  // Dashboard section roots should not remain active on nested pages.
+  if (href === "/admin" || href === "/account" || href === "/partner") {
+    return pathname === href;
   }
 
   if (pathname === href) {

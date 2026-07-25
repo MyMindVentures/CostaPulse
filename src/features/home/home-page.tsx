@@ -7,7 +7,7 @@ import {
   Sparkles,
   Users
 } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { BrandLink } from "@/components/shared/brand-link";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Container } from "@/components/ui/container";
@@ -36,12 +36,15 @@ type LocationPill = {
 };
 
 export async function HomePageFeature() {
-  const t = await getTranslations("HomePage");
+  const [t, locale] = await Promise.all([
+    getTranslations("HomePage"),
+    getLocale()
+  ]);
   const curatedCategories = t.raw("curatedCategories") as CuratedCategory[];
   const heroTrustPoints = t.raw("heroTrustPoints") as HeroTrustPoint[];
   const locationPills = t.raw("locationPills") as LocationPill[];
   const trustPoints = t.raw("trustPoints") as TrustPoint[];
-  const experiences = await getPublishedExperienceCards(3);
+  const experiences = await getPublishedExperienceCards(3, locale);
   const siteLogo = await getSiteLogoAsset();
   const structuredData = {
     "@context": "https://schema.org",

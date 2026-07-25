@@ -1,0 +1,550 @@
+{
+  "Navigation": {
+    "primaryLabel": "Hoofdnavigatie",
+    "openMenu": "Navigatiemenu openen",
+    "closeMenu": "Navigatiemenu sluiten",
+    "dismissMenu": "Navigatiemenu sluiten",
+    "account": {
+      "login": "Inloggen",
+      "account": "Account",
+      "admin": "Admin"
+    }
+  },
+  "MarketingPages": {
+    "destinations": {
+      "kicker": "Bestemmingen",
+      "title": "Costa Blanca-bestemmingen",
+      "description": "Ontmoetingspunten en kustbases verschijnen hier zodra ze gepubliceerd zijn."
+    },
+    "services": {
+      "kicker": "Diensten",
+      "title": "CostaPulse-diensten",
+      "description": "Concierge- en hosted services verschijnen hier zodra ze gepubliceerd zijn."
+    },
+    "about": {
+      "kicker": "Over ons",
+      "title": "Over CostaPulse",
+      "description": "Ons verhaal en aanpak verschijnen hier zodra redactionele content wordt gepubliceerd."
+    },
+    "partners": {
+      "kicker": "Partners",
+      "title": "Partner van CostaPulse worden",
+      "description": "Partnermogelijkheden verschijnen hier zodra ze gepubliceerd zijn."
+    },
+    "contact": {
+      "kicker": "Contact",
+      "title": "Contact CostaPulse",
+      "description": "Contactopties verschijnen hier zodra ze gepubliceerd zijn."
+    }
+  },
+  "HomePage": {
+    "title": "Jouw Costa Blanca. Vanaf het water.",
+    "description": "Privé-yachttrips, paddle-avonturen, sunset BBQ’s en persoonlijk gehoste Mediterrane experiences.",
+    "browse": "Bekijk experiences",
+    "bookCta": "Boek je experience",
+    "privateDayCta": "Plan een privé-dag",
+    "menuLabel": "Navigatiemenu openen",
+    "eyebrow": "Costa Blanca · Spanje",
+    "heroCardKicker": "Sunset-klaar",
+    "heroCardTitle": "Gehoste dagen op zee met lokale Costa Blanca-crews.",
+    "heroTrustLabel": "CostaPulse-vertrouwenssignalen",
+    "nav": [
+      {
+        "label": "Experiences",
+        "href": "#experiences"
+      },
+      {
+        "label": "Over ons",
+        "href": "#intro"
+      },
+      {
+        "label": "Locaties",
+        "href": "#locations"
+      },
+      {
+        "label": "Voor groepen",
+        "href": "#cta"
+      },
+      {
+        "label": "Waarom CostaPulse",
+        "href": "#trust"
+      },
+      {
+        "label": "Contact",
+        "href": "mailto:hello@costapulse.club"
+      }
+    ],
+    "heroTrustPoints": [
+      {
+        "title": "Vergund",
+        "label": "Met skipper"
+      },
+      {
+        "title": "Lokale host",
+        "label": "Persoonlijke service"
+      },
+      {
+        "title": "Veilig & betrouwbaar",
+        "label": "Altijd"
+      },
+      {
+        "title": "Costa Blanca",
+        "label": "Experiences"
+      }
+    ],
+    "locationPills": [
+      {
+        "label": "Santa Pola"
+      },
+      {
+        "label": "Alicante"
+      },
+      {
+        "label": "Villajoyosa"
+      },
+      {
+        "label": "Altea"
+      },
+      {
+        "label": "Calpe"
+      },
+      {
+        "label": "En meer"
+      }
+    ],
+    "introKicker": "De CostaPulse-edit",
+    "introTitle": "Mediterrane dagen, zorgvuldig samengesteld.",
+    "introDescription": "We brengen bijzondere lokale mensen en plekken samen, zodat elke experience moeiteloos, persoonlijk en onmiskenbaar Costa Blanca voelt.",
+    "experiencesKicker": "Onze experiences",
+    "experiencesTitle": "Met de hand gekozen dagen op en rond de Costa Blanca.",
+    "experiencesDescription": "Kies uit yacht experiences, paddle-avonturen en sunset hospitality met betrouwbare lokale hosts.",
+    "viewAllExperiences": "Alle experiences bekijken",
+    "viewOnMap": "Kaart verkennen",
+    "experienceBadge": "CostaPulse-selectie",
+    "favoriteLabel": "Bewaar deze experience",
+    "selectedHost": "Geselecteerde host",
+    "hostedBy": "Gehost door {name}",
+    "viewDetails": "Details bekijken",
+    "fromPrice": "Vanaf",
+    "priceUnitPerPerson": "per persoon",
+    "priceUnitPerGroup": "per experience",
+    "reviewCountLabel": "({count, plural, one {# review} other {# reviews}})",
+    "ratingAriaLabel": "Gastbeoordeling {rating} uit {count} reviews",
+    "featuresLabel": "Highlights van de experience",
+    "experienceFallback": "Gepubliceerde experiencedetails verschijnen hier zodra inventory aan CostaPulse wordt toegevoegd.",
+    "meta": {
+      "duration": "Duur",
+      "durationValue": "{minutes} minuten",
+      "durationHours": "{hours} uur",
+      "durationHour": "{hours} uur",
+      "durationHoursMinutes": "{hours}u {minutes}m",
+      "capacity": "Capaciteit",
+      "capacityValue": "Tot {count} gasten",
+      "location": "Locatie",
+      "locationPending": "Costa Blanca-locatie volgt binnenkort"
+    },
+    "curatedCategories": [
+      {
+        "number": "01",
+        "slug": "private-charters",
+        "title": "Private charters",
+        "copy": "Ongehaaste dagen op zee, vormgegeven rond jou en je gasten."
+      },
+      {
+        "number": "02",
+        "slug": "coastal-adventures",
+        "title": "Kustavonturen",
+        "copy": "Een andere kijk op verborgen baaien, helder water en een dramatische kustlijn."
+      },
+      {
+        "number": "03",
+        "slug": "local-hospitality",
+        "title": "Lokale hospitality",
+        "copy": "Memorabele tafels, betrouwbare hosts en de smaken van de Costa Blanca."
+      }
+    ],
+    "trustPoints": [
+      {
+        "title": "Met zorg gekozen",
+        "description": "Elke host en experience wordt gekozen op kwaliteit, karakter en echte lokale kennis."
+      },
+      {
+        "title": "Moeiteloos persoonlijk",
+        "description": "Duidelijke begeleiding en doordachte service, van eerste inspiratie tot jouw dag aan de kust."
+      }
+    ],
+    "readinessTitle": "Platformgereedheid",
+    "readinessCards": {
+      "backend": {
+        "title": "Getypeerde backend-contracten",
+        "description": "Supabase-gestuurde booking-, webhook- en readiness-endpoints zijn nu geïnitialiseerd."
+      },
+      "operations": {
+        "title": "Beveiligd admin-gebied",
+        "description": "Admin-toegang vereist nu geauthenticeerde Supabase-rollen in plaats van openbare placeholderpagina’s."
+      },
+      "inventory": {
+        "title": "Klaar voor echte experiences",
+        "description": "Gepubliceerde experiences verschijnen automatisch op de homepage zodra inventory wordt toegevoegd."
+      }
+    },
+    "ctaKicker": "Jouw Mediterrane verhaal",
+    "ctaTitle": "Goede dagen beginnen met een beetje nieuwsgierigheid.",
+    "ctaLink": "Start een gesprek",
+    "footerTagline": "Geselecteerd op de Costa Blanca.",
+    "footerCopyright": "© {year} CostaPulse"
+  },
+  "AnalyticsConsent": {
+    "title": "Analysecookies",
+    "description": "We gebruiken privacybewuste analytics om te begrijpen hoe CostaPulse wordt gebruikt. Je kunt analysecookies accepteren of weigeren. Essentiële sitecookies blijven altijd actief.",
+    "accept": "Analytics accepteren",
+    "decline": "Weigeren"
+  },
+  "SharedUI": {
+    "language": "Taal",
+    "loadingExperiences": "Experiences laden",
+    "loadingExperience": "Experience laden",
+    "loadingBooking": "Boeking laden",
+    "experiencesErrorTitle": "Experiences konden niet worden geladen",
+    "experiencesErrorDescription": "Probeer opnieuw. Blijft het probleem, neem dan contact op.",
+    "experienceErrorTitle": "Deze experience kon niet worden geladen",
+    "experienceErrorDescription": "Probeer opnieuw of bekijk andere experiences.",
+    "bookingErrorTitle": "Boeking kon niet worden geladen",
+    "bookingErrorDescription": "Probeer opnieuw. Je eerdere keuzes zijn mogelijk nog beschikbaar.",
+    "retry": "Opnieuw proberen"
+  },
+  "ExperiencesPage": {
+    "backHome": "Terug naar home",
+    "eyebrow": "Costa Blanca experiences",
+    "heroTitle": "Kies jouw perfecte dag.",
+    "heroDescription": "Privé-yachttrips, paddle-avonturen en persoonlijk gehoste momenten langs de Mediterrane kust.",
+    "sectionKicker": "Verken de kust",
+    "sectionTitle": "Alle experiences",
+    "sectionDescription": "Elke experience wordt in kleine groepen gehost met persoonlijke aandacht, lokale kennis en duidelijke prijzen.",
+    "emptyTitle": "Nieuwe experiences komen eraan.",
+    "emptyDescription": "Neem contact op en we creëren een privé Costa Blanca-dag rond jouw groep.",
+    "emptyCta": "Plan een privé-dag",
+    "emptyMailto": "mailto:hello@costapulse.club",
+    "mapPreviewLabel": "Kaartvoorbeeld {title}",
+    "viewOnMap": "Bekijk op kaart",
+    "exploreMapCta": "Kaart verkennen"
+  },
+  "MapPage": {
+    "meta": {
+      "title": "Verken experiences op de kaart | CostaPulse",
+      "description": "Ontdek Costa Blanca experiences op locatie, datum, type en host op de interactieve CostaPulse-kaart."
+    },
+    "kicker": "Costa Blanca-kaart",
+    "title": "Verken experiences op de kaart",
+    "description": "Vind yachtdagen, paddle-sessies en hosted momenten bij Costa Blanca-ontmoetingspunten.",
+    "resultsLabel": "{count, plural, =0 {Geen experiences} one {# experience} other {# experiences}}",
+    "resultsRegionLabel": "Resultaten experiences",
+    "mapRegionLabel": "Interactieve experiencekaart",
+    "viewMap": "Kaart",
+    "viewList": "Lijst",
+    "viewToggleLabel": "Kaart- of lijstweergave",
+    "openFilters": "Filters",
+    "closeFilters": "Filters sluiten",
+    "filtersTitle": "Experiences filteren",
+    "filters": {
+      "date": "Datum",
+      "dateHint": "Toon beschikbaarheid op deze dag",
+      "experienceType": "Type experience",
+      "experienceTypeAll": "Alle types",
+      "teamMember": "Host",
+      "teamMemberAll": "Alle hosts",
+      "location": "Locatie",
+      "locationAll": "Alle locaties",
+      "clear": "Filters wissen",
+      "apply": "Filters toepassen"
+    },
+    "list": {
+      "selectAria": "Selecteer {title} in {location}",
+      "viewDetails": "Details bekijken",
+      "fromPrice": "Vanaf",
+      "availabilityNone": "Geen aankomende beschikbaarheid in dit venster",
+      "availabilityNext": "Volgende beschikbaar {date}",
+      "slotsAvailable": "{count, plural, one {# vrij slot} other {# vrije slots}}",
+      "hostedBy": "Gehost door {names}",
+      "locationFallback": "Costa Blanca"
+    },
+    "markerAria": "{title} in {location}",
+    "popupClose": "Sluiten",
+    "selectedClose": "Selectie wissen",
+    "empty": {
+      "title": "Geen experiences matchen deze filters",
+      "description": "Probeer een andere datum, type, host of locatie — of wis filters om alles op de kaart te zien.",
+      "clear": "Filters wissen"
+    },
+    "error": {
+      "title": "De kaart kon niet worden geladen",
+      "description": "Probeer opnieuw. Blijft het probleem, bekijk dan de experiencelijst.",
+      "retry": "Opnieuw proberen",
+      "browseCatalog": "Bekijk experiences"
+    },
+    "mapError": {
+      "title": "Kaart niet beschikbaar",
+      "description": "Je kunt experiences nog steeds in de lijst bekijken."
+    },
+    "loading": "Kaartexperiences laden"
+  },
+  "Booking": {
+    "stepperLabel": "Boekingsvoortgang",
+    "stepHint": "Stap {step} van {total}",
+    "steps": {
+      "experience": "Experience",
+      "datetime": "Datum & tijd",
+      "details": "Gegevens",
+      "extras": "Extras",
+      "review": "Controleren & boeken"
+    },
+    "actions": {
+      "back": "Terug",
+      "continueToDate": "Doorgaan naar datum & tijd",
+      "continueToDetails": "Doorgaan naar gegevens",
+      "continueToExtras": "Doorgaan naar extras",
+      "continueToReview": "Doorgaan naar overzicht",
+      "payNow": "Veilig betalen"
+    },
+    "summary": {
+      "kicker": "Jouw experience",
+      "placeholderTitle": "Selecteer een experience",
+      "datePending": "Datum nog te kiezen",
+      "timePending": "Tijd nog te kiezen",
+      "locationPending": "Ontmoetingspunt bevestigd na boeking",
+      "guests": "{count, plural, one {# gast} other {# gasten}}",
+      "estimatedPrice": "Geschatte prijs",
+      "pricePending": "Prijs volgt",
+      "trust": "Zeker je plek. Je hold blijft 20 minuten actief terwijl je de betaling afrondt."
+    },
+    "experience": {
+      "title": "Boek je experience",
+      "subtitle": "Selecteer je voorkeuren en wij creëren de perfecte dag voor jou.",
+      "empty": "Er zijn momenteel geen gepubliceerde experiences om te boeken."
+    },
+    "datetime": {
+      "title": "Selecteer je datum",
+      "subtitle": "Kies een beschikbare datum voor je experience.",
+      "variantLabel": "Duur",
+      "guestsLabel": "Gasten",
+      "prevMonth": "Vorige",
+      "nextMonth": "Volgende",
+      "calendarLabel": "Beschikbaarheidskalender",
+      "dayLabel": "{date}",
+      "slotsTitle": "Selecteer een starttijd",
+      "localTime": "Alle tijden zijn lokaal ({timezone}).",
+      "loading": "Beschikbaarheid laden…",
+      "loadError": "Beschikbaarheid kon niet worden geladen. Probeer opnieuw.",
+      "noSlots": "Geen beschikbare vertrekken op deze datum voor jouw groepsgrootte.",
+      "spotsLeft": "{count, plural, one {# plek over} other {# plekken over}}",
+      "weekdays": {
+        "mon": "ma",
+        "tue": "di",
+        "wed": "wo",
+        "thu": "do",
+        "fri": "vr",
+        "sat": "za",
+        "sun": "zo"
+      },
+      "levels": {
+        "good": "{count} plekken",
+        "limited": "{count} over",
+        "full": "Vol",
+        "none": ""
+      },
+      "legend": {
+        "good": "Goede beschikbaarheid",
+        "limited": "Beperkte beschikbaarheid",
+        "full": "Volgeboekt"
+      }
+    },
+    "details": {
+      "title": "Jouw gegevens",
+      "subtitle": "We gebruiken deze gegevens voor bevestiging en boarding.",
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "email": "E-mail",
+      "phone": "Telefoon",
+      "language": "Voorkeurstaal",
+      "specialRequests": "Bericht toevoegen (optioneel)",
+      "specialRequestsPlaceholder": "Speciale wensen of verzoeken?",
+      "required": "Dit veld is verplicht.",
+      "emailInvalid": "Voer een geldig e-mailadres in."
+    },
+    "extras": {
+      "title": "Extras",
+      "subtitle": "Optionele add-ons voor jouw dag.",
+      "empty": "Er zijn nog geen extras voor deze experience. Je kunt doorgaan naar het overzicht."
+    },
+    "review": {
+      "title": "Controleren & boeken",
+      "subtitle": "Bevestig je gegevens en ga door naar veilige betaling.",
+      "experience": "Experience",
+      "variant": "Optie",
+      "when": "Datum & tijd",
+      "guests": "Gasten",
+      "contact": "Contact",
+      "total": "Totaal",
+      "terms": "Ik accepteer de boekingsvoorwaarden en annuleringsregeling.",
+      "holdUntil": "Je hold is gereserveerd tot {time}.",
+      "paying": "Doorsturen naar betaling…",
+      "payError": "Betaling kon niet worden gestart. Probeer opnieuw.",
+      "createError": "De boeking kon niet worden aangemaakt. Probeer opnieuw.",
+      "incomplete": "Vul alle verplichte boekingsgegevens in vóór betaling.",
+      "guestLabel": "Gast {number}"
+    },
+    "success": {
+      "kicker": "Boeking bevestigd",
+      "title": "Bedankt — je bent geboekt.",
+      "subtitle": "We hebben je betaling ontvangen. Je ontvangt zo een bevestigingsmail.",
+      "reference": "Boekingsreferentie",
+      "status": "Status",
+      "backToExperience": "Terug naar experience",
+      "backHome": "Terug naar home"
+    },
+    "email": {
+      "paymentReceived": {
+        "subject": "CostaPulse boeking {reference}",
+        "greeting": "Hoi {name},",
+        "intro": "We hebben je betaling ontvangen. Hier zijn je boekingsgegevens.",
+        "referenceLabel": "Boekingsreferentie",
+        "experienceLabel": "Experience",
+        "variantLabel": "Optie",
+        "whenLabel": "Datum & tijd",
+        "locationLabel": "Locatie",
+        "guestsLabel": "Gasten",
+        "totalLabel": "Totaal",
+        "outro": "Heb je vragen? Beantwoord deze e-mail of neem contact op met CostaPulse.",
+        "guestFallback": "daar",
+        "whenFallback": "Nog te bevestigen",
+        "notProvided": "—"
+      }
+    },
+    "cancel": {
+      "kicker": "Betaling geannuleerd",
+      "title": "Betaling is niet voltooid",
+      "subtitle": "Er is niets in rekening gebracht. Je kunt checkout hervatten zolang je hold actief is.",
+      "expired": "Je boekingshold is verlopen. Kies een nieuwe datum en tijd.",
+      "status": "Huidige status: {status}",
+      "resume": "Boeking hervatten",
+      "backToExperience": "Terug naar experience"
+    },
+    "widget": {
+      "from": "Vanaf",
+      "perPerson": "per persoon",
+      "perGroup": "per boot",
+      "duration": "Duur",
+      "date": "Datum",
+      "guests": "Gasten",
+      "maxGuests": "Maximaal {count} gasten per boeking",
+      "checkAvailability": "Beschikbaarheid checken",
+      "checking": "Bezig met controleren…",
+      "chooseVariant": "Kies een duur om verder te gaan.",
+      "availabilityError": "Beschikbaarheid kon niet worden gecontroleerd. Probeer opnieuw.",
+      "noSlots": "Geen beschikbare vertrekken op deze datum voor jouw groepsgrootte.",
+      "availableTimes": "Beschikbare tijden",
+      "instant": "Directe bevestiging",
+      "selectSlot": "Selecteer een tijd om verder te gaan.",
+      "continue": "Doorgaan naar boeking"
+    }
+  },
+  "Dashboards": {
+    "navigationLabel": "Dashboardnavigatie",
+    "overview": "Overzicht",
+    "bookings": "Boekingen",
+    "calendar": "Kalender",
+    "customers": "Klanten",
+    "signOut": "Uitloggen",
+    "account": {
+      "title": "Jouw account",
+      "heading": "Accountoverzicht",
+      "description": "Beheer je CostaPulse-klantaccount.",
+      "bookingsHeading": "Jouw boekingen",
+      "bookingsEmpty": "Nog geen boekingen",
+      "bookingsEmptyDescription": "Jouw boekingen verschijnen hier nadat je een reservering maakt."
+    },
+    "partner": {
+      "title": "Partnerdashboard",
+      "heading": "Partneroverzicht",
+      "description": "Jouw geautoriseerde CostaPulse-partnerworkspace."
+    },
+    "admin": {
+      "title": "Beheer",
+      "kicker": "CostaPulse-operaties",
+      "overviewHeading": "Overzicht",
+      "overviewDescription": "Live operationele signalen van boekingen, klanten en aankomende capaciteit.",
+      "statusConnected": "Verbonden met Supabase",
+      "statusDisconnected": "Live metrics konden niet worden geladen",
+      "loadErrorTitle": "Admingegevens konden niet worden geladen",
+      "notFound": "Dit record is niet gevonden.",
+      "metrics": {
+        "bookingsTotal": "Boekingen deze periode",
+        "bookingsConfirmed": "Bevestigde boekingen",
+        "pendingManual": "Wacht op handmatige bevestiging",
+        "customers": "Klanten",
+        "paidRevenue": "Betaalde omzet",
+        "upcomingSlots": "Aankomende slots (30 dagen)",
+        "failedPayments": "Mislukte betalingen",
+        "refunds": "Terugbetalingen",
+        "reviewsPending": "Reviews in behandeling"
+      },
+      "bookingsHeading": "Boekingen",
+      "bookingsDescription": "Zoek en beheer CostaPulse-reserveringen.",
+      "bookingsEmpty": "Geen boekingen matchen deze filters",
+      "bookingsEmptyDescription": "Probeer filters te wissen of de zoekopdracht te verbreden.",
+      "customersHeading": "Klanten",
+      "customersDescription": "Klantrecords gekoppeld aan boekingen en vouchers.",
+      "customersEmpty": "Geen klanten gevonden",
+      "customersEmptyDescription": "Probeer een andere zoekopdracht, of wacht tot boekingen klantprofielen aanmaken.",
+      "calendarHeading": "Kalender",
+      "calendarDescription": "Beschikbaarheidsslots, capaciteit en toegewezen hosts.",
+      "calendarEmpty": "Geen slots in dit bereik",
+      "calendarEmptyDescription": "Pas het datumbereik aan of maak een nieuw beschikbaarheidsvak.",
+      "table": {
+        "reference": "Referentie",
+        "customer": "Klant",
+        "experience": "Experience",
+        "when": "Wanneer",
+        "status": "Status",
+        "payment": "Betaling",
+        "total": "Totaal",
+        "email": "E-mail",
+        "phone": "Telefoon",
+        "bookings": "Boekingen",
+        "spent": "Besteed",
+        "lastBooking": "Laatste boeking"
+      },
+      "paginationLabel": "Paginering",
+      "paginationSummary": "Pagina {page} van {pageCount} · {total} totaal",
+      "previous": "Vorige",
+      "next": "Volgende",
+      "backToBookings": "Terug naar boekingen",
+      "backToCustomers": "Terug naar klanten",
+      "viewCustomer": "Klant bekijken",
+      "partySize": "Groepsgrootte",
+      "createdAt": "Aangemaakt",
+      "specialRequests": "Speciale verzoeken",
+      "statusHistory": "Statusgeschiedenis",
+      "statusHistoryEmpty": "Nog geen statuswijzigingen vastgelegd.",
+      "readOnlyTitle": "Alleen-lezen",
+      "readOnlyStatusDescription": "Jouw rol kan boekingen bekijken maar geen status wijzigen.",
+      "unknownExperience": "Experience zonder titel",
+      "notes": "Notities",
+      "customerBookings": "Boekingen",
+      "customerBookingsEmpty": "Deze klant heeft nog geen boekingen.",
+      "capacitySummary": "{available} beschikbaar · {reserved} gereserveerd · {total} totaal",
+      "assignedTeam": "Toegewezen team",
+      "noTeamAssigned": "Nog geen teamleden toegewezen."
+    }
+  },
+  "Auth": {
+    "login": {
+      "title": "Inloggen",
+      "description": "Log in met je CostaPulse e-mail en wachtwoord.",
+      "email": "E-mail",
+      "password": "Wachtwoord",
+      "submit": "Inloggen",
+      "errorTitle": "Inloggen mislukt"
+    }
+  }
+}

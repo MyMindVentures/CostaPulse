@@ -18,9 +18,6 @@ export async function getPublishedMediaPlacements(
   if (!supabase) return grouped;
 
   const { data, error } = await supabase
-    // The consolidated view exists in production. Generated database types are
-    // refreshed independently, so keep this query build-safe during that gap.
-    // @ts-expect-error published_media_assets is newer than database.ts
     .from("published_media_assets")
     .select("*")
     .eq("scope_type", scopeType)

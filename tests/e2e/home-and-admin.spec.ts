@@ -38,16 +38,21 @@ test("homepage renders and readiness endpoints respond", async ({
   ).toBeVisible();
 });
 
-test("admin redirects unauthenticated visitors back to the homepage", async ({
-  page
-}) => {
+test("admin redirects unauthenticated visitors to login", async ({ page }) => {
   await page.goto("/admin");
+  await expect(page).toHaveURL(/\/login/);
   await expect(page).toHaveURL(/auth=required/);
-  await page.getByRole("button", { name: /Decline/i }).click();
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: /Your Costa Blanca/i
+      name: /Log in/i
     })
   ).toBeVisible();
+});
+
+test("login page renders email and password fields", async ({ page }) => {
+  await page.goto("/login");
+  await expect(page.getByLabel(/Email/i)).toBeVisible();
+  await expect(page.getByLabel(/Password/i)).toBeVisible();
+  await expect(page.getByRole("button", { name: /Log in/i })).toBeVisible();
 });

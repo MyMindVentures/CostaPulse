@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { ChevronDown, X } from "lucide-react";
 import { BrandLink } from "@/components/shared/brand-link";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
@@ -13,6 +13,7 @@ import {
   type NavAudience
 } from "@/config/navigation";
 import type { SiteNavigationViewModel } from "@/lib/view-models/site-navigation";
+import { resolveAppLocale } from "@/i18n/locales";
 import { cn } from "@/lib/utils";
 
 type MobileNavigationProps = {
@@ -39,6 +40,7 @@ export function MobileNavigation({
   overlayTone
 }: MobileNavigationProps) {
   const t = useTranslations("Navigation");
+  const locale = resolveAppLocale(useLocale());
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -206,7 +208,10 @@ export function MobileNavigation({
         </nav>
 
         <div className="mobile-nav__actions mt-auto grid gap-3.5">
-          <LanguageSwitcher className="shell-lang-switch inline-flex items-center gap-1.5 text-[0.72rem] font-extrabold tracking-wider" />
+          <LanguageSwitcher
+            currentLocale={locale}
+            className="shell-lang-switch inline-flex items-center gap-1.5 text-[0.72rem] font-extrabold tracking-wider"
+          />
           <Link
             href={account.href}
             className="shell-account inline-flex text-[0.82rem] font-bold opacity-[0.85] hover:opacity-100"

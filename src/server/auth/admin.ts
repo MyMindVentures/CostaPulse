@@ -44,7 +44,7 @@ export async function requireAdminAccess() {
   const context = await getAdminSessionContext();
 
   if (context.status !== "authorized") {
-    redirect("/?admin=locked");
+    redirect("/login?auth=required");
   }
 
   return context;

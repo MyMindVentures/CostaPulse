@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { stripe } from "@/lib/stripe";
+import { sendBookingPaymentReceivedEmail } from "@/server/bookings/confirmation-email";
 import { getBookingUpdateForStripeEvent } from "@/server/payments/stripe-webhooks";
 import type { Json } from "@/types/database";
 
@@ -131,6 +132,9 @@ export async function POST(request: Request) {
         { status: 503 }
       );
     }
+
+    // Soft-fail: payment confirmation must succeed even when email is disabled.
+    await sendBookingPaymentReceivedEmail(bookingId);
   } else {
     const bookingPatch: Record<string, string | null> = {
       payment_status: bookingUpdate.paymentStatus,

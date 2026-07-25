@@ -3,10 +3,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import { canAccessAdminArea, isTeamRole } from "@/server/auth/role-access";
 import type { Database } from "@/types/database";
 
-function redirectToHome(request: NextRequest, reason = "required") {
+function redirectToLogin(request: NextRequest, reason = "required") {
   const url = request.nextUrl.clone();
-  url.pathname = "/";
+  url.pathname = "/login";
   url.searchParams.set("auth", reason);
+  url.searchParams.set("next", request.nextUrl.pathname);
   return NextResponse.redirect(url);
 }
 
@@ -15,7 +16,7 @@ export async function proxy(request: NextRequest) {
   const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
   if (!url || !publishableKey) {
-    return redirectToHome(request);
+    return redirectToLogin(request);
   }
 
   let response = NextResponse.next({
@@ -48,7 +49,7 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return redirectToHome(request);
+    return redirectToLogin(request);
   }
 
   const { data: roles, error } = await supabase
@@ -63,7 +64,7 @@ export async function proxy(request: NextRequest) {
     (path.startsWith("/partner") && userRoles.some(isTeamRole)) ||
     (path.startsWith("/admin") && canAccessAdminArea(userRoles));
   if (error || !authorized) {
-    return redirectToHome(request, "forbidden");
+    return redirectToLogin(request, "forbidden");
   }
 
   return response;

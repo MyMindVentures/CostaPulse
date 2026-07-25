@@ -38,6 +38,54 @@ const presentationalNoBackendImports = {
           group: ["@/types/database", "@/types/database/*"],
           message:
             "Do not use raw database row types in presentational UI. Map to view models at the repository boundary."
+        },
+        {
+          group: ["**/*.test", "**/*.test.*", "**/*.spec", "**/*.spec.*"],
+          message:
+            "Production UI must not import test modules. Keep fixtures in test files only."
+        },
+        {
+          group: [
+            "**/fixtures",
+            "**/fixtures/*",
+            "**/__fixtures__",
+            "**/__fixtures__/*",
+            "**/mocks",
+            "**/mocks/*",
+            "**/__mocks__",
+            "**/__mocks__/*"
+          ],
+          message:
+            "Production UI must not import fixtures or mocks. Use real view models from repositories."
+        }
+      ]
+    }
+  ]
+};
+
+const productionNoTestImports = {
+  "no-restricted-imports": [
+    "error",
+    {
+      patterns: [
+        {
+          group: ["**/*.test", "**/*.test.*", "**/*.spec", "**/*.spec.*"],
+          message:
+            "Production modules must not import test files. Keep fixtures in test code only."
+        },
+        {
+          group: [
+            "**/fixtures",
+            "**/fixtures/*",
+            "**/__fixtures__",
+            "**/__fixtures__/*",
+            "**/mocks",
+            "**/mocks/*",
+            "**/__mocks__",
+            "**/__mocks__/*"
+          ],
+          message:
+            "Production modules must not import fixtures or mocks. Use real backend contracts."
         }
       ]
     }
@@ -63,13 +111,25 @@ export default defineConfig([
   {
     files: [
       "src/components/**/*.{ts,tsx}",
-      "src/features/**/components/**/*.{ts,tsx}"
+      "src/features/**/components/**/*.{ts,tsx}",
+      "src/features/**/detail/**/*.{ts,tsx}",
+      "src/features/**/preview/**/*.{ts,tsx}",
+      "src/features/**/steps/**/*.{ts,tsx}"
     ],
     ignores: [
       "src/components/**/*.test.{ts,tsx}",
       "src/features/**/*.test.{ts,tsx}"
     ],
     rules: presentationalNoBackendImports
+  },
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: [
+      "src/**/*.test.{ts,tsx}",
+      "src/**/*.spec.{ts,tsx}",
+      "src/**/*.stories.{ts,tsx}"
+    ],
+    rules: productionNoTestImports
   },
   {
     files: ["start-standalone.cjs", "scripts/prepare-standalone.cjs"],

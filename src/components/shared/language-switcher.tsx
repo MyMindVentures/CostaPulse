@@ -12,8 +12,8 @@ type LanguageSwitcherProps = {
 };
 
 /**
- * Preserves the current path and query (including booking attribution params)
- * when switching language. Locale routing expands as more locales are enabled.
+ * Sets NEXT_LOCALE via /api/locale and returns to the same path + query
+ * (booking attribution and filters preserved).
  */
 export function LanguageSwitcher({
   currentLocale = "en",
@@ -23,11 +23,12 @@ export function LanguageSwitcher({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const query = searchParams.toString();
+  const nextPath = query ? `${pathname}?${query}` : pathname;
 
   return (
     <nav className={cn(className)} aria-label={label}>
       {ENABLED_LOCALES.map((locale) => {
-        const href = query ? `${pathname}?${query}` : pathname;
+        const href = `/api/locale?locale=${locale}&next=${encodeURIComponent(nextPath)}`;
         const active = locale === currentLocale;
 
         return (
@@ -35,6 +36,7 @@ export function LanguageSwitcher({
             key={locale}
             href={href}
             hrefLang={locale}
+            prefetch={false}
             className={active ? "is-active" : undefined}
             aria-current={active ? "true" : undefined}
           >

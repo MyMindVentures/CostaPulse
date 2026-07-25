@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { ExperienceDetail } from "@/features/experiences/detail/experience-detail";
 import { getExperienceHeroImageSrc } from "@/lib/media/experience-media";
 import { getPublishedExperienceBySlug } from "@/server/repositories/catalog";
@@ -15,7 +16,8 @@ export async function generateMetadata({
   params
 }: ExperiencePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const experience = await getPublishedExperienceBySlug(slug);
+  const locale = await getLocale();
+  const experience = await getPublishedExperienceBySlug(slug, locale);
 
   if (!experience) {
     return { title: "Experience not found | CostaPulse" };
@@ -47,7 +49,8 @@ export async function generateMetadata({
 
 export default async function ExperiencePage({ params }: ExperiencePageProps) {
   const { slug } = await params;
-  const experience = await getPublishedExperienceBySlug(slug);
+  const locale = await getLocale();
+  const experience = await getPublishedExperienceBySlug(slug, locale);
 
   if (!experience) notFound();
 

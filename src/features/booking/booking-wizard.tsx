@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Container } from "@/components/ui/container";
 import { ExperienceBooking } from "@/features/experiences/booking/experience-booking";
 import { BookingStepper } from "./booking-stepper";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
+import { resolveAppLocale } from "@/i18n/locales";
 import {
   clearIdempotencyKey,
   getOrCreateAnonymousSessionId,
@@ -62,6 +63,7 @@ export function BookingWizard({
   initialStep
 }: BookingWizardProps) {
   const t = useTranslations("Booking");
+  const locale = resolveAppLocale(useLocale());
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -269,7 +271,7 @@ export function BookingWizard({
             CostaPulse
           </Link>
           <BookingStepper current={step} />
-          <LanguageSwitcher currentLocale="en" />
+          <LanguageSwitcher currentLocale={locale} />
         </header>
 
         <div className="bk-layout grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(17rem,0.9fr)]">

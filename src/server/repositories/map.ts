@@ -1,5 +1,6 @@
 import "server-only";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { resolveAppLocale } from "@/i18n/locales";
 import {
   filterMapItemsByLocationSlug,
   parseExperienceMapRows,
@@ -13,7 +14,9 @@ import {
 } from "@/lib/url/map-rpc-params";
 import type { CatalogFilters } from "@/lib/url/catalog-filters";
 
-export type GetExperienceMapParams = MapRpcCallParams;
+export type GetExperienceMapParams = MapRpcCallParams & {
+  locale?: string;
+};
 
 export type GetExperienceMapResult =
   | { ok: true; items: ExperienceMapItem[] }
@@ -33,7 +36,9 @@ export async function getExperienceMapItems(
     return { ok: false, error: "unavailable" };
   }
 
+  const locale = resolveAppLocale(params.locale);
   const { data, error } = await supabase.rpc("get_experience_map", {
+    p_locale: locale,
     ...(params.from ? { p_from: params.from } : {}),
     ...(params.to ? { p_to: params.to } : {}),
     ...(params.experienceType
@@ -60,10 +65,11 @@ export async function getExperienceMapForFilters(
   filters: Pick<
     CatalogFilters,
     "date" | "experienceType" | "teamMember" | "location"
-  >
+  >,
+  locale?: string
 ): Promise<GetExperienceMapResult> {
   const rpcParams = catalogFiltersToMapRpcParams(filters);
-  const result = await getExperienceMapItems(rpcParams);
+  const result = await getExperienceMapItems({ ...rpcParams, locale });
   if (!result.ok) return result;
 
   return {
@@ -75,7 +81,9 @@ export async function getExperienceMapForFilters(
 /**
  * Distinct filter options from published map inventory (no hardcoded enums).
  */
-export async function listMapFilterOptions(): Promise<MapFilterOptions> {
+export async function listMapFilterOptions(
+  locale?: string
+): Promise<MapFilterOptions> {
   const empty: MapFilterOptions = {
     experienceTypes: [],
     teamMembers: [],
@@ -85,7 +93,7 @@ export async function listMapFilterOptions(): Promise<MapFilterOptions> {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return empty;
 
-  const result = await getExperienceMapItems({});
+  const result = await getExperienceMapItems({ locale });
   if (!result.ok) return empty;
 
   const experienceTypes = [

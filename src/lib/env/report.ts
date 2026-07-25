@@ -34,7 +34,10 @@ const envChecks = [
     requiredKeys: ["NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"] as const
   },
   { name: "stripeWebhooks", requiredKeys: ["STRIPE_WEBHOOK_SECRET"] as const },
-  { name: "resend", requiredKeys: ["RESEND_API_KEY"] as const },
+  {
+    name: "resend",
+    requiredKeys: ["RESEND_API_KEY", "RESEND_FROM_EMAIL"] as const
+  },
   {
     name: "sentry",
     requiredKeys: ["NEXT_PUBLIC_SENTRY_DSN", "SENTRY_AUTH_TOKEN"] as const

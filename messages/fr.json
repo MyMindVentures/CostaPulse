@@ -1,0 +1,550 @@
+{
+  "Navigation": {
+    "primaryLabel": "Navigation principale",
+    "openMenu": "Ouvrir le menu de navigation",
+    "closeMenu": "Fermer le menu de navigation",
+    "dismissMenu": "Fermer le menu de navigation",
+    "account": {
+      "login": "Connexion",
+      "account": "Compte",
+      "admin": "Admin"
+    }
+  },
+  "MarketingPages": {
+    "destinations": {
+      "kicker": "Destinations",
+      "title": "Destinations Costa Blanca",
+      "description": "Les points de rendez-vous et bases côtières apparaîtront ici dès leur publication."
+    },
+    "services": {
+      "kicker": "Services",
+      "title": "Services CostaPulse",
+      "description": "Les offres conciergerie et services hébergés apparaîtront ici dès leur publication."
+    },
+    "about": {
+      "kicker": "À propos",
+      "title": "À propos de CostaPulse",
+      "description": "Notre histoire et notre approche apparaîtront ici dès la publication du contenu éditorial."
+    },
+    "partners": {
+      "kicker": "Partenaires",
+      "title": "Devenir partenaire CostaPulse",
+      "description": "Les opportunités partenaires apparaîtront ici dès leur publication."
+    },
+    "contact": {
+      "kicker": "Contact",
+      "title": "Contacter CostaPulse",
+      "description": "Les options de contact apparaîtront ici dès leur publication."
+    }
+  },
+  "HomePage": {
+    "title": "Votre Costa Blanca. Depuis l’eau.",
+    "description": "Sorties yacht privées, aventures paddle, BBQ au coucher du soleil et expériences méditerranéennes personnellement animées.",
+    "browse": "Parcourir les expériences",
+    "bookCta": "Réservez votre expérience",
+    "privateDayCta": "Planifier une journée privée",
+    "menuLabel": "Ouvrir le menu de navigation",
+    "eyebrow": "Costa Blanca · Espagne",
+    "heroCardKicker": "Prêt pour le coucher du soleil",
+    "heroCardTitle": "Des journées en mer animées avec des équipages locaux de Costa Blanca.",
+    "heroTrustLabel": "Signaux de confiance CostaPulse",
+    "nav": [
+      {
+        "label": "Expériences",
+        "href": "#experiences"
+      },
+      {
+        "label": "À propos",
+        "href": "#intro"
+      },
+      {
+        "label": "Lieux",
+        "href": "#locations"
+      },
+      {
+        "label": "Pour les groupes",
+        "href": "#cta"
+      },
+      {
+        "label": "Pourquoi CostaPulse",
+        "href": "#trust"
+      },
+      {
+        "label": "Contact",
+        "href": "mailto:hello@costapulse.club"
+      }
+    ],
+    "heroTrustPoints": [
+      {
+        "title": "Licencié",
+        "label": "Avec skipper"
+      },
+      {
+        "title": "Hôte local",
+        "label": "Service personnel"
+      },
+      {
+        "title": "Sûr et fiable",
+        "label": "Toujours"
+      },
+      {
+        "title": "Costa Blanca",
+        "label": "Expériences"
+      }
+    ],
+    "locationPills": [
+      {
+        "label": "Santa Pola"
+      },
+      {
+        "label": "Alicante"
+      },
+      {
+        "label": "Villajoyosa"
+      },
+      {
+        "label": "Altea"
+      },
+      {
+        "label": "Calpe"
+      },
+      {
+        "label": "Et plus encore"
+      }
+    ],
+    "introKicker": "L’édition CostaPulse",
+    "introTitle": "Des journées méditerranéennes, pensées avec soin.",
+    "introDescription": "Nous réunissons des personnes et des lieux locaux remarquables, pour que chaque expérience soit fluide, personnelle et indéniablement Costa Blanca.",
+    "experiencesKicker": "Nos expériences",
+    "experiencesTitle": "Des journées sélectionnées sur et autour de la Costa Blanca.",
+    "experiencesDescription": "Choisissez parmi des sorties yacht, des aventures paddle et une hospitalité au coucher du soleil avec des hôtes locaux de confiance.",
+    "viewAllExperiences": "Voir toutes les expériences",
+    "viewOnMap": "Explorer la carte",
+    "experienceBadge": "Sélection CostaPulse",
+    "favoriteLabel": "Enregistrer cette expérience",
+    "selectedHost": "Hôte sélectionné",
+    "hostedBy": "Animé par {name}",
+    "viewDetails": "Voir les détails",
+    "fromPrice": "À partir de",
+    "priceUnitPerPerson": "par personne",
+    "priceUnitPerGroup": "par expérience",
+    "reviewCountLabel": "({count, plural, one {# avis} other {# avis}})",
+    "ratingAriaLabel": "Note des voyageurs {rating} sur {count} avis",
+    "featuresLabel": "Points forts de l’expérience",
+    "experienceFallback": "Les détails des expériences publiées apparaîtront ici à mesure que l’inventaire est ajouté à CostaPulse.",
+    "meta": {
+      "duration": "Durée",
+      "durationValue": "{minutes} minutes",
+      "durationHours": "{hours} heures",
+      "durationHour": "{hours} heure",
+      "durationHoursMinutes": "{hours}h {minutes}m",
+      "capacity": "Capacité",
+      "capacityValue": "Jusqu’à {count} invités",
+      "location": "Lieu",
+      "locationPending": "Lieu Costa Blanca bientôt disponible"
+    },
+    "curatedCategories": [
+      {
+        "number": "01",
+        "slug": "private-charters",
+        "title": "Affrètements privés",
+        "copy": "Des journées sans précipitation en mer, pensées pour vous et vos invités."
+      },
+      {
+        "number": "02",
+        "slug": "coastal-adventures",
+        "title": "Aventures côtières",
+        "copy": "Une autre vue sur des criques cachées, une eau claire et un littoral spectaculaire."
+      },
+      {
+        "number": "03",
+        "slug": "local-hospitality",
+        "title": "Hospitalité locale",
+        "copy": "Des tables mémorables, des hôtes de confiance et les saveurs de la Costa Blanca."
+      }
+    ],
+    "trustPoints": [
+      {
+        "title": "Choisis avec soin",
+        "description": "Chaque hôte et expérience est choisi pour sa qualité, son caractère et une connaissance locale authentique."
+      },
+      {
+        "title": "Personnel sans effort",
+        "description": "Des conseils clairs et un service attentionné, de la première inspiration à votre journée sur la côte."
+      }
+    ],
+    "readinessTitle": "Préparation de la plateforme",
+    "readinessCards": {
+      "backend": {
+        "title": "Contrats backend typés",
+        "description": "Les endpoints de réservation, webhook et readiness basés sur Supabase sont maintenant initialisés."
+      },
+      "operations": {
+        "title": "Espace admin protégé",
+        "description": "L’accès admin exige désormais des rôles Supabase authentifiés plutôt que des pages publiques fictives."
+      },
+      "inventory": {
+        "title": "Prêt pour de vraies expériences",
+        "description": "Les expériences publiées apparaîtront automatiquement sur la page d’accueil dès l’ajout d’inventaire."
+      }
+    },
+    "ctaKicker": "Votre histoire méditerranéenne",
+    "ctaTitle": "Les belles journées commencent par un peu de curiosité.",
+    "ctaLink": "Lancer une conversation",
+    "footerTagline": "Sélectionné sur la Costa Blanca.",
+    "footerCopyright": "© {year} CostaPulse"
+  },
+  "AnalyticsConsent": {
+    "title": "Cookies d’analyse",
+    "description": "Nous utilisons des analyses respectueuses de la vie privée pour comprendre comment CostaPulse est utilisé. Vous pouvez accepter ou refuser les cookies d’analyse. Les cookies essentiels restent toujours actifs.",
+    "accept": "Accepter les analyses",
+    "decline": "Refuser"
+  },
+  "SharedUI": {
+    "language": "Langue",
+    "loadingExperiences": "Chargement des expériences",
+    "loadingExperience": "Chargement de l’expérience",
+    "loadingBooking": "Chargement de la réservation",
+    "experiencesErrorTitle": "Les expériences n’ont pas pu être chargées",
+    "experiencesErrorDescription": "Veuillez réessayer. Si le problème continue, contactez-nous.",
+    "experienceErrorTitle": "Cette expérience n’a pas pu être chargée",
+    "experienceErrorDescription": "Veuillez réessayer ou parcourir d’autres expériences.",
+    "bookingErrorTitle": "La réservation n’a pas pu être chargée",
+    "bookingErrorDescription": "Veuillez réessayer. Vos sélections précédentes peuvent encore être disponibles.",
+    "retry": "Réessayer"
+  },
+  "ExperiencesPage": {
+    "backHome": "Retour à l’accueil",
+    "eyebrow": "Expériences Costa Blanca",
+    "heroTitle": "Choisissez votre journée idéale.",
+    "heroDescription": "Sorties yacht privées, aventures paddle et moments personnellement animés le long de la Méditerranée.",
+    "sectionKicker": "Explorer la côte",
+    "sectionTitle": "Toutes les expériences",
+    "sectionDescription": "Chaque expérience se déroule en petit groupe avec une attention personnelle, un savoir local et des tarifs clairs.",
+    "emptyTitle": "De nouvelles expériences arrivent bientôt.",
+    "emptyDescription": "Contactez-nous et nous créerons une journée privée Costa Blanca autour de votre groupe.",
+    "emptyCta": "Planifier une journée privée",
+    "emptyMailto": "mailto:hello@costapulse.club",
+    "mapPreviewLabel": "Aperçu carte {title}",
+    "viewOnMap": "Voir sur la carte",
+    "exploreMapCta": "Explorer la carte"
+  },
+  "MapPage": {
+    "meta": {
+      "title": "Explorer les expériences sur la carte | CostaPulse",
+      "description": "Découvrez les expériences Costa Blanca par lieu, date, type et hôte sur la carte interactive CostaPulse."
+    },
+    "kicker": "Carte Costa Blanca",
+    "title": "Explorer les expériences sur la carte",
+    "description": "Trouvez des journées yacht, sessions paddle et moments hébergés sur les points de rendez-vous Costa Blanca.",
+    "resultsLabel": "{count, plural, =0 {Aucune expérience} one {# expérience} other {# expériences}}",
+    "resultsRegionLabel": "Résultats des expériences",
+    "mapRegionLabel": "Carte interactive des expériences",
+    "viewMap": "Carte",
+    "viewList": "Liste",
+    "viewToggleLabel": "Vue carte ou liste",
+    "openFilters": "Filtres",
+    "closeFilters": "Fermer les filtres",
+    "filtersTitle": "Filtrer les expériences",
+    "filters": {
+      "date": "Date",
+      "dateHint": "Afficher la disponibilité ce jour-là",
+      "experienceType": "Type d’expérience",
+      "experienceTypeAll": "Tous les types",
+      "teamMember": "Hôte",
+      "teamMemberAll": "Tous les hôtes",
+      "location": "Lieu",
+      "locationAll": "Tous les lieux",
+      "clear": "Effacer les filtres",
+      "apply": "Appliquer les filtres"
+    },
+    "list": {
+      "selectAria": "Sélectionner {title} à {location}",
+      "viewDetails": "Voir les détails",
+      "fromPrice": "À partir de",
+      "availabilityNone": "Aucune disponibilité à venir sur cette période",
+      "availabilityNext": "Prochaine disponibilité {date}",
+      "slotsAvailable": "{count, plural, one {# créneau libre} other {# créneaux libres}}",
+      "hostedBy": "Animé par {names}",
+      "locationFallback": "Costa Blanca"
+    },
+    "markerAria": "{title} à {location}",
+    "popupClose": "Fermer",
+    "selectedClose": "Effacer la sélection",
+    "empty": {
+      "title": "Aucune expérience ne correspond à ces filtres",
+      "description": "Essayez une autre date, type, hôte ou lieu — ou effacez les filtres pour tout voir sur la carte.",
+      "clear": "Effacer les filtres"
+    },
+    "error": {
+      "title": "La carte n’a pas pu être chargée",
+      "description": "Veuillez réessayer. Si le problème continue, consultez la liste des expériences.",
+      "retry": "Réessayer",
+      "browseCatalog": "Parcourir les expériences"
+    },
+    "mapError": {
+      "title": "Carte indisponible",
+      "description": "Vous pouvez toujours parcourir les expériences dans la liste."
+    },
+    "loading": "Chargement des expériences de la carte"
+  },
+  "Booking": {
+    "stepperLabel": "Progression de la réservation",
+    "stepHint": "Étape {step} sur {total}",
+    "steps": {
+      "experience": "Expérience",
+      "datetime": "Date et heure",
+      "details": "Détails",
+      "extras": "Extras",
+      "review": "Vérifier et réserver"
+    },
+    "actions": {
+      "back": "Retour",
+      "continueToDate": "Continuer vers date et heure",
+      "continueToDetails": "Continuer vers les détails",
+      "continueToExtras": "Continuer vers les extras",
+      "continueToReview": "Continuer vers la vérification",
+      "payNow": "Payer en toute sécurité"
+    },
+    "summary": {
+      "kicker": "Votre expérience",
+      "placeholderTitle": "Sélectionnez une expérience",
+      "datePending": "Date à sélectionner",
+      "timePending": "Heure à sélectionner",
+      "locationPending": "Point de rendez-vous confirmé après réservation",
+      "guests": "{count, plural, one {# invité} other {# invités}}",
+      "estimatedPrice": "Prix estimé",
+      "pricePending": "Prix en attente",
+      "trust": "Sécurisez votre place. Votre option dure 20 minutes le temps de finaliser le paiement."
+    },
+    "experience": {
+      "title": "Réservez votre expérience",
+      "subtitle": "Sélectionnez vos préférences et nous créerons la journée idéale pour vous.",
+      "empty": "Aucune expérience publiée n’est disponible à la réservation pour le moment."
+    },
+    "datetime": {
+      "title": "Sélectionnez votre date",
+      "subtitle": "Choisissez une date disponible pour votre expérience.",
+      "variantLabel": "Durée",
+      "guestsLabel": "Invités",
+      "prevMonth": "Précédent",
+      "nextMonth": "Suivant",
+      "calendarLabel": "Calendrier de disponibilité",
+      "dayLabel": "{date}",
+      "slotsTitle": "Sélectionnez une heure de début",
+      "localTime": "Toutes les heures sont locales ({timezone}).",
+      "loading": "Chargement des disponibilités…",
+      "loadError": "La disponibilité n’a pas pu être chargée. Veuillez réessayer.",
+      "noSlots": "Aucun départ disponible à cette date pour la taille de votre groupe.",
+      "spotsLeft": "{count, plural, one {# place restante} other {# places restantes}}",
+      "weekdays": {
+        "mon": "lun.",
+        "tue": "mar.",
+        "wed": "mer.",
+        "thu": "jeu.",
+        "fri": "ven.",
+        "sat": "sam.",
+        "sun": "dim."
+      },
+      "levels": {
+        "good": "{count} places",
+        "limited": "{count} restantes",
+        "full": "Complet",
+        "none": ""
+      },
+      "legend": {
+        "good": "Bonne disponibilité",
+        "limited": "Disponibilité limitée",
+        "full": "Complet"
+      }
+    },
+    "details": {
+      "title": "Vos informations",
+      "subtitle": "Nous utiliserons ces informations pour la confirmation et l’embarquement.",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "language": "Langue préférée",
+      "specialRequests": "Ajouter un message (facultatif)",
+      "specialRequestsPlaceholder": "Souhaits ou demandes particulières ?",
+      "required": "Ce champ est obligatoire.",
+      "emailInvalid": "Saisissez une adresse e-mail valide."
+    },
+    "extras": {
+      "title": "Extras",
+      "subtitle": "Options supplémentaires pour votre journée.",
+      "empty": "Aucun extra n’est encore disponible pour cette expérience. Vous pouvez continuer vers la vérification."
+    },
+    "review": {
+      "title": "Vérifier et réserver",
+      "subtitle": "Confirmez vos informations, puis continuez vers le paiement sécurisé.",
+      "experience": "Expérience",
+      "variant": "Option",
+      "when": "Date et heure",
+      "guests": "Invités",
+      "contact": "Contact",
+      "total": "Total",
+      "terms": "J’accepte les conditions de réservation et la politique d’annulation.",
+      "holdUntil": "Votre option est réservée jusqu’à {time}.",
+      "paying": "Redirection vers le paiement…",
+      "payError": "Le paiement n’a pas pu démarrer. Veuillez réessayer.",
+      "createError": "La réservation n’a pas pu être créée. Veuillez réessayer.",
+      "incomplete": "Complétez tous les détails obligatoires avant de payer.",
+      "guestLabel": "Invité {number}"
+    },
+    "success": {
+      "kicker": "Réservation confirmée",
+      "title": "Merci — votre réservation est confirmée.",
+      "subtitle": "Nous avons reçu votre paiement. Un e-mail de confirmation suivra sous peu.",
+      "reference": "Référence de réservation",
+      "status": "Statut",
+      "backToExperience": "Retour à l’expérience",
+      "backHome": "Retour à l’accueil"
+    },
+    "email": {
+      "paymentReceived": {
+        "subject": "Réservation CostaPulse {reference}",
+        "greeting": "Bonjour {name},",
+        "intro": "Nous avons reçu votre paiement. Voici les détails de votre réservation.",
+        "referenceLabel": "Référence de réservation",
+        "experienceLabel": "Expérience",
+        "variantLabel": "Option",
+        "whenLabel": "Date et heure",
+        "locationLabel": "Lieu",
+        "guestsLabel": "Participants",
+        "totalLabel": "Total",
+        "outro": "Des questions ? Répondez à cet e-mail ou contactez CostaPulse.",
+        "guestFallback": "bonjour",
+        "whenFallback": "À confirmer",
+        "notProvided": "—"
+      }
+    },
+    "cancel": {
+      "kicker": "Paiement annulé",
+      "title": "Le paiement n’a pas été finalisé",
+      "subtitle": "Aucun débit n’a été effectué. Vous pouvez reprendre le paiement tant que votre option est active.",
+      "expired": "Votre option de réservation a expiré. Veuillez choisir une nouvelle date et heure.",
+      "status": "Statut actuel : {status}",
+      "resume": "Reprendre la réservation",
+      "backToExperience": "Retour à l’expérience"
+    },
+    "widget": {
+      "from": "À partir de",
+      "perPerson": "par personne",
+      "perGroup": "par bateau",
+      "duration": "Durée",
+      "date": "Date",
+      "guests": "Invités",
+      "maxGuests": "Maximum {count} invités par réservation",
+      "checkAvailability": "Vérifier la disponibilité",
+      "checking": "Vérification…",
+      "chooseVariant": "Choisissez une durée pour continuer.",
+      "availabilityError": "La disponibilité n’a pas pu être vérifiée. Veuillez réessayer.",
+      "noSlots": "Aucun départ disponible à cette date pour la taille de votre groupe.",
+      "availableTimes": "Horaires disponibles",
+      "instant": "Confirmation instantanée",
+      "selectSlot": "Sélectionnez une heure pour continuer.",
+      "continue": "Continuer vers la réservation"
+    }
+  },
+  "Dashboards": {
+    "navigationLabel": "Navigation du tableau de bord",
+    "overview": "Aperçu",
+    "bookings": "Réservations",
+    "calendar": "Calendrier",
+    "customers": "Clients",
+    "signOut": "Déconnexion",
+    "account": {
+      "title": "Votre compte",
+      "heading": "Aperçu du compte",
+      "description": "Gérez votre compte client CostaPulse.",
+      "bookingsHeading": "Vos réservations",
+      "bookingsEmpty": "Pas encore de réservations",
+      "bookingsEmptyDescription": "Vos réservations apparaîtront ici après une réservation."
+    },
+    "partner": {
+      "title": "Tableau de bord partenaire",
+      "heading": "Aperçu partenaire",
+      "description": "Votre espace partenaire CostaPulse autorisé."
+    },
+    "admin": {
+      "title": "Administration",
+      "kicker": "Opérations CostaPulse",
+      "overviewHeading": "Aperçu",
+      "overviewDescription": "Signaux opérationnels en direct sur les réservations, clients et capacité à venir.",
+      "statusConnected": "Connecté à Supabase",
+      "statusDisconnected": "Impossible de charger les métriques en direct",
+      "loadErrorTitle": "Les données admin n’ont pas pu être chargées",
+      "notFound": "Cet enregistrement est introuvable.",
+      "metrics": {
+        "bookingsTotal": "Réservations sur la période",
+        "bookingsConfirmed": "Réservations confirmées",
+        "pendingManual": "En attente de confirmation manuelle",
+        "customers": "Clients",
+        "paidRevenue": "Revenu encaissé",
+        "upcomingSlots": "Créneaux à venir (30 jours)",
+        "failedPayments": "Paiements échoués",
+        "refunds": "Remboursements",
+        "reviewsPending": "Avis en attente"
+      },
+      "bookingsHeading": "Réservations",
+      "bookingsDescription": "Recherchez et gérez les réservations CostaPulse.",
+      "bookingsEmpty": "Aucune réservation ne correspond à ces filtres",
+      "bookingsEmptyDescription": "Essayez d’effacer les filtres ou d’élargir la recherche.",
+      "customersHeading": "Clients",
+      "customersDescription": "Fiches clients liées aux réservations et bons.",
+      "customersEmpty": "Aucun client trouvé",
+      "customersEmptyDescription": "Essayez une autre recherche, ou attendez que les réservations créent des profils clients.",
+      "calendarHeading": "Calendrier",
+      "calendarDescription": "Créneaux, capacité et hôtes assignés.",
+      "calendarEmpty": "Aucun créneau sur cette plage",
+      "calendarEmptyDescription": "Ajustez la plage de dates ou créez un nouveau créneau.",
+      "table": {
+        "reference": "Référence",
+        "customer": "Client",
+        "experience": "Expérience",
+        "when": "Quand",
+        "status": "Statut",
+        "payment": "Paiement",
+        "total": "Total",
+        "email": "E-mail",
+        "phone": "Téléphone",
+        "bookings": "Réservations",
+        "spent": "Dépensé",
+        "lastBooking": "Dernière réservation"
+      },
+      "paginationLabel": "Pagination",
+      "paginationSummary": "Page {page} sur {pageCount} · {total} au total",
+      "previous": "Précédent",
+      "next": "Suivant",
+      "backToBookings": "Retour aux réservations",
+      "backToCustomers": "Retour aux clients",
+      "viewCustomer": "Voir le client",
+      "partySize": "Taille du groupe",
+      "createdAt": "Créé",
+      "specialRequests": "Demandes spéciales",
+      "statusHistory": "Historique des statuts",
+      "statusHistoryEmpty": "Aucun changement de statut enregistré pour le moment.",
+      "readOnlyTitle": "Lecture seule",
+      "readOnlyStatusDescription": "Votre rôle peut consulter les réservations mais pas modifier le statut.",
+      "unknownExperience": "Expérience sans titre",
+      "notes": "Notes",
+      "customerBookings": "Réservations",
+      "customerBookingsEmpty": "Ce client n’a pas encore de réservations.",
+      "capacitySummary": "{available} disponibles · {reserved} réservées · {total} au total",
+      "assignedTeam": "Équipe assignée",
+      "noTeamAssigned": "Aucun membre d’équipe assigné pour le moment."
+    }
+  },
+  "Auth": {
+    "login": {
+      "title": "Connexion",
+      "description": "Connectez-vous avec votre e-mail et mot de passe CostaPulse.",
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "submit": "Connexion",
+      "errorTitle": "Échec de la connexion"
+    }
+  }
+}

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Menu } from "lucide-react";
 import { BrandLink } from "@/components/shared/brand-link";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
@@ -16,6 +16,7 @@ import {
   type NavAudience
 } from "@/config/navigation";
 import type { SiteNavigationViewModel } from "@/lib/view-models/site-navigation";
+import { resolveAppLocale } from "@/i18n/locales";
 import { cn } from "@/lib/utils";
 
 type NavbarProps = {
@@ -34,6 +35,7 @@ export function Navbar({
   logoAlt
 }: NavbarProps) {
   const t = useTranslations("Navigation");
+  const locale = resolveAppLocale(useLocale());
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuPhase, setMenuPhase] = useState<"closed" | "open" | "closing">(
@@ -121,7 +123,10 @@ export function Navbar({
           </nav>
 
           <div className="shell-navbar__actions inline-flex min-w-11 shrink-0 items-center gap-3 whitespace-nowrap">
-            <LanguageSwitcher className="shell-lang-switch nav:inline-flex hidden items-center gap-1.5 text-[0.72rem] font-extrabold tracking-wider" />
+            <LanguageSwitcher
+              currentLocale={locale}
+              className="shell-lang-switch nav:inline-flex hidden items-center gap-1.5 text-[0.72rem] font-extrabold tracking-wider"
+            />
             <Link
               href={account.href}
               className="shell-account nav:inline-flex hidden text-[0.82rem] font-bold opacity-[0.85] hover:opacity-100"

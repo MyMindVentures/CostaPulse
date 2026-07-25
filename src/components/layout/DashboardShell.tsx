@@ -10,6 +10,7 @@ type Props = {
   navigationLabel: string;
   items: readonly NavigationItem[];
   labels: Record<string, string>;
+  footer?: ReactNode;
 };
 
 export function DashboardShell({
@@ -17,7 +18,8 @@ export function DashboardShell({
   title,
   navigationLabel,
   items,
-  labels
+  labels,
+  footer
 }: Props) {
   return (
     <div className="dashboard-shell bg-panel grid min-h-dvh grid-cols-1 md:grid-cols-[minmax(15rem,18rem)_minmax(0,1fr)]">
@@ -29,6 +31,7 @@ export function DashboardShell({
           items={items}
           labels={labels}
         />
+        {footer ? <div className="mt-auto pt-4">{footer}</div> : null}
       </aside>
       <main className="dashboard-main min-w-0 p-[clamp(1.25rem,4vw,3rem)]">
         <Breadcrumbs

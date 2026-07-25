@@ -27,6 +27,9 @@ jobs:
       - name: Check formatting
         run: npm run format:check
 
+      - name: Guardrails
+        run: npm run guardrails
+
       - name: Lint
         run: npm run lint
 

@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { LoadingState } from "@/components/shared/loading-state";
 import { parseCatalogFilters } from "@/lib/url/catalog-filters";
 import { resolveMapStyleUrl } from "@/lib/map/config";
@@ -17,12 +17,15 @@ type ExperienceMapPageFeatureProps = {
 export async function ExperienceMapPageFeature({
   searchParams
 }: ExperienceMapPageFeatureProps) {
-  const t = await getTranslations("MapPage");
+  const [t, locale] = await Promise.all([
+    getTranslations("MapPage"),
+    getLocale()
+  ]);
   const filters = parseCatalogFilters(searchParams);
 
   const [mapResult, options] = await Promise.all([
-    getExperienceMapForFilters(filters),
-    listMapFilterOptions()
+    getExperienceMapForFilters(filters, locale),
+    listMapFilterOptions(locale)
   ]);
 
   const items = mapResult.ok ? mapResult.items : [];

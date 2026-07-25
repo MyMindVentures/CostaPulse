@@ -46,21 +46,18 @@ CostaPulse brand CSS variables in `src/app/globals.css` are the source of truth 
 - Sentry is wired through `instrumentation.ts`, `instrumentation-client.ts`, and the server/edge config modules. Capture is disabled when the DSN is absent.
 - PostHog initializes in the client only when keys are set and analytics consent is granted.
 
-## Deferred frontend libraries (Scope B)
+## Frontend libraries (Scope B)
 
 Installed:
 
 - `maplibre-gl` — interactive map (dynamic client import; OpenFreeMap style via `NEXT_PUBLIC_MAP_STYLE_URL`)
 - Storybook 9 (`npm run storybook`) — catalog for `src/components/ui` and `src/components/shared`
+- `sonner` — accessible toasts (shadcn Toaster)
+- `embla-carousel-react` — media galleries (shadcn Carousel)
+- `vaul` — mobile sheets (shadcn Drawer)
+- `react-day-picker` — richer calendar primitive (shadcn Calendar)
 
-Still candidate when needed:
-
-- `sonner` — accessible toasts
-- `embla-carousel-react` — media galleries
-- `vaul` / shadcn Drawer — mobile sheets
-- `react-day-picker` — if a richer calendar primitive is required beyond current booking UI
-
-Do not add TanStack Query for server-rendered catalog data. Do not add `nuqs` while `catalog-filters` covers URL state.
+Wire these through CostaPulse tokens and `src/components/ui` only. Do not add TanStack Query for server-rendered catalog data. Do not add `nuqs` while `catalog-filters` covers URL state.
 
 ## Security status
 

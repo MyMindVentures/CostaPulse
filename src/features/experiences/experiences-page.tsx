@@ -1,13 +1,16 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Container } from "@/components/ui/container";
 import { EmptyState } from "@/components/shared/empty-state";
 import { getPublishedExperienceCards } from "@/server/repositories/catalog";
 import { ExperienceCard } from "./components/experience-card";
 
 export async function ExperiencesPageFeature() {
-  const t = await getTranslations("ExperiencesPage");
-  const experiences = await getPublishedExperienceCards();
+  const [t, locale] = await Promise.all([
+    getTranslations("ExperiencesPage"),
+    getLocale()
+  ]);
+  const experiences = await getPublishedExperienceCards(undefined, locale);
 
   return (
     <main className="catalog-page">

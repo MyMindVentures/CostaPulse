@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   canAccessAdminArea,
+  canAccessAdminSection,
+  canMutateAdminSlots,
+  canMutateBookingStatus,
+  filterAdminNavSections,
+  getPostLoginPath,
   isAdminRole,
   isTeamRole,
   resolveNavAudience
@@ -59,5 +64,42 @@ describe("resolveNavAudience", () => {
     expect(resolveNavAudience(["customer"])).toBe("customer");
     expect(resolveNavAudience([])).toBe("customer");
     expect(resolveNavAudience(null)).toBe("customer");
+  });
+});
+
+describe("admin section capabilities", () => {
+  it("hides bookings and customers from content managers", () => {
+    expect(canAccessAdminSection(["content_manager"], "overview")).toBe(true);
+    expect(canAccessAdminSection(["content_manager"], "calendar")).toBe(true);
+    expect(canAccessAdminSection(["content_manager"], "bookings")).toBe(false);
+    expect(canAccessAdminSection(["content_manager"], "customers")).toBe(false);
+  });
+
+  it("allows finance to see bookings but not mutate slots", () => {
+    expect(canAccessAdminSection(["finance_manager"], "bookings")).toBe(true);
+    expect(canMutateAdminSlots(["finance_manager"])).toBe(false);
+    expect(canMutateBookingStatus(["finance_manager"])).toBe(false);
+  });
+
+  it("allows operations to mutate slots and booking status", () => {
+    expect(canMutateAdminSlots(["operations_staff"])).toBe(true);
+    expect(canMutateBookingStatus(["operations_staff"])).toBe(true);
+  });
+
+  it("filters nav sections by role", () => {
+    expect(
+      filterAdminNavSections(
+        ["content_manager"],
+        ["overview", "bookings", "calendar", "customers"]
+      )
+    ).toEqual(["overview", "calendar"]);
+  });
+});
+
+describe("getPostLoginPath", () => {
+  it("routes by audience", () => {
+    expect(getPostLoginPath(["administrator"])).toBe("/admin");
+    expect(getPostLoginPath(["partner"])).toBe("/partner");
+    expect(getPostLoginPath(["customer"])).toBe("/account");
   });
 });

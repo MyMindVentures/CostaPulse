@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { BookingWizard } from "@/features/booking/booking-wizard";
 import { getExperienceHeroImageSrc } from "@/lib/media/experience-media";
 import {
@@ -17,9 +18,10 @@ export default async function BookExperiencePage({
   params
 }: BookExperiencePageProps) {
   const { slug } = await params;
+  const locale = await getLocale();
   const [experience, cards] = await Promise.all([
-    getPublishedExperienceBySlug(slug),
-    getPublishedExperienceCards()
+    getPublishedExperienceBySlug(slug, locale),
+    getPublishedExperienceCards(undefined, locale)
   ]);
 
   if (!experience) notFound();

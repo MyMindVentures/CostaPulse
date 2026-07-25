@@ -20,6 +20,7 @@ Canonical stack reference for coding agents. Follow the repository and lockfile;
 - Lucide icons
 - `next-intl` for routing, translations, formatting, and the language switch
 - React Hook Form with Zod resolvers for complex forms
+- Scope B UX primitives: `sonner` (toasts), `vaul` (drawers), `embla-carousel-react` (galleries), `react-day-picker` (calendar)
 
 Do not add one-off styling systems, arbitrary UI kits, duplicate component libraries, or hardcoded user-facing copy.
 
@@ -53,17 +54,23 @@ Analytics is never an operational source of truth. Never log secrets or unnecess
 - Playwright
 - ESLint 9
 - Prettier with Tailwind sorting
+- Husky + lint-staged (pre-commit)
+- commitlint (conventional commit messages)
+- `npm run guardrails` (i18n catalogs, no production mocks, stack deps, companion tests)
 
 Required checks where applicable:
 
 ```bash
 npm run format:check
+npm run guardrails
 npm run lint
 npm run typecheck
 npm run test
 npm run test:e2e
 npm run build
 ```
+
+Local git hooks: `pre-commit` (secrets + lint-staged + guardrails), `commit-msg` (commitlint), `pre-push` (typecheck + unit tests). CI still owns build, Storybook, and e2e.
 
 ## Agent rules
 

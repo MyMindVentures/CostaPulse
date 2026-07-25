@@ -402,6 +402,24 @@
       "backToExperience": "Back to experience",
       "backHome": "Back to home"
     },
+    "email": {
+      "paymentReceived": {
+        "subject": "CostaPulse booking {reference}",
+        "greeting": "Hi {name},",
+        "intro": "We’ve received your payment. Here are your booking details.",
+        "referenceLabel": "Booking reference",
+        "experienceLabel": "Experience",
+        "variantLabel": "Option",
+        "whenLabel": "Date & time",
+        "locationLabel": "Location",
+        "guestsLabel": "Guests",
+        "totalLabel": "Total",
+        "outro": "If you have questions, reply to this email or contact CostaPulse.",
+        "guestFallback": "there",
+        "whenFallback": "To be confirmed",
+        "notProvided": "—"
+      }
+    },
     "cancel": {
       "kicker": "Payment cancelled",
       "title": "Payment was not completed",
@@ -434,6 +452,9 @@
     "navigationLabel": "Dashboard navigation",
     "overview": "Overview",
     "bookings": "Bookings",
+    "calendar": "Calendar",
+    "customers": "Customers",
+    "signOut": "Sign out",
     "account": {
       "title": "Your account",
       "heading": "Account overview",
@@ -448,7 +469,82 @@
       "description": "Your authorized CostaPulse partner workspace."
     },
     "admin": {
-      "title": "Administration"
+      "title": "Administration",
+      "kicker": "CostaPulse operations",
+      "overviewHeading": "Overview",
+      "overviewDescription": "Live operational signals from bookings, customers, and upcoming capacity.",
+      "statusConnected": "Connected to Supabase",
+      "statusDisconnected": "Unable to load live metrics",
+      "loadErrorTitle": "Admin data could not be loaded",
+      "notFound": "This record was not found.",
+      "metrics": {
+        "bookingsTotal": "Bookings this period",
+        "bookingsConfirmed": "Confirmed bookings",
+        "pendingManual": "Pending manual confirmation",
+        "customers": "Customers",
+        "paidRevenue": "Paid revenue",
+        "upcomingSlots": "Upcoming slots (30 days)",
+        "failedPayments": "Failed payments",
+        "refunds": "Refunds",
+        "reviewsPending": "Reviews pending"
+      },
+      "bookingsHeading": "Bookings",
+      "bookingsDescription": "Search and manage CostaPulse reservations.",
+      "bookingsEmpty": "No bookings match these filters",
+      "bookingsEmptyDescription": "Try clearing filters or widening the search.",
+      "customersHeading": "Customers",
+      "customersDescription": "Customer records linked to bookings and vouchers.",
+      "customersEmpty": "No customers found",
+      "customersEmptyDescription": "Try a different search, or wait until bookings create customer profiles.",
+      "calendarHeading": "Calendar",
+      "calendarDescription": "Availability slots, capacity, and assigned hosts.",
+      "calendarEmpty": "No slots in this range",
+      "calendarEmptyDescription": "Adjust the date range or create a new availability slot.",
+      "table": {
+        "reference": "Reference",
+        "customer": "Customer",
+        "experience": "Experience",
+        "when": "When",
+        "status": "Status",
+        "payment": "Payment",
+        "total": "Total",
+        "email": "Email",
+        "phone": "Phone",
+        "bookings": "Bookings",
+        "spent": "Spent",
+        "lastBooking": "Last booking"
+      },
+      "paginationLabel": "Pagination",
+      "paginationSummary": "Page {page} of {pageCount} · {total} total",
+      "previous": "Previous",
+      "next": "Next",
+      "backToBookings": "Back to bookings",
+      "backToCustomers": "Back to customers",
+      "viewCustomer": "View customer",
+      "partySize": "Party size",
+      "createdAt": "Created",
+      "specialRequests": "Special requests",
+      "statusHistory": "Status history",
+      "statusHistoryEmpty": "No status changes recorded yet.",
+      "readOnlyTitle": "Read only",
+      "readOnlyStatusDescription": "Your role can view bookings but cannot change status.",
+      "unknownExperience": "Untitled experience",
+      "notes": "Notes",
+      "customerBookings": "Bookings",
+      "customerBookingsEmpty": "This customer has no bookings yet.",
+      "capacitySummary": "{available} available · {reserved} reserved · {total} total",
+      "assignedTeam": "Assigned team",
+      "noTeamAssigned": "No team members assigned yet."
+    }
+  },
+  "Auth": {
+    "login": {
+      "title": "Log in",
+      "description": "Sign in with your CostaPulse email and password.",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log in",
+      "errorTitle": "Sign-in failed"
     }
   }
 }

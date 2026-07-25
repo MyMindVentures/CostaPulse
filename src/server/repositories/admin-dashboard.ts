@@ -1,40 +1,36 @@
 import "server-only";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+import { AdminApiError } from "@/server/admin/schemas";
+import {
+  fetchAdminDashboardOverview,
+  type AdminDashboardOverview
+} from "@/server/repositories/admin-ops";
 
 export type AdminDashboardSnapshot = {
   dataConnected: boolean;
-  metrics: {
-    bookings: number;
-    users: number;
-    experiences: number;
-  };
+  errorMessage: string | null;
+  overview: AdminDashboardOverview | null;
 };
 
 export async function getAdminDashboardSnapshot(): Promise<AdminDashboardSnapshot> {
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) {
+  try {
+    const overview = await fetchAdminDashboardOverview();
+    return {
+      dataConnected: true,
+      errorMessage: null,
+      overview
+    };
+  } catch (error) {
+    const message =
+      error instanceof AdminApiError
+        ? error.message
+        : error instanceof Error
+          ? error.message
+          : "Unable to load dashboard overview";
     return {
       dataConnected: false,
-      metrics: { bookings: 0, users: 0, experiences: 0 }
+      errorMessage: message,
+      overview: null
     };
   }
-
-  const [bookings, users, experiences] = await Promise.all([
-    supabase.from("bookings").select("id", { count: "exact", head: true }),
-    supabase.from("profiles").select("id", { count: "exact", head: true }),
-    supabase.from("experiences").select("id", { count: "exact", head: true })
-  ]);
-
-  const hasError = [bookings, users, experiences].some(
-    (result) => result.error
-  );
-
-  return {
-    dataConnected: !hasError,
-    metrics: {
-      bookings: bookings.count ?? 0,
-      users: users.count ?? 0,
-      experiences: experiences.count ?? 0
-    }
-  };
 }

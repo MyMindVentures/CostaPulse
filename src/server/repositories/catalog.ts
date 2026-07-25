@@ -9,6 +9,12 @@ import {
 import { selectPreferredPlacement } from "@/lib/media/media-placement";
 import { getPublishedMediaPlacements } from "@/server/repositories/media";
 import { summarizeAvailabilityFromSlots } from "@/server/availability/summarize";
+import { resolveAppLocale } from "@/i18n/locales";
+import {
+  pickLocalizedFields,
+  pickLocalizedString,
+  type LocalizedTextRow
+} from "@/lib/i18n/pick-localized";
 
 export type { ExperienceCardViewModel };
 
@@ -112,6 +118,8 @@ export type ExperienceDetailViewModel = ExperienceCardViewModel & {
   };
 };
 
+type NestedTranslations = LocalizedTextRow | LocalizedTextRow[] | null;
+
 type CardExperienceRow = {
   id: string;
   slug: string;
@@ -124,6 +132,7 @@ type CardExperienceRow = {
   category_label: string | null;
   experience_type?: string | null;
   highlights?: unknown;
+  experience_translations?: NestedTranslations;
   provider:
     | { display_name: string | null }
     | Array<{ display_name: string | null }>
@@ -140,6 +149,7 @@ type CardExperienceRow = {
     max_party_size: number | null;
     is_default: boolean;
     is_active: boolean;
+    experience_variant_translations?: NestedTranslations;
   }> | null;
   reviews?: Array<{
     id?: string;
@@ -172,6 +182,7 @@ type DetailExperienceRow = Omit<
     duration_minutes: number | null;
     subtitle: string | null;
     badge_label: string | null;
+    experience_variant_translations?: NestedTranslations;
   }> | null;
   experience_languages: Array<{
     language_code: string;
@@ -185,6 +196,7 @@ type DetailExperienceRow = Omit<
     starts_after_minutes: number | null;
     duration_minutes: number | null;
     display_order: number;
+    experience_itinerary_step_translations?: NestedTranslations;
   }> | null;
   experience_requirements: Array<{
     id: string;
@@ -193,6 +205,7 @@ type DetailExperienceRow = Omit<
     description: string | null;
     is_mandatory: boolean;
     display_order: number;
+    experience_requirement_translations?: NestedTranslations;
   }> | null;
   experience_policies: Array<{
     id: string;
@@ -202,6 +215,7 @@ type DetailExperienceRow = Omit<
     value_minutes: number | null;
     is_active: boolean;
     display_order: number;
+    experience_policy_translations?: NestedTranslations;
   }> | null;
   experience_locations: Array<{
     is_primary: boolean;
@@ -252,6 +266,42 @@ function toNullableNumber(
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function localizeExperienceCopy(
+  row: Pick<
+    CardExperienceRow,
+    | "title"
+    | "short_description"
+    | "description"
+    | "category_label"
+    | "location_name"
+    | "highlights"
+    | "experience_translations"
+  > & { inclusions?: unknown },
+  locale: string
+) {
+  return pickLocalizedFields({
+    locale,
+    translations: row.experience_translations,
+    base: {
+      title: row.title,
+      short_description: row.short_description,
+      description: row.description,
+      category_label: row.category_label,
+      location_name: row.location_name,
+      highlights: parseStringArray(row.highlights),
+      inclusions: parseStringArray(row.inclusions)
+    },
+    stringKeys: [
+      "title",
+      "short_description",
+      "description",
+      "category_label",
+      "location_name"
+    ],
+    arrayKeys: ["highlights", "inclusions"]
+  });
+}
+
 function mapCardExperience(
   row: CardExperienceRow,
   media: Awaited<ReturnType<typeof getPublishedMediaPlacements>> extends Map<
@@ -259,8 +309,10 @@ function mapCardExperience(
     infer T
   >
     ? T
-    : never
+    : never,
+  locale: string
 ): ExperienceCardViewModel {
+  const copy = localizeExperienceCopy(row, locale);
   const variants = (row.experience_variants ?? [])
     .filter((variant) => variant.is_active)
     .sort((left, right) => left.unit_amount_minor - right.unit_amount_minor);
@@ -271,21 +323,21 @@ function mapCardExperience(
   return experienceCardSchema.parse({
     id: row.id,
     slug: row.slug,
-    title: row.title,
-    shortDescription: row.short_description,
-    description: row.description,
+    title: copy.title,
+    shortDescription: copy.short_description,
+    description: copy.description,
     durationMinutes: row.duration_minutes,
     baseCapacity: row.base_capacity,
-    locationName: row.location_name,
+    locationName: copy.location_name,
     heroImagePath: hero?.storagePath ?? null,
     heroImageUrl: hero?.url ?? null,
     heroImageAlt: hero?.altText ?? null,
     heroFocalX: hero?.focalX ?? 50,
     heroFocalY: hero?.focalY ?? 50,
-    categoryLabel: row.category_label,
+    categoryLabel: copy.category_label,
     providerName: getProviderName(row.provider),
     experienceType: row.experience_type?.trim() || null,
-    highlights: parseStringArray(row.highlights),
+    highlights: copy.highlights,
     startingPriceMinor: cheapestVariant?.unit_amount_minor ?? null,
     currency: cheapestVariant?.currency?.trim() ?? null,
     pricingModel: cheapestVariant?.pricing_model ?? null,
@@ -297,9 +349,11 @@ function mapCardExperience(
 function mapDetailExperience(
   row: DetailExperienceRow,
   placements: NonNullable<Parameters<typeof mapCardExperience>[1]>,
-  availabilitySummary: string | null
+  availabilitySummary: string | null,
+  locale: string
 ): ExperienceDetailViewModel {
-  const card = mapCardExperience(row, placements);
+  const copy = localizeExperienceCopy(row, locale);
+  const card = mapCardExperience(row, placements, locale);
   const variants = (row.experience_variants ?? [])
     .filter((variant) => variant.is_active)
     .sort((left, right) => {
@@ -309,16 +363,37 @@ function mapDetailExperience(
     .map((variant) => ({
       id: variant.id,
       slug: variant.slug,
-      name: variant.name,
-      description: variant.description,
+      name:
+        pickLocalizedString({
+          locale,
+          translations: variant.experience_variant_translations,
+          field: "name",
+          fallback: variant.name
+        }) ?? variant.name,
+      description: pickLocalizedString({
+        locale,
+        translations: variant.experience_variant_translations,
+        field: "description",
+        fallback: variant.description
+      }),
       pricingModel: variant.pricing_model,
       unitAmountMinor: variant.unit_amount_minor,
       currency: variant.currency.trim(),
       minPartySize: variant.min_party_size,
       maxPartySize: variant.max_party_size,
       durationMinutes: variant.duration_minutes,
-      subtitle: variant.subtitle,
-      badgeLabel: variant.badge_label,
+      subtitle: pickLocalizedString({
+        locale,
+        translations: variant.experience_variant_translations,
+        field: "subtitle",
+        fallback: variant.subtitle
+      }),
+      badgeLabel: pickLocalizedString({
+        locale,
+        translations: variant.experience_variant_translations,
+        field: "badge_label",
+        fallback: variant.badge_label
+      }),
       isDefault: variant.is_default
     }));
 
@@ -371,8 +446,8 @@ function mapDetailExperience(
     startingPriceMinor: variants[0]?.unitAmountMinor ?? card.startingPriceMinor,
     currency: variants[0]?.currency ?? card.currency,
     pricingModel: variants[0]?.pricingModel ?? card.pricingModel,
-    highlights: parseStringArray(row.highlights),
-    inclusions: parseStringArray(row.inclusions),
+    highlights: copy.highlights,
+    inclusions: copy.inclusions,
     timezone: row.timezone || "Europe/Madrid",
     media,
     variants,
@@ -387,8 +462,19 @@ function mapDetailExperience(
       .sort((left, right) => left.display_order - right.display_order)
       .map((step) => ({
         id: step.id,
-        title: step.title,
-        description: step.description,
+        title:
+          pickLocalizedString({
+            locale,
+            translations: step.experience_itinerary_step_translations,
+            field: "title",
+            fallback: step.title
+          }) ?? step.title,
+        description: pickLocalizedString({
+          locale,
+          translations: step.experience_itinerary_step_translations,
+          field: "description",
+          fallback: step.description
+        }),
         startsAfterMinutes: step.starts_after_minutes,
         durationMinutes: step.duration_minutes,
         displayOrder: step.display_order
@@ -398,8 +484,19 @@ function mapDetailExperience(
       .map((requirement) => ({
         id: requirement.id,
         requirementType: requirement.requirement_type,
-        title: requirement.title,
-        description: requirement.description,
+        title:
+          pickLocalizedString({
+            locale,
+            translations: requirement.experience_requirement_translations,
+            field: "title",
+            fallback: requirement.title
+          }) ?? requirement.title,
+        description: pickLocalizedString({
+          locale,
+          translations: requirement.experience_requirement_translations,
+          field: "description",
+          fallback: requirement.description
+        }),
         isMandatory: requirement.is_mandatory,
         displayOrder: requirement.display_order
       })),
@@ -409,8 +506,19 @@ function mapDetailExperience(
       .map((policy) => ({
         id: policy.id,
         policyType: policy.policy_type,
-        title: policy.title,
-        description: policy.description,
+        title:
+          pickLocalizedString({
+            locale,
+            translations: policy.experience_policy_translations,
+            field: "title",
+            fallback: policy.title
+          }) ?? policy.title,
+        description: pickLocalizedString({
+          locale,
+          translations: policy.experience_policy_translations,
+          field: "description",
+          fallback: policy.description
+        }),
         valueMinutes: policy.value_minutes,
         displayOrder: policy.display_order
       })),
@@ -447,7 +555,10 @@ const cardSelect = `
   location_name,
   category_label,
   experience_type,
-  highlights
+  highlights,
+  experience_translations(
+    locale, title, short_description, description, category_label, location_name, highlights, inclusions
+  )
 `;
 
 const detailSelect = `
@@ -465,15 +576,28 @@ const detailSelect = `
   highlights,
   inclusions,
   provider:profiles!experiences_provider_profile_id_fkey(display_name),
+  experience_translations(
+    locale, title, short_description, description, category_label, location_name, highlights, inclusions
+  ),
   experience_variants(
     id, slug, name, description, pricing_model, unit_amount_minor, currency,
     min_party_size, max_party_size, is_default, is_active, duration_minutes,
-    subtitle, badge_label
+    subtitle, badge_label,
+    experience_variant_translations(locale, name, description, subtitle, badge_label)
   ),
   experience_languages(language_code, display_name, is_primary),
-  experience_itinerary_steps(id, title, description, starts_after_minutes, duration_minutes, display_order),
-  experience_requirements(id, requirement_type, title, description, is_mandatory, display_order),
-  experience_policies(id, policy_type, title, description, value_minutes, is_active, display_order),
+  experience_itinerary_steps(
+    id, title, description, starts_after_minutes, duration_minutes, display_order,
+    experience_itinerary_step_translations(locale, title, description)
+  ),
+  experience_requirements(
+    id, requirement_type, title, description, is_mandatory, display_order,
+    experience_requirement_translations(locale, title, description)
+  ),
+  experience_policies(
+    id, policy_type, title, description, value_minutes, is_active, display_order,
+    experience_policy_translations(locale, title, description)
+  ),
   experience_locations(
     is_primary, display_order, is_active, meeting_point_override,
     location:locations(id, name, slug, address_line_1, city, latitude, longitude, meeting_point_notes, is_active)
@@ -482,8 +606,10 @@ const detailSelect = `
 `;
 
 export async function getPublishedExperienceCards(
-  limit?: number
+  limit?: number,
+  locale?: string
 ): Promise<ExperienceCardViewModel[]> {
+  const resolvedLocale = resolveAppLocale(locale);
   const supabase = await createSupabaseServerClient();
   if (!supabase) return [];
 
@@ -513,7 +639,7 @@ export async function getPublishedExperienceCards(
       ? supabase
           .from("experience_variants")
           .select(
-            "id, experience_id, slug, name, description, pricing_model, unit_amount_minor, currency, min_party_size, max_party_size, is_default, is_active"
+            "id, experience_id, slug, name, description, pricing_model, unit_amount_minor, currency, min_party_size, max_party_size, is_default, is_active, experience_variant_translations(locale, name, description, subtitle, badge_label)"
           )
           .in("experience_id", experienceIds)
           .eq("is_active", true)
@@ -549,7 +675,9 @@ export async function getPublishedExperienceCards(
               min_party_size: variant.min_party_size,
               max_party_size: variant.max_party_size,
               is_default: variant.is_default,
-              is_active: variant.is_active
+              is_active: variant.is_active,
+              experience_variant_translations:
+                variant.experience_variant_translations as NestedTranslations
             })),
           reviews: reviews
             .filter((review) => review.experience_id === row.id)
@@ -558,7 +686,8 @@ export async function getPublishedExperienceCards(
               status: review.status
             }))
         },
-        mediaBySlug.get(row.slug) ?? []
+        mediaBySlug.get(row.slug) ?? [],
+        resolvedLocale
       )
     );
   } catch {
@@ -567,8 +696,10 @@ export async function getPublishedExperienceCards(
 }
 
 export async function getPublishedExperienceBySlug(
-  slug: string
+  slug: string,
+  locale?: string
 ): Promise<ExperienceDetailViewModel | null> {
+  const resolvedLocale = resolveAppLocale(locale);
   const supabase = await createSupabaseServerClient();
   if (!supabase) return null;
 
@@ -602,7 +733,8 @@ export async function getPublishedExperienceBySlug(
     return mapDetailExperience(
       detailRow,
       mediaBySlug.get(slug) ?? [],
-      availabilitySummary
+      availabilitySummary,
+      resolvedLocale
     );
   } catch {
     return null;

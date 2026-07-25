@@ -7,12 +7,12 @@ export type ProtectedArea = "account" | "partner" | "admin";
 
 export async function requireAreaAccess(area: ProtectedArea) {
   const supabase = await createSupabaseServerClient();
-  if (!supabase) redirect("/?auth=required");
+  if (!supabase) redirect("/login?auth=required");
 
   const {
     data: { user }
   } = await supabase.auth.getUser();
-  if (!user) redirect("/?auth=required");
+  if (!user) redirect("/login?auth=required");
 
   const { data, error } = await supabase
     .from("user_roles")
@@ -25,7 +25,7 @@ export async function requireAreaAccess(area: ProtectedArea) {
     (area === "account" ||
       (area === "partner" && roles.some(isTeamRole)) ||
       (area === "admin" && canAccessAdminArea(roles)));
-  if (!authorized) redirect("/?auth=forbidden");
+  if (!authorized) redirect("/login?auth=forbidden");
 
   return { userId: user.id, roles };
 }

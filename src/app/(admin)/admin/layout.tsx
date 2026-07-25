@@ -1,21 +1,38 @@
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 import { DashboardShell } from "@/components/layout/DashboardShell";
-import { DASHBOARD_NAVIGATION } from "@/config/navigation";
+import { getAdminDashboardNavItems } from "@/config/navigation";
+import { SignOutButton } from "@/features/auth/sign-out-button";
 import { requireAreaAccess } from "@/server/auth/protected-area";
+import { filterAdminNavSections } from "@/server/auth/role-access";
+
 export default async function AdminLayout({
   children
 }: {
   children: ReactNode;
 }) {
-  await requireAreaAccess("admin");
+  const { roles } = await requireAreaAccess("admin");
   const t = await getTranslations("Dashboards");
+  const sections = filterAdminNavSections(roles, [
+    "overview",
+    "bookings",
+    "calendar",
+    "customers"
+  ]);
+  const items = getAdminDashboardNavItems(sections);
+
   return (
     <DashboardShell
       title={t("admin.title")}
       navigationLabel={t("navigationLabel")}
-      items={DASHBOARD_NAVIGATION.admin}
-      labels={{ overview: t("overview") }}
+      items={items}
+      labels={{
+        overview: t("overview"),
+        bookings: t("bookings"),
+        calendar: t("calendar"),
+        customers: t("customers")
+      }}
+      footer={<SignOutButton label={t("signOut")} />}
     >
       {children}
     </DashboardShell>

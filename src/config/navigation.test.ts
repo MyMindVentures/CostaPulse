@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   DASHBOARD_NAVIGATION,
   getAccountNav,
+  getAdminDashboardNavItems,
   isNavHrefActive,
   isNavItemTreeActive
 } from "./navigation";
@@ -13,7 +14,12 @@ describe("dashboard navigation", () => {
       "/account/bookings"
     ]);
     expect(DASHBOARD_NAVIGATION.partner[0].href).toBe("/partner");
-    expect(DASHBOARD_NAVIGATION.admin[0].href).toBe("/admin");
+    expect(DASHBOARD_NAVIGATION.admin.map((item) => item.href)).toEqual([
+      "/admin",
+      "/admin/bookings",
+      "/admin/calendar",
+      "/admin/customers"
+    ]);
   });
 });
 
@@ -42,6 +48,14 @@ describe("isNavHrefActive", () => {
     expect(isNavHrefActive("/", "/")).toBe(true);
     expect(isNavHrefActive("/", "/experiences")).toBe(false);
   });
+
+  it("only treats dashboard roots as active on their exact path", () => {
+    expect(isNavHrefActive("/admin", "/admin")).toBe(true);
+    expect(isNavHrefActive("/admin", "/admin/bookings")).toBe(false);
+    expect(isNavHrefActive("/admin/bookings", "/admin/bookings/abc")).toBe(
+      true
+    );
+  });
 });
 
 describe("isNavItemTreeActive", () => {
@@ -64,7 +78,18 @@ describe("isNavItemTreeActive", () => {
 describe("account nav", () => {
   it("varies the account slot by audience", () => {
     expect(getAccountNav("guest").labelKey).toBe("login");
+    expect(getAccountNav("guest").href).toBe("/login");
     expect(getAccountNav("customer").labelKey).toBe("account");
     expect(getAccountNav("admin").labelKey).toBe("admin");
+  });
+});
+
+describe("getAdminDashboardNavItems", () => {
+  it("filters admin nav by allowed sections", () => {
+    expect(
+      getAdminDashboardNavItems(["overview", "calendar"]).map(
+        (item) => item.href
+      )
+    ).toEqual(["/admin", "/admin/calendar"]);
   });
 });
