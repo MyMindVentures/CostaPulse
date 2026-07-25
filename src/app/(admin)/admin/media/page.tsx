@@ -28,6 +28,13 @@ export default async function AdminMediaPage({
     mimeType: params.mime || null,
     pageSize: 48
   });
+  const mediaResultKey = JSON.stringify([
+    params.q ?? "",
+    params.type ?? "",
+    params.usage ?? "",
+    params.entityType ?? "",
+    params.mime ?? ""
+  ]);
 
   return (
     <section className="flex flex-col gap-6">
@@ -116,6 +123,7 @@ export default async function AdminMediaPage({
       ) : null}
 
       <MediaLibraryClient
+        key={mediaResultKey}
         initial={media}
         labels={{
           upload: t("upload"),

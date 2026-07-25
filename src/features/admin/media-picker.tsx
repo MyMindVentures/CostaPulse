@@ -269,9 +269,7 @@ export function MediaLibraryClient({ initial, labels }: LibraryProps) {
           title: String(formData.get("title") ?? ""),
           alt_text: String(formData.get("alt_text") ?? ""),
           caption: String(formData.get("caption") ?? ""),
-          tags,
-          status: "published",
-          visibility: "public"
+          tags
         }
       });
       if (!result.ok) {
