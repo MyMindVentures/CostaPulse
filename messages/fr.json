@@ -725,7 +725,14 @@
       "mediaDeleteInUse": "This media asset cannot be deleted because it is still in use.",
       "mediaDeleteCancel": "Cancel",
       "mediaDeleteConfirm": "Delete asset",
-      "mediaDeleteSuccess": "Media asset deleted."
+      "mediaDeleteSuccess": "Media asset deleted.",
+      "mediaEditTitle": "Edit media asset",
+      "mediaEdit": "Edit",
+      "mediaEditCancel": "Cancel",
+      "mediaSaveChanges": "Save changes",
+      "mediaUpdateSuccess": "Media asset updated successfully.",
+      "mediaUpdateError": "The media asset could not be updated.",
+      "mediaDiscardChanges": "You have unsaved changes. Discard them?"
     },
     "experiences": "Expériences",
     "media": "Médias",

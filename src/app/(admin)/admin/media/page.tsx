@@ -5,7 +5,10 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { MediaLibraryClient } from "@/features/admin/media-picker";
 import { fetchAdminMedia } from "@/server/repositories/admin-cms";
 import { requireAreaAccess } from "@/server/auth/protected-area";
-import { canDeleteAdminMedia } from "@/server/auth/role-access";
+import {
+  canDeleteAdminMedia,
+  canMutateAdminContent
+} from "@/server/auth/role-access";
 
 type SearchParams = Promise<{
   q?: string;
@@ -129,6 +132,7 @@ export default async function AdminMediaPage({
         key={mediaResultKey}
         initial={media}
         canDelete={canDeleteAdminMedia(roles)}
+        canEdit={canMutateAdminContent(roles)}
         labels={{
           upload: t("upload"),
           delete: t("delete"),
@@ -147,7 +151,14 @@ export default async function AdminMediaPage({
           deleteInUse: t("mediaDeleteInUse"),
           deleteCancel: t("mediaDeleteCancel"),
           deleteConfirm: t("mediaDeleteConfirm"),
-          deleteSuccess: t("mediaDeleteSuccess")
+          deleteSuccess: t("mediaDeleteSuccess"),
+          editTitle: t("mediaEditTitle"),
+          edit: t("mediaEdit"),
+          cancel: t("mediaEditCancel"),
+          saveChanges: t("mediaSaveChanges"),
+          updateSuccess: t("mediaUpdateSuccess"),
+          updateError: t("mediaUpdateError"),
+          discard: t("mediaDiscardChanges")
         }}
       />
     </section>

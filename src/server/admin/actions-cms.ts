@@ -428,24 +428,70 @@ export async function replaceTeamCollectionAction(input: {
 
 export async function upsertMediaAssetAction(input: {
   id: string;
-  payload: Record<string, unknown>;
+  payload: unknown;
 }): Promise<AdminActionResult> {
   const { roles } = await requireAreaAccess("admin");
   if (!canMutateAdminContent(roles)) {
     return { ok: false, message: "Forbidden", status: 403 };
   }
+  const nullableText = z.preprocess(
+    (value) =>
+      typeof value === "string" && value.trim() === "" ? null : value,
+    z.string().trim().max(20000).nullable()
+  );
+  const payloadSchema = z
+    .object({
+      title: nullableText.optional(),
+      alt_text: nullableText.optional(),
+      caption: nullableText.optional(),
+      description: nullableText.optional(),
+      tags: z.array(z.string().trim().min(1).max(100)).max(100).optional(),
+      status: z.enum(["draft", "published", "archived"]).optional(),
+      visibility: z.enum(["public", "authenticated", "private"]).optional(),
+      is_active: z.boolean().optional(),
+      published_at: z.iso.datetime({ offset: true }).nullable().optional(),
+      starts_at: z.iso.datetime({ offset: true }).nullable().optional(),
+      ends_at: z.iso.datetime({ offset: true }).nullable().optional(),
+      focal_x: z.number().min(0).max(100).optional(),
+      focal_y: z.number().min(0).max(100).optional(),
+      dominant_color: z
+        .string()
+        .regex(/^#[0-9A-Fa-f]{6}$/)
+        .nullable()
+        .optional(),
+      display_order: z.number().int().optional(),
+      is_primary: z.boolean().optional(),
+      link_url: nullableText.optional(),
+      open_in_new_tab: z.boolean().optional(),
+      placement_key: nullableText.optional(),
+      scope_type: nullableText.optional(),
+      scope_key: nullableText.optional(),
+      page_path: nullableText.optional(),
+      section_key: nullableText.optional(),
+      component_key: nullableText.optional(),
+      locale: nullableText.optional(),
+      breakpoint: z.string().trim().min(1).max(100).optional(),
+      role: z.string().trim().min(1).max(100).optional(),
+      variant: nullableText.optional()
+    })
+    .strict()
+    .refine(
+      (value) =>
+        !value.starts_at || !value.ends_at || value.starts_at < value.ends_at,
+      { message: "Start must be before end", path: ["ends_at"] }
+    );
   const parsed = z
     .object({
       id: z.string().uuid(),
-      payload: z.record(z.string(), z.unknown())
+      payload: payloadSchema
     })
     .safeParse(input);
   if (!parsed.success) return { ok: false, message: "Invalid media payload" };
 
   try {
-    await upsertAdminMediaAsset(parsed.data);
+    const asset = await upsertAdminMediaAsset(parsed.data);
     revalidatePath("/admin/media");
-    return { ok: true };
+    return { ok: true, data: asset };
   } catch (error) {
     return toActionError(error);
   }
