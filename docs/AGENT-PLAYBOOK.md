@@ -24,6 +24,7 @@ npm run format:check   # Prettier check
 npm run guardrails     # i18n parity, no production mocks, stack, companion tests
 npm run build          # Production build + standalone prepare
 npm run check          # format:check + lint + typecheck + test + build
+npm run production:check # Repository-wide lint, types, tests, and production build
 npm run storybook      # Component catalog (ui + shared)
 ```
 
@@ -33,13 +34,15 @@ Agents must not remove, weaken, skip, or reintroduce `--passWithNoTests` to gree
 
 Local gates run automatically; do not bypass them to land broken work.
 
-| Hook         | Runs                                                                            |
-| ------------ | ------------------------------------------------------------------------------- |
-| `pre-commit` | Block staged secrets → `lint-staged` (Prettier + ESLint) → `npm run guardrails` |
-| `commit-msg` | Conventional Commits via commitlint                                             |
-| `pre-push`   | `npm run typecheck` + `npm run test`                                            |
+| Hook         | Runs                                                                         |
+| ------------ | ---------------------------------------------------------------------------- |
+| `pre-commit` | Secrets → staged formatting/lint → guardrails → full production-parity check |
+| `commit-msg` | Conventional Commits via commitlint                                          |
+| `pre-push`   | `npm run typecheck` + `npm run test`                                         |
 
-Build, Storybook, and Playwright stay in CI. Skipping hooks (`--no-verify` / `HUSKY=0`) is for emergencies only and must be called out in the PR.
+The pre-commit production-parity check formats and lints staged files, then runs repository-wide linting, type checking, unit/component tests, and the same `npm run build` command used by production. Storybook and Playwright stay in CI. Skipping hooks (`--no-verify` / `HUSKY=0`) is for emergencies only and must be called out in the PR.
+
+This gate proves that the committed source can pass the production build path. It cannot prove parity of mutable live data, secret values, Railway dashboard overrides, DNS, external services, or a deployment that has not happened yet; those remain release-time checks.
 
 ## File map
 

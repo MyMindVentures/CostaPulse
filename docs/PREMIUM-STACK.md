@@ -54,7 +54,7 @@ Analytics is never an operational source of truth. Never log secrets or unnecess
 - Playwright
 - ESLint 9
 - Prettier with Tailwind sorting
-- Husky + lint-staged (pre-commit)
+- Husky + lint-staged + full production-parity check (pre-commit)
 - commitlint (conventional commit messages)
 - `npm run guardrails` (i18n catalogs, no production mocks, stack deps, companion tests)
 
@@ -70,7 +70,7 @@ npm run test:e2e
 npm run build
 ```
 
-Local git hooks: `pre-commit` (secrets + lint-staged + guardrails), `commit-msg` (commitlint), `pre-push` (typecheck + unit tests). CI still owns build, Storybook, and e2e.
+Local git hooks: `pre-commit` (secrets + staged formatting/lint + guardrails + repository-wide lint, typecheck, unit tests, and production build), `commit-msg` (commitlint), `pre-push` (typecheck + unit tests). CI still owns Storybook and e2e.
 
 ## Agent rules
 
