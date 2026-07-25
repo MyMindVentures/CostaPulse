@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ExperienceDetailPageFeature } from "@/features/experiences/experience-detail-page";
+import { ExperienceDetail } from "@/features/experiences/detail/experience-detail";
 import { getExperienceHeroImageSrc } from "@/lib/media/experience-media";
 import { getPublishedExperienceBySlug } from "@/server/repositories/catalog";
 
@@ -101,7 +101,7 @@ export default async function ExperiencePage({ params }: ExperiencePageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <ExperienceDetailPageFeature experience={experience} />
+      <ExperienceDetail experience={experience} />
     </>
   );
 }
