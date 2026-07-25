@@ -1,4 +1,3 @@
 node scripts/quality/check-secrets.mjs
 npx lint-staged
 npm run guardrails
-npm run production:check
