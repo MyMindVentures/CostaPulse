@@ -12,6 +12,7 @@ const overflowRoutes = [
   { name: "homepage", path: "/" },
   { name: "experiences catalog", path: "/experiences" },
   { name: "experiences map", path: "/experiences/map" },
+  { name: "team", path: "/team" },
   { name: "booking", path: "/book" }
 ] as const;
 

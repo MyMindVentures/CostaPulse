@@ -104,6 +104,29 @@ Every frontend implementation must:
 - Work correctly for zero, one or many records and missing optional media or metadata.
 - Produce no console errors, TypeScript errors, broken routes or dead interactions.
 
+## Route discoverability and sitemap
+
+Every new App Router page must be reachable through the website in the same
+change set.
+
+- Add every new public static page to the verified database-backed site
+  navigation, including translations for every enabled locale.
+- Add every new account, partner or admin section page to the appropriate
+  navigation configuration.
+- Detail, create, result and other nested flow pages do not need a global
+  navigation item when their nearest static parent section is in navigation and
+  the new page is linked from that real, working section flow.
+- Add every new indexable public page to `src/app/sitemap.ts`. Dynamic public
+  pages must be emitted from their real backend records; private, authenticated,
+  transactional, success/cancel and `noindex` pages must not be added.
+- Update route documentation and navigation/sitemap tests when the route
+  surface changes.
+- Never ship an orphan page that is only reachable by manually typing its URL.
+
+The staged-page discoverability guardrail runs in pre-commit. Do not bypass it
+or satisfy it with a dead link, fabricated navigation record or inappropriate
+sitemap entry.
+
 ## Responsive by default
 
 Every frontend implementation must be fully responsive and production-ready across smartphone, tablet, laptop, desktop and large desktop viewports.
@@ -245,6 +268,9 @@ A frontend task is complete only when:
 - No schema, contract, data or behavior was invented.
 - No production mocks, placeholder functionality or static mockups remain.
 - The requested user flow works end-to-end.
+- Every new page is reachable through global navigation or a real navigated
+  parent flow, and every indexable public route is represented correctly in the
+  sitemap.
 - Loading, empty, error, validation, success and authorization states work.
 - The UI follows the CostaPulse design system and works responsively and accessibly.
 - The implementation was verified on representative smartphone, tablet, laptop and desktop viewports.
