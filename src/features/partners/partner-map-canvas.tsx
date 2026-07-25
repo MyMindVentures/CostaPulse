@@ -261,10 +261,10 @@ export function PartnerMapCanvas({
   }, [items, ready, selectedSlug]);
 
   return (
-    <div className="relative h-full min-h-0 w-full">
+    <div className="map-canvas-wrap relative min-h-0">
       <div
         ref={nodeRef}
-        className="absolute inset-0"
+        className="map-canvas"
         role="region"
         aria-label={t("mapLabel")}
       />
