@@ -1,14 +1,13 @@
 import "server-only";
-import { resolveExperienceMediaUrl } from "@/lib/media/experience-media";
+
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import {
-  aggregatePublishedRatings,
-  resolveHeroMedia
-} from "@/features/experiences/card-data";
+import { aggregatePublishedRatings } from "@/features/experiences/card-data";
 import {
   experienceCardSchema,
   type ExperienceCardViewModel
 } from "@/lib/view-models/experience-card";
+import { selectPreferredPlacement } from "@/lib/media/media-placement";
+import { getPublishedMediaPlacements } from "@/server/repositories/media";
 import { summarizeAvailabilityFromSlots } from "@/server/availability/summarize";
 
 export type { ExperienceCardViewModel };
@@ -31,13 +30,23 @@ export type ExperienceDetailVariant = {
 
 export type ExperienceDetailMedia = {
   id: string;
+  assetKey: string;
+  placementKey: string;
+  role: string;
+  breakpoint: string;
   storagePath: string;
   url: string | null;
   mediaType: string;
+  mimeType: string | null;
   altText: string | null;
   caption: string | null;
-  isHero: boolean;
+  focalX: number;
+  focalY: number;
+  width: number | null;
+  height: number | null;
+  durationSeconds: number | null;
   displayOrder: number;
+  isPrimary: boolean;
 };
 
 export type ExperienceDetailLocation = {
@@ -112,7 +121,6 @@ type CardExperienceRow = {
   duration_minutes: number;
   base_capacity: number;
   location_name: string | null;
-  hero_image_path: string | null;
   category_label: string | null;
   experience_type?: string | null;
   highlights?: unknown;
@@ -133,20 +141,6 @@ type CardExperienceRow = {
     is_default: boolean;
     is_active: boolean;
   }> | null;
-  experience_media?: Array<{
-    id?: string;
-    storage_path: string;
-    media_type: string;
-    alt_text: string | null;
-    caption?: string | null;
-    is_hero: boolean;
-    display_order: number;
-    media_asset_id?: string | null;
-    media_assets?: {
-      bucket_id: string;
-      storage_path: string;
-    } | null;
-  }> | null;
   reviews?: Array<{
     id?: string;
     rating: number;
@@ -157,25 +151,9 @@ type CardExperienceRow = {
   }> | null;
 };
 
-type DetailExperienceRow = {
-  id: string;
-  slug: string;
-  title: string;
-  short_description: string | null;
-  description: string | null;
-  duration_minutes: number;
-  base_capacity: number;
-  location_name: string | null;
-  hero_image_path: string | null;
-  category_label: string | null;
-  experience_type?: string | null;
+type DetailExperienceRow = CardExperienceRow & {
   timezone: string;
-  highlights: unknown;
   inclusions: unknown;
-  provider:
-    | { display_name: string | null }
-    | Array<{ display_name: string | null }>
-    | null;
   experience_variants: Array<{
     id: string;
     slug: string;
@@ -191,20 +169,6 @@ type DetailExperienceRow = {
     duration_minutes: number | null;
     subtitle: string | null;
     badge_label: string | null;
-  }> | null;
-  experience_media: Array<{
-    id: string;
-    storage_path: string;
-    media_type: string;
-    alt_text: string | null;
-    caption: string | null;
-    is_hero: boolean;
-    display_order: number;
-    media_asset_id?: string | null;
-    media_assets?: {
-      bucket_id: string;
-      storage_path: string;
-    } | null;
   }> | null;
   experience_languages: Array<{
     language_code: string;
@@ -263,13 +227,8 @@ type DetailExperienceRow = {
   }> | null;
 };
 
-function getProviderName(
-  provider: CardExperienceRow["provider"]
-): string | null {
-  if (Array.isArray(provider)) {
-    return provider[0]?.display_name ?? null;
-  }
-
+function getProviderName(provider: CardExperienceRow["provider"]): string | null {
+  if (Array.isArray(provider)) return provider[0]?.display_name ?? null;
   return provider?.display_name ?? null;
 }
 
@@ -280,34 +239,26 @@ function parseStringArray(value: unknown): string[] {
   );
 }
 
-function toNullableNumber(
-  value: number | string | null | undefined
-): number | null {
+function toNullableNumber(value: number | string | null | undefined): number | null {
   if (value === null || value === undefined) return null;
   const parsed = typeof value === "number" ? value : Number(value);
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-async function mapCardExperience(
-  row: CardExperienceRow
-): Promise<ExperienceCardViewModel> {
+function mapCardExperience(
+  row: CardExperienceRow,
+  media: Awaited<ReturnType<typeof getPublishedMediaPlacements>> extends Map<
+    string,
+    infer T
+  >
+    ? T
+    : never
+): ExperienceCardViewModel {
   const variants = (row.experience_variants ?? [])
     .filter((variant) => variant.is_active)
     .sort((left, right) => left.unit_amount_minor - right.unit_amount_minor);
-
   const cheapestVariant = variants[0] ?? null;
-
-  const hero = resolveHeroMedia(
-    (row.experience_media ?? []).map((item) => ({
-      storagePath: item.storage_path,
-      mediaType: item.media_type,
-      altText: item.alt_text,
-      isHero: item.is_hero,
-      displayOrder: item.display_order
-    })),
-    row.hero_image_path
-  );
-
+  const hero = selectPreferredPlacement(media ?? [], ["card", "hero"]);
   const ratingSummary = aggregatePublishedRatings(row.reviews ?? []);
 
   return experienceCardSchema.parse({
@@ -319,8 +270,11 @@ async function mapCardExperience(
     durationMinutes: row.duration_minutes,
     baseCapacity: row.base_capacity,
     locationName: row.location_name,
-    heroImagePath: hero.path,
-    heroImageAlt: hero.path ? hero.altText : null,
+    heroImagePath: hero?.storagePath ?? null,
+    heroImageUrl: hero?.url ?? null,
+    heroImageAlt: hero?.altText ?? null,
+    heroFocalX: hero?.focalX ?? 50,
+    heroFocalY: hero?.focalY ?? 50,
     categoryLabel: row.category_label,
     providerName: getProviderName(row.provider),
     experienceType: row.experience_type?.trim() || null,
@@ -333,18 +287,16 @@ async function mapCardExperience(
   });
 }
 
-async function mapDetailExperience(
+function mapDetailExperience(
   row: DetailExperienceRow,
+  placements: NonNullable<Parameters<typeof mapCardExperience>[1]>,
   availabilitySummary: string | null
-): Promise<ExperienceDetailViewModel> {
-  const card = await mapCardExperience(row);
-
+): ExperienceDetailViewModel {
+  const card = mapCardExperience(row, placements);
   const variants = (row.experience_variants ?? [])
     .filter((variant) => variant.is_active)
     .sort((left, right) => {
-      if (left.is_default !== right.is_default) {
-        return left.is_default ? -1 : 1;
-      }
+      if (left.is_default !== right.is_default) return left.is_default ? -1 : 1;
       return left.unit_amount_minor - right.unit_amount_minor;
     })
     .map((variant) => ({
@@ -363,71 +315,52 @@ async function mapDetailExperience(
       isDefault: variant.is_default
     }));
 
-  const media = [...(row.experience_media ?? [])]
-    .sort((left, right) => left.display_order - right.display_order)
-    .map((item) => ({
-      id: item.id,
-      storagePath: item.storage_path,
-      url: resolveExperienceMediaUrl(
-        item.storage_path,
-        item.media_assets
-          ? {
-              bucketId: item.media_assets.bucket_id,
-              storagePath: item.media_assets.storage_path
-            }
-          : null
-      ),
-      mediaType: item.media_type,
-      altText: item.alt_text,
-      caption: item.caption,
-      isHero: item.is_hero,
-      displayOrder: item.display_order
-    }));
-
-  const hero = resolveHeroMedia(
-    media.map((item) => ({
-      storagePath: item.storagePath,
-      mediaType: item.mediaType,
-      altText: item.altText,
-      isHero: item.isHero,
-      displayOrder: item.displayOrder
-    })),
-    row.hero_image_path
-  );
+  const media: ExperienceDetailMedia[] = placements.map((item) => ({
+    id: item.id,
+    assetKey: item.assetKey,
+    placementKey: item.placementKey,
+    role: item.role,
+    breakpoint: item.breakpoint,
+    storagePath: item.storagePath,
+    url: item.url,
+    mediaType: item.mediaType,
+    mimeType: item.mimeType,
+    altText: item.altText,
+    caption: item.caption,
+    focalX: item.focalX,
+    focalY: item.focalY,
+    width: item.width,
+    height: item.height,
+    durationSeconds: item.durationSeconds,
+    displayOrder: item.displayOrder,
+    isPrimary: item.isPrimary
+  }));
 
   const publishedReviews = (row.reviews ?? []).filter(
     (review) => review.status === "published"
   );
   const ratingSummary = aggregatePublishedRatings(publishedReviews);
-
   const locations = [...(row.experience_locations ?? [])]
-    .filter(
-      (entry) => entry.is_active && entry.location && entry.location.is_active
-    )
+    .filter((entry) => entry.is_active && entry.location?.is_active)
     .sort((left, right) => left.display_order - right.display_order)
-    .map((entry) => {
-      const location = entry.location!;
-      return {
-        id: location.id,
-        name: location.name,
-        slug: location.slug,
-        isPrimary: entry.is_primary,
-        addressLine1: location.address_line_1,
-        city: location.city,
-        latitude: toNullableNumber(location.latitude),
-        longitude: toNullableNumber(location.longitude),
-        meetingInstructions:
-          entry.meeting_point_override?.trim() ||
-          location.meeting_point_notes?.trim() ||
-          null,
-        displayOrder: entry.display_order
-      };
-    });
+    .map((entry) => ({
+      id: entry.location!.id,
+      name: entry.location!.name,
+      slug: entry.location!.slug,
+      isPrimary: entry.is_primary,
+      addressLine1: entry.location!.address_line_1,
+      city: entry.location!.city,
+      latitude: toNullableNumber(entry.location!.latitude),
+      longitude: toNullableNumber(entry.location!.longitude),
+      meetingInstructions:
+        entry.meeting_point_override?.trim() ||
+        entry.location!.meeting_point_notes?.trim() ||
+        null,
+      displayOrder: entry.display_order
+    }));
 
   return {
     ...card,
-    heroImagePath: hero.path,
-    heroImageAlt: hero.altText,
     startingPriceMinor: variants[0]?.unitAmountMinor ?? card.startingPriceMinor,
     currency: variants[0]?.currency ?? card.currency,
     pricingModel: variants[0]?.pricingModel ?? card.pricingModel,
@@ -480,15 +413,10 @@ async function mapDetailExperience(
       averageRating: ratingSummary.averageRating,
       reviewCount: ratingSummary.reviewCount,
       items: publishedReviews
-        .sort((left, right) => {
-          const leftTime = left.published_at
-            ? Date.parse(left.published_at)
-            : 0;
-          const rightTime = right.published_at
-            ? Date.parse(right.published_at)
-            : 0;
-          return rightTime - leftTime;
-        })
+        .sort((left, right) =>
+          (right.published_at ? Date.parse(right.published_at) : 0) -
+          (left.published_at ? Date.parse(left.published_at) : 0)
+        )
         .map((review) => ({
           id: review.id,
           rating: review.rating,
@@ -509,42 +437,15 @@ const cardSelect = `
   duration_minutes,
   base_capacity,
   location_name,
-  hero_image_path,
   category_label,
   experience_type,
   highlights,
   provider:profiles!experiences_provider_profile_id_fkey(display_name),
   experience_variants(
-    id,
-    slug,
-    name,
-    description,
-    pricing_model,
-    unit_amount_minor,
-    currency,
-    min_party_size,
-    max_party_size,
-    is_default,
-    is_active
+    id, slug, name, description, pricing_model, unit_amount_minor, currency,
+    min_party_size, max_party_size, is_default, is_active
   ),
-  experience_media(
-    id,
-    storage_path,
-    media_type,
-    alt_text,
-    caption,
-    is_hero,
-    display_order,
-    media_asset_id,
-    media_assets(
-      bucket_id,
-      storage_path
-    )
-  ),
-  reviews(
-    rating,
-    status
-  )
+  reviews(rating, status)
 `;
 
 const detailSelect = `
@@ -556,7 +457,6 @@ const detailSelect = `
   duration_minutes,
   base_capacity,
   location_name,
-  hero_image_path,
   category_label,
   experience_type,
   timezone,
@@ -564,90 +464,19 @@ const detailSelect = `
   inclusions,
   provider:profiles!experiences_provider_profile_id_fkey(display_name),
   experience_variants(
-    id,
-    slug,
-    name,
-    description,
-    pricing_model,
-    unit_amount_minor,
-    currency,
-    min_party_size,
-    max_party_size,
-    is_default,
-    is_active,
-    duration_minutes,
-    subtitle,
-    badge_label
+    id, slug, name, description, pricing_model, unit_amount_minor, currency,
+    min_party_size, max_party_size, is_default, is_active, duration_minutes,
+    subtitle, badge_label
   ),
-  experience_media(
-    id,
-    storage_path,
-    media_type,
-    alt_text,
-    caption,
-    is_hero,
-    display_order,
-    media_asset_id,
-    media_assets(
-      bucket_id,
-      storage_path
-    )
-  ),
-  experience_languages(
-    language_code,
-    display_name,
-    is_primary
-  ),
-  experience_itinerary_steps(
-    id,
-    title,
-    description,
-    starts_after_minutes,
-    duration_minutes,
-    display_order
-  ),
-  experience_requirements(
-    id,
-    requirement_type,
-    title,
-    description,
-    is_mandatory,
-    display_order
-  ),
-  experience_policies(
-    id,
-    policy_type,
-    title,
-    description,
-    value_minutes,
-    is_active,
-    display_order
-  ),
+  experience_languages(language_code, display_name, is_primary),
+  experience_itinerary_steps(id, title, description, starts_after_minutes, duration_minutes, display_order),
+  experience_requirements(id, requirement_type, title, description, is_mandatory, display_order),
+  experience_policies(id, policy_type, title, description, value_minutes, is_active, display_order),
   experience_locations(
-    is_primary,
-    display_order,
-    is_active,
-    meeting_point_override,
-    location:locations(
-      id,
-      name,
-      slug,
-      address_line_1,
-      city,
-      latitude,
-      longitude,
-      meeting_point_notes,
-      is_active
-    )
+    is_primary, display_order, is_active, meeting_point_override,
+    location:locations(id, name, slug, address_line_1, city, latitude, longitude, meeting_point_notes, is_active)
   ),
-  reviews(
-    id,
-    rating,
-    title,
-    comment,
-    status,
-    published_at
-  )
+  reviews(id, rating, title, comment, status, published_at)
 `;
 
 export async function getPublishedExperienceCards(
@@ -665,18 +494,17 @@ export async function getPublishedExperienceCards(
     .order("created_at", { ascending: false });
 
   if (typeof limit === "number") query = query.limit(limit);
-
   const { data, error } = await query;
-  if (error || !data) {
-    return [];
-  }
+  if (error || !data) return [];
+
+  const rows = data as unknown as CardExperienceRow[];
+  const mediaBySlug = await getPublishedMediaPlacements(
+    "experience",
+    rows.map((row) => row.slug)
+  );
 
   try {
-    return await Promise.all(
-      (data as unknown as CardExperienceRow[]).map((row) =>
-        mapCardExperience(row)
-      )
-    );
+    return rows.map((row) => mapCardExperience(row, mediaBySlug.get(row.slug) ?? []));
   } catch {
     return [];
   }
@@ -694,28 +522,32 @@ export async function getPublishedExperienceBySlug(
     .eq("status", "published")
     .eq("slug", slug)
     .maybeSingle();
-
   if (error || !data) return null;
 
   const detailRow = data as unknown as DetailExperienceRow;
-  const timezone = detailRow.timezone || "Europe/Madrid";
-
-  const { data: slots } = await supabase
-    .from("availability_slots")
-    .select("starts_at")
-    .eq("experience_id", detailRow.id)
-    .eq("status", "scheduled")
-    .gte("starts_at", new Date().toISOString())
-    .order("starts_at", { ascending: true })
-    .limit(90);
+  const [{ data: slots }, mediaBySlug] = await Promise.all([
+    supabase
+      .from("availability_slots")
+      .select("starts_at")
+      .eq("experience_id", detailRow.id)
+      .eq("status", "scheduled")
+      .gte("starts_at", new Date().toISOString())
+      .order("starts_at", { ascending: true })
+      .limit(90),
+    getPublishedMediaPlacements("experience", [slug])
+  ]);
 
   const availabilitySummary = summarizeAvailabilityFromSlots(
     (slots ?? []).map((slot) => slot.starts_at),
-    timezone
+    detailRow.timezone || "Europe/Madrid"
   );
 
   try {
-    return await mapDetailExperience(detailRow, availabilitySummary);
+    return mapDetailExperience(
+      detailRow,
+      mediaBySlug.get(slug) ?? [],
+      availabilitySummary
+    );
   } catch {
     return null;
   }
