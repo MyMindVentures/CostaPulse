@@ -35,6 +35,7 @@ const opsContentRoles = new Set<AppRole>([
 export type AdminNavSection =
   | "overview"
   | "bookings"
+  | "bookingStories"
   | "calendar"
   | "customers"
   | "experiences"
@@ -52,6 +53,7 @@ const adminNavRoles: Record<AdminNavSection, ReadonlySet<AppRole>> = {
     "administrator",
     "super_administrator"
   ]),
+  bookingStories: contentRoles,
   calendar: new Set<AppRole>([
     "operations_staff",
     "customer_support",

@@ -267,7 +267,6 @@ npm run build
 
 - **Vitest** for application logic and validation
 - **React Testing Library** for user-visible component behaviour
-- **Playwright** for complete browser journeys
 - **ESLint** and **Prettier** for consistency
 - `npm run check` as the local quality gate
 

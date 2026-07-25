@@ -6,7 +6,8 @@ import { PartnerEditorForm } from "@/features/admin/partner-editor-form";
 import { AdminApiError } from "@/server/admin/schemas";
 import {
   fetchAdminMedia,
-  fetchAdminPartnerDetail
+  fetchAdminPartnerDetail,
+  fetchPartnerOwnerProfiles
 } from "@/server/repositories/admin-cms";
 
 type Props = { params: Promise<{ id: string }> };
@@ -30,9 +31,12 @@ export default async function AdminPartnerDetailPage({ params }: Props) {
     throw error;
   }
 
-  const media = await fetchAdminMedia({ pageSize: 48 });
+  const [media, ownerProfiles] = await Promise.all([
+    fetchAdminMedia({ pageSize: 48 }),
+    fetchPartnerOwnerProfiles()
+  ]);
   const referralUrl = partner.referral_code
-    ? `${siteUrl()}/?ref=${encodeURIComponent(partner.referral_code)}`
+    ? `${siteUrl()}/r/${encodeURIComponent(partner.referral_code)}`
     : null;
 
   return (
@@ -47,6 +51,7 @@ export default async function AdminPartnerDetailPage({ params }: Props) {
       <PartnerEditorForm
         partner={partner}
         mediaLibrary={media.items}
+        ownerProfiles={ownerProfiles}
         referralUrl={referralUrl}
         labels={{
           save: t("save"),

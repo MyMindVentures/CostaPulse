@@ -69,7 +69,8 @@ function participantsToJson(
 }
 
 export async function createExperienceBooking(
-  input: CreateBookingInput
+  input: CreateBookingInput,
+  referralSessionTokenHash?: string
 ): Promise<CreateBookingResult> {
   const supabase = createSupabaseAdminClient();
   if (!supabase) {
@@ -90,6 +91,38 @@ export async function createExperienceBooking(
     };
   }
 
+  if (referralSessionTokenHash) {
+    const { data: contextData, error: contextError } = await supabase.rpc(
+      "get_verified_referral_context",
+      { p_session_token_hash: referralSessionTokenHash }
+    );
+    const context =
+      contextData &&
+      typeof contextData === "object" &&
+      !Array.isArray(contextData)
+        ? (contextData as {
+            eligible_partners?: Array<{ referral_id?: string }>;
+          })
+        : null;
+    const eligible = context?.eligible_partners ?? [];
+    if (contextError) {
+      return {
+        ok: false,
+        status: 403,
+        code: "REFERRAL_SESSION_INVALID",
+        message: "The verified partner session is no longer valid."
+      };
+    }
+    if (eligible.length > 0 && !input.selectedReferralId) {
+      return {
+        ok: false,
+        status: 403,
+        code: "PARTNER_SELECTION_REQUIRED",
+        message: "Select an eligible partner before continuing."
+      };
+    }
+  }
+
   const { data, error } = await supabase.rpc("create_experience_booking", {
     p_availability_slot_id: input.availabilitySlotId,
     p_party_size: input.partySize,
@@ -101,7 +134,9 @@ export async function createExperienceBooking(
     p_special_requests: input.specialRequests ?? undefined,
     p_terms_accepted: input.termsAccepted,
     p_idempotency_key: input.idempotencyKey,
-    p_anonymous_session_id: input.anonymousSessionId ?? undefined
+    p_anonymous_session_id: input.anonymousSessionId ?? undefined,
+    p_selected_referral_id: input.selectedReferralId ?? undefined,
+    p_referral_session_token_hash: referralSessionTokenHash
   });
 
   if (error) {
@@ -122,45 +157,6 @@ export async function createExperienceBooking(
       code: "BOOKING_CREATE_FAILED",
       message: "The booking could not be created."
     };
-  }
-
-  if (input.referralCode) {
-    const { data: referral } = await supabase
-      .from("referrals")
-      .select("id, partner_id, status, expires_at")
-      .eq("code", input.referralCode)
-      .maybeSingle();
-
-    const isExpired =
-      referral?.expires_at != null &&
-      new Date(referral.expires_at).getTime() <= Date.now();
-
-    if (referral && referral.status === "active" && !isExpired) {
-      const { data: existing } = await supabase
-        .from("bookings")
-        .select("metadata")
-        .eq("id", payload.booking_id)
-        .maybeSingle();
-
-      const existingMetadata =
-        existing?.metadata &&
-        typeof existing.metadata === "object" &&
-        !Array.isArray(existing.metadata)
-          ? existing.metadata
-          : {};
-
-      await supabase
-        .from("bookings")
-        .update({
-          partner_id: referral.partner_id,
-          referral_id: referral.id,
-          metadata: {
-            ...existingMetadata,
-            referralCode: input.referralCode
-          }
-        })
-        .eq("id", payload.booking_id);
-    }
   }
 
   if (input.participants && input.participants.length > 0) {

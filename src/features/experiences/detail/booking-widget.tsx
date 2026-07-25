@@ -25,7 +25,6 @@ type BookingWidgetProps = {
     description: string | null;
     valueMinutes: number | null;
   }>;
-  referralCode?: string | null;
 };
 
 type AvailabilitySlot = {
@@ -71,8 +70,7 @@ export function BookingWidget({
   currency,
   averageRating,
   reviewCount,
-  policies,
-  referralCode
+  policies
 }: BookingWidgetProps) {
   const t = useTranslations("Booking");
   const initialVariant =
@@ -137,16 +135,8 @@ export function BookingWidget({
       partySize: String(partySize),
       slotId: selectedSlotId
     });
-    if (referralCode) params.set("ref", referralCode);
     return `/book/${encodeURIComponent(experienceSlug)}?${params.toString()}`;
-  }, [
-    date,
-    experienceSlug,
-    partySize,
-    referralCode,
-    selectedSlotId,
-    selectedVariant
-  ]);
+  }, [date, experienceSlug, partySize, selectedSlotId, selectedVariant]);
 
   function onVariantChange(variantId: string) {
     const next = variants.find((variant) => variant.id === variantId);

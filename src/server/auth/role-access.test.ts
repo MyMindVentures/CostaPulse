@@ -72,6 +72,9 @@ describe("admin section capabilities", () => {
     expect(canAccessAdminSection(["content_manager"], "overview")).toBe(true);
     expect(canAccessAdminSection(["content_manager"], "calendar")).toBe(true);
     expect(canAccessAdminSection(["content_manager"], "bookings")).toBe(false);
+    expect(canAccessAdminSection(["content_manager"], "bookingStories")).toBe(
+      true
+    );
     expect(canAccessAdminSection(["content_manager"], "customers")).toBe(false);
   });
 
@@ -104,6 +107,7 @@ describe("admin section capabilities", () => {
           "locations",
           "team",
           "bookings",
+          "bookingStories",
           "calendar",
           "customers"
         ]
@@ -115,6 +119,7 @@ describe("admin section capabilities", () => {
       "partners",
       "locations",
       "team",
+      "bookingStories",
       "calendar"
     ]);
   });

@@ -5,9 +5,14 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { getPublishedExperienceCards } from "@/server/repositories/catalog";
 import { ExperienceCard } from "./components/experience-card";
 
-export async function ExperiencesPageFeature() {
-  const [t, locale] = await Promise.all([
+export async function ExperiencesPageFeature({
+  referralVerified = false
+}: {
+  referralVerified?: boolean;
+} = {}) {
+  const [t, referralT, locale] = await Promise.all([
     getTranslations("ExperiencesPage"),
+    getTranslations("Referral"),
     getLocale()
   ]);
   const experiences = await getPublishedExperienceCards(undefined, locale);
@@ -16,6 +21,17 @@ export async function ExperiencesPageFeature() {
     <main className="catalog-page">
       <header className="catalog-header">
         <Container className="catalog-hero">
+          {referralVerified ? (
+            <div
+              className="border-turquoise/30 text-navy mb-6 rounded-2xl border bg-white p-5 shadow-sm"
+              role="status"
+            >
+              <p className="text-turquoise font-semibold">
+                {referralT("verifiedTitle")}
+              </p>
+              <p className="mt-1 text-sm">{referralT("verifiedDescription")}</p>
+            </div>
+          ) : null}
           <p className="eyebrow">
             <span />
             {t("eyebrow")}

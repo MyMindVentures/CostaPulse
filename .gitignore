@@ -3,9 +3,7 @@ node_modules
 .next-app
 out
 coverage
-playwright-report
 storybook-static
-test-results
 .env
 .env.local
 .env.*.local

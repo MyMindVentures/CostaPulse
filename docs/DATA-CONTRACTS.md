@@ -19,6 +19,15 @@ supabase (schema / RLS / RPC)
 5. Public map/calendar consume `get_experience_map` / `get_experience_calendar` contracts via repositories + view-models.
 6. After migrations, regenerate types and update Zod/view-model parsers in the same change set.
 
+## Partner referral boundary
+
+- Browser routes never read private referral, verification, session, event, customer, booking, or voucher rows directly.
+- `/r/[partnerCode]` records each entry through `register_partner_referral_visit`.
+- Public landing data is limited to `get_public_referral_landing`.
+- Contact verification and referral-session tokens are random, stored only as SHA-256 hashes, and consumed through service-role-only RPCs.
+- Booking requests expose `selectedReferralId`; the secure referral-session cookie is hashed by the server and passed separately to `create_experience_booking`.
+- Partner and reward snapshots, voucher calculation, issuance, expiry and refund cancellation remain database-authoritative.
+
 ## Type sync checklist
 
 1. Add/adjust migration under `supabase/migrations`.

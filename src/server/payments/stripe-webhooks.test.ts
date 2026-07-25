@@ -29,6 +29,13 @@ describe("getBookingUpdateForStripeEvent", () => {
     });
   });
 
+  it("marks refund events as partially refunded until the charge confirms a full refund", () => {
+    expect(getBookingUpdateForStripeEvent("charge.refunded")).toEqual({
+      paymentStatus: "partially_refunded",
+      bookingStatus: "partially_refunded"
+    });
+  });
+
   it("ignores unsupported events", () => {
     expect(getBookingUpdateForStripeEvent("customer.created")).toBeNull();
   });

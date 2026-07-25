@@ -29,12 +29,31 @@ export type BookingDraftState = {
   customerPhone: string;
   specialRequests: string;
   termsAccepted: boolean;
-  referralCode: string | null;
+  selectedReferralId: string | null;
   bookingId: string | null;
   bookingReference: string | null;
   expiresAt: string | null;
   totalAmountMinor: number | null;
   currency: string | null;
+};
+
+export type EligiblePartnerReferral = {
+  referralId: string;
+  partnerId: string;
+  partnerName: string;
+  businessType: string | null;
+  rewardBasisPoints: number;
+  expiresAt: string;
+};
+
+export type BookingReferralContext = {
+  verifiedCustomer: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  } | null;
+  eligiblePartners: EligiblePartnerReferral[];
 };
 
 export type WizardExperienceOption = {
@@ -102,7 +121,7 @@ export function createInitialDraft(
     customerPhone: "",
     specialRequests: "",
     termsAccepted: false,
-    referralCode: null,
+    selectedReferralId: null,
     bookingId: null,
     bookingReference: null,
     expiresAt: null,

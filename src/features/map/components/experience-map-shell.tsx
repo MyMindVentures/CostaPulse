@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useMemo, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { SlidersHorizontal } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { ErrorState } from "@/components/shared/error-state";
 import {
@@ -135,19 +136,24 @@ export function ExperienceMapShell({
       </header>
 
       <Container className="map-page__body grid gap-5 py-6 pb-12">
-        <div className="map-page__toolbar grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
-          <p
-            className="map-page__count text-navy m-0 font-semibold"
-            aria-live="polite"
-          >
-            {t("resultsLabel", { count: items.length })}
-            {isPending ? "…" : null}
-          </p>
-          <MapListToggle
-            view={view}
-            onChange={handleViewChange}
-            className="map-page__toggle md:!hidden"
-          />
+        <div className="map-page__toolbar">
+          <div className="map-page__toolbar-heading">
+            <div className="map-page__toolbar-icon">
+              <SlidersHorizontal aria-hidden />
+            </div>
+            <div>
+              <p className="map-page__toolbar-label">{t("filtersTitle")}</p>
+              <p className="map-page__count" aria-live="polite">
+                {t("resultsLabel", { count: items.length })}
+                {isPending ? "…" : null}
+              </p>
+            </div>
+            <MapListToggle
+              view={view}
+              onChange={handleViewChange}
+              className="map-page__toggle md:!hidden"
+            />
+          </div>
           <ExperienceMapFilters filters={filters} options={options} />
         </div>
 

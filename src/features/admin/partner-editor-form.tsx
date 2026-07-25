@@ -36,7 +36,8 @@ const schema = z.object({
   city: z.string().optional(),
   province: z.string().optional(),
   country_code: z.string().length(2),
-  referral_code: z.string().optional()
+  referral_code: z.string().optional(),
+  owner_profile_id: z.string().uuid().optional().or(z.literal(""))
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -45,6 +46,11 @@ type Props = {
   partner?: AdminPartnerDetail | null;
   mediaLibrary?: AdminMediaAsset[];
   referralUrl?: string | null;
+  ownerProfiles?: Array<{
+    id: string;
+    display_name: string | null;
+    email: string | null;
+  }>;
   labels: { save: string; unsavedChanges: string; referralQr: string };
 };
 
@@ -52,6 +58,7 @@ export function PartnerEditorForm({
   partner,
   mediaLibrary = [],
   referralUrl,
+  ownerProfiles = [],
   labels
 }: Props) {
   const router = useRouter();
@@ -75,7 +82,8 @@ export function PartnerEditorForm({
       city: partner?.city ?? "",
       province: partner?.province ?? "",
       country_code: partner?.country_code ?? "ES",
-      referral_code: partner?.referral_code ?? ""
+      referral_code: partner?.referral_code ?? "",
+      owner_profile_id: partner?.owner_profile_id ?? ""
     }
   });
   useUnsavedChangesWarning(form.formState.isDirty);
@@ -100,7 +108,8 @@ export function PartnerEditorForm({
         city: values.city || null,
         province: values.province || null,
         country_code: values.country_code,
-        referral_code: values.referral_code || undefined
+        referral_code: values.referral_code || undefined,
+        owner_profile_id: values.owner_profile_id || null
       });
       if (!result.ok) {
         toast.error(result.message);
@@ -114,10 +123,6 @@ export function PartnerEditorForm({
       router.refresh();
     });
   });
-
-  const qrSrc = referralUrl
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(referralUrl)}`
-    : null;
 
   return (
     <form className="flex flex-col gap-6" onSubmit={onSubmit}>
@@ -153,6 +158,20 @@ export function PartnerEditorForm({
             />
           </label>
         ))}
+        <label className="flex flex-col gap-1 text-sm">
+          Partner account owner
+          <select
+            className="border-border min-h-11 rounded-md border px-3"
+            {...form.register("owner_profile_id")}
+          >
+            <option value="">Unassigned</option>
+            {ownerProfiles.map((profile) => (
+              <option key={profile.id} value={profile.id}>
+                {profile.display_name ?? profile.email ?? profile.id}
+              </option>
+            ))}
+          </select>
+        </label>
         <label className="flex flex-col gap-1 text-sm">
           Status
           <select
@@ -213,15 +232,9 @@ export function PartnerEditorForm({
         <section className="flex flex-col gap-2">
           <h2 className="text-lg font-semibold">{labels.referralQr}</h2>
           <p className="text-muted text-sm break-all">{referralUrl}</p>
-          {qrSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={qrSrc}
-              alt="Partner referral QR code"
-              width={180}
-              height={180}
-            />
-          ) : null}
+          <p className="text-muted text-sm">
+            QR artwork is generated locally on the owning partner account.
+          </p>
         </section>
       ) : null}
 

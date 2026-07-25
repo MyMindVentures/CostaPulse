@@ -29,7 +29,8 @@
     "partners": {
       "kicker": "Partners",
       "title": "Partner van CostaPulse worden",
-      "description": "Partnermogelijkheden verschijnen hier zodra ze gepubliceerd zijn."
+      "description": "Partnermogelijkheden verschijnen hier zodra ze gepubliceerd zijn.",
+      "referralCta": "Ik heb een partner-QR-code"
     },
     "contact": {
       "kicker": "Contact",
@@ -414,7 +415,10 @@
       "payError": "Betaling kon niet worden gestart. Probeer opnieuw.",
       "createError": "De boeking kon niet worden aangemaakt. Probeer opnieuw.",
       "incomplete": "Vul alle verplichte boekingsgegevens in vóór betaling.",
-      "guestLabel": "Gast {number}"
+      "guestLabel": "Gast {number}",
+      "partnerReward": "Kies je partnerbeloning",
+      "partnerRewardPercent": "{percent}% terug na succesvolle betaling",
+      "projectedVoucher": "Verwachte partnervoucher: {amount}"
     },
     "success": {
       "kicker": "Boeking bevestigd",
@@ -423,7 +427,15 @@
       "reference": "Boekingsreferentie",
       "status": "Status",
       "backToExperience": "Terug naar experience",
-      "backHome": "Terug naar home"
+      "backHome": "Terug naar home",
+      "voucherPending": "Je partnervoucher wordt klaargemaakt. Deze pagina wordt automatisch bijgewerkt.",
+      "voucherIssued": "Je partnervoucher",
+      "voucherFailed": "We hebben je betaling ontvangen, maar je voucher kan nog niet worden getoond. CostaPulse is op de hoogte.",
+      "voucherCode": "Vouchercode",
+      "voucherAmount": "Bedrag",
+      "voucherPartner": "Geldig bij",
+      "voucherExpiry": "Verloopt",
+      "voucherRestriction": "Alleen inwisselbaar bij {partner}."
     },
     "email": {
       "paymentReceived": {
@@ -440,7 +452,13 @@
         "outro": "Heb je vragen? Beantwoord deze e-mail of neem contact op met CostaPulse.",
         "guestFallback": "daar",
         "whenFallback": "Nog te bevestigen",
-        "notProvided": "—"
+        "notProvided": "—",
+        "voucherCodeLabel": "Partnervouchercode",
+        "voucherAmountLabel": "Voucherbedrag",
+        "voucherPartnerLabel": "Geldig bij",
+        "voucherExpiryLabel": "Voucher verloopt",
+        "voucherRestrictionLabel": "Inwisselen",
+        "voucherRestriction": "Deze voucher kan alleen worden ingewisseld bij {partner}."
       }
     },
     "cancel": {
@@ -474,7 +492,9 @@
   "Dashboards": {
     "navigationLabel": "Dashboardnavigatie",
     "overview": "Overzicht",
+    "partnerQr": "QR-materiaal",
     "bookings": "Boekingen",
+    "bookingStories": "Boekingsverhalen",
     "calendar": "Kalender",
     "customers": "Klanten",
     "signOut": "Uitloggen",
@@ -489,7 +509,12 @@
     "partner": {
       "title": "Partnerdashboard",
       "heading": "Partneroverzicht",
-      "description": "Jouw geautoriseerde CostaPulse-partnerworkspace."
+      "description": "Jouw geautoriseerde CostaPulse-partnerworkspace.",
+      "qrDescription": "Open het printbare QR-materiaal voor elk bedrijf dat aan je account is toegewezen.",
+      "fallbackType": "Partner",
+      "status": "Status: {status}",
+      "openQr": "Open QR-materiaal",
+      "empty": "Er zijn nog geen bedrijven aan dit partneraccount toegewezen."
     },
     "admin": {
       "title": "Beheer",
@@ -635,6 +660,49 @@
     "partners": "Partners",
     "locations": "Locaties",
     "team": "Team"
+  },
+  "Referral": {
+    "entryTitle": "Begin met een partner-QR-code",
+    "entryDescription": "Scan de QR-code bij een deelnemende CostaPulse-partner om de geverifieerde doorverwijzing te starten.",
+    "entryCta": "Bekijk CostaPulse-partners",
+    "formKicker": "CostaPulse partnerbeloning",
+    "formTitle": "Verifieer je e-mail om verder te gaan",
+    "formDescription": "Vul je gegevens in om dit partnerbezoek aan je boeking te koppelen. Een wachtwoord is niet nodig.",
+    "firstName": "Voornaam",
+    "lastName": "Achternaam",
+    "email": "E-mailadres",
+    "phone": "Telefoon (optioneel)",
+    "marketingConsent": "Ik ontvang graag af en toe nieuws en aanbiedingen van CostaPulse.",
+    "whatsappConsent": "Ik ga akkoord met boekingsberichten via WhatsApp.",
+    "submit": "Stuur verificatielink",
+    "submitting": "Versturen…",
+    "checkEmailTitle": "Controleer je e-mail",
+    "checkEmailDescription": "We hebben een eenmalige verificatielink gestuurd. Deze verloopt over 15 minuten.",
+    "resend": "Stuur een nieuwe link",
+    "unavailableTitle": "Deze partneraanbieding is niet beschikbaar",
+    "unavailableDescription": "De link kan ongeldig of verlopen zijn, of de partner is niet meer actief.",
+    "verifiedTitle": "Partnerbeloning geverifieerd",
+    "verifiedDescription": "Kies een ervaring. Je geldige partnerbeloning is beschikbaar tijdens de boekingscontrole.",
+    "expiredTitle": "Verificatielink niet beschikbaar",
+    "expiredDescription": "Deze link is ongeldig, verlopen of al gebruikt. Ga terug naar de partnerpagina en vraag een nieuwe link aan.",
+    "validationError": "Controleer de gemarkeerde velden.",
+    "sendError": "We konden de verificatie-e-mail niet versturen. Probeer het opnieuw."
+  },
+  "BookingStories": {
+    "kicker": "Verhalen van gasten",
+    "heading": "Eerdere avonturen",
+    "description": "Echte momenten van recente CostaPulse-gasten.",
+    "featured": "Uitgelicht",
+    "viewStory": "Bekijk verhaal",
+    "viewStoryLabel": "Bekijk verhaal: {title}",
+    "viewerLabel": "Verhaalviewer: {title}",
+    "mediaCounter": "{current} van {total}",
+    "close": "Sluit verhaal",
+    "previousMedia": "Vorige media",
+    "nextMedia": "Volgende media",
+    "previousStory": "Vorig verhaal",
+    "nextStory": "Volgend verhaal",
+    "bookExperience": "Boek deze ervaring"
   },
   "Auth": {
     "login": {

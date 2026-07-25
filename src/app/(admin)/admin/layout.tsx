@@ -21,6 +21,7 @@ export default async function AdminLayout({
     "locations",
     "team",
     "bookings",
+    "bookingStories",
     "calendar",
     "customers"
   ]);
@@ -39,6 +40,7 @@ export default async function AdminLayout({
         locations: t("locations"),
         team: t("team"),
         bookings: t("bookings"),
+        bookingStories: t("bookingStories"),
         calendar: t("calendar"),
         customers: t("customers")
       }}

@@ -24,6 +24,7 @@ import {
   createInitialDraft,
   type AvailabilitySlotDto,
   type BookingDraftState,
+  type BookingReferralContext,
   type BookingStepId,
   type WizardExperienceOption,
   type WizardVariantOption
@@ -44,6 +45,7 @@ type BookingWizardProps = {
     variants: WizardVariantOption[];
   };
   initialStep?: BookingStepId;
+  referralContext?: BookingReferralContext;
 };
 
 function estimateTotal(
@@ -60,7 +62,8 @@ export function BookingWizard({
   mode,
   experiences,
   experience,
-  initialStep
+  initialStep,
+  referralContext = { verifiedCustomer: null, eligiblePartners: [] }
 }: BookingWizardProps) {
   const t = useTranslations("Booking");
   const locale = resolveAppLocale(useLocale());
@@ -94,7 +97,14 @@ export function BookingWizard({
       partySize: Number(searchParams.get("partySize") ?? 2) || 2,
       locationName: experience?.locationName ?? null,
       preferredLanguage: searchParams.get("lang") ?? "en",
-      referralCode: searchParams.get("ref"),
+      contactFirstName: referralContext.verifiedCustomer?.firstName ?? "",
+      contactLastName: referralContext.verifiedCustomer?.lastName ?? "",
+      customerEmail: referralContext.verifiedCustomer?.email ?? "",
+      customerPhone: referralContext.verifiedCustomer?.phone ?? "",
+      selectedReferralId:
+        referralContext.eligiblePartners.length === 1
+          ? (referralContext.eligiblePartners[0]?.referralId ?? null)
+          : null,
       currency: initialVariant?.currency ?? null,
       totalAmountMinor: estimateTotal(
         initialVariant,
@@ -191,7 +201,7 @@ export function BookingWizard({
           termsAccepted: true,
           idempotencyKey,
           anonymousSessionId,
-          referralCode: draft.referralCode || undefined,
+          selectedReferralId: draft.selectedReferralId || undefined,
           participants: Array.from({ length: draft.partySize }, (_, index) => ({
             firstName:
               index === 0
@@ -356,6 +366,7 @@ export function BookingWizard({
                   preferredLanguage: draft.preferredLanguage,
                   specialRequests: draft.specialRequests
                 }}
+                lockVerifiedEmail={referralContext.eligiblePartners.length > 0}
                 onBack={() => goTo("datetime")}
                 onContinue={(values: DetailsFormValues) => {
                   updateDraft({
@@ -385,6 +396,10 @@ export function BookingWizard({
                 onBack={() => goTo("extras")}
                 onTermsChange={(termsAccepted) =>
                   updateDraft({ termsAccepted })
+                }
+                eligiblePartners={referralContext.eligiblePartners}
+                onPartnerChange={(selectedReferralId) =>
+                  updateDraft({ selectedReferralId })
                 }
                 onCreateAndPay={createAndPay}
               />

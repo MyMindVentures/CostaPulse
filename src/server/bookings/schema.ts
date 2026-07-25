@@ -15,7 +15,7 @@ export const createBookingInputSchema = z.object({
   termsAccepted: z.literal(true),
   idempotencyKey: z.string().uuid(),
   anonymousSessionId: z.string().uuid().optional(),
-  referralCode: z.string().trim().max(64).optional(),
+  selectedReferralId: z.string().uuid().optional(),
   participants: z
     .array(
       z.object({
@@ -68,7 +68,12 @@ export const BOOKING_RPC_ERROR_CODES = [
   "PARTICIPANTS_MUST_BE_ARRAY",
   "PARTICIPANT_COUNT_MISMATCH",
   "INVALID_BOOKING_STATUS",
-  "BOOKING_EXPIRED"
+  "BOOKING_EXPIRED",
+  "REFERRAL_SESSION_REQUIRED",
+  "REFERRAL_SESSION_INVALID",
+  "REFERRAL_NOT_ELIGIBLE",
+  "REFERRAL_CUSTOMER_MISMATCH",
+  "PARTNER_SELECTION_REQUIRED"
 ] as const;
 
 export type BookingRpcErrorCode = (typeof BOOKING_RPC_ERROR_CODES)[number];
@@ -96,6 +101,12 @@ export function mapBookingRpcError(message: string): {
     case "INVALID_BOOKING_STATUS":
       return { code: match, status: 409 };
     case "NOT_AUTHORIZED":
+      return { code: match, status: 403 };
+    case "REFERRAL_SESSION_REQUIRED":
+    case "REFERRAL_SESSION_INVALID":
+    case "REFERRAL_NOT_ELIGIBLE":
+    case "REFERRAL_CUSTOMER_MISMATCH":
+    case "PARTNER_SELECTION_REQUIRED":
       return { code: match, status: 403 };
     default:
       return { code: match, status: 400 };

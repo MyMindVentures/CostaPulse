@@ -22,6 +22,23 @@ function extractBookingIdFromEvent(event: Stripe.Event) {
     : null;
 }
 
+async function resolveBookingId(event: Stripe.Event) {
+  const direct = extractBookingIdFromEvent(event);
+  if (direct) return direct;
+  if (event.type === "charge.refunded") {
+    const charge = event.data.object as Stripe.Charge;
+    const paymentIntent = charge.payment_intent;
+    const paymentIntentId =
+      typeof paymentIntent === "string" ? paymentIntent : paymentIntent?.id;
+    if (paymentIntentId) {
+      const intent = await stripe?.paymentIntents.retrieve(paymentIntentId);
+      const bookingId = intent?.metadata?.bookingId;
+      if (bookingId) return bookingId;
+    }
+  }
+  return null;
+}
+
 function extractProviderPaymentId(event: Stripe.Event) {
   const object = event.data.object as { id?: string };
   return typeof object.id === "string" ? object.id : null;
@@ -61,14 +78,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ status: "ignored", eventType: event.type });
   }
 
-  const bookingId = extractBookingIdFromEvent(event);
-  if (!bookingId) {
-    return NextResponse.json({
-      status: "ignored",
-      reason: "missing_booking_id"
-    });
-  }
-
   const supabase = createSupabaseAdminClient();
   if (!supabase) {
     return NextResponse.json(
@@ -78,6 +87,14 @@ export async function POST(request: Request) {
       },
       { status: 503 }
     );
+  }
+
+  const bookingId = await resolveBookingId(event);
+  if (!bookingId) {
+    return NextResponse.json({
+      status: "ignored",
+      reason: "missing_booking_id"
+    });
   }
 
   const { data: existingEvent } = await supabase
@@ -135,6 +152,44 @@ export async function POST(request: Request) {
 
     // Soft-fail: payment confirmation must succeed even when email is disabled.
     await sendBookingPaymentReceivedEmail(bookingId);
+  } else if (event.type === "charge.refunded") {
+    const charge = event.data.object as Stripe.Charge;
+    const fullyRefunded =
+      charge.refunded || charge.amount_refunded >= charge.amount;
+    const { error: cancelError } = await supabase.rpc(
+      "cancel_booking_voucher",
+      {
+        p_booking_id: bookingId,
+        p_reason: fullyRefunded
+          ? "Stripe charge fully refunded"
+          : "Stripe charge partially refunded"
+      }
+    );
+    if (cancelError) {
+      return NextResponse.json(
+        {
+          status: "voucher_cancel_failed",
+          error: "The refunded booking voucher could not be cancelled."
+        },
+        { status: 503 }
+      );
+    }
+    const { error: bookingError } = await supabase
+      .from("bookings")
+      .update({
+        payment_status: fullyRefunded
+          ? "refunded"
+          : bookingUpdate.paymentStatus,
+        status: fullyRefunded ? "refunded" : bookingUpdate.bookingStatus,
+        cancelled_at: now
+      })
+      .eq("id", bookingId);
+    if (bookingError) {
+      return NextResponse.json(
+        { status: "booking_update_failed" },
+        { status: 503 }
+      );
+    }
   } else {
     const bookingPatch: Record<string, string | null> = {
       payment_status: bookingUpdate.paymentStatus,

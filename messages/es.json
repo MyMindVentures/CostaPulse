@@ -29,7 +29,8 @@
     "partners": {
       "kicker": "Partners",
       "title": "Colabora con CostaPulse",
-      "description": "Las oportunidades de partners aparecerán aquí cuando se publiquen."
+      "description": "Las oportunidades de partners aparecerán aquí cuando se publiquen.",
+      "referralCta": "Tengo un código QR de colaborador"
     },
     "contact": {
       "kicker": "Contacto",
@@ -414,7 +415,10 @@
       "payError": "No se pudo iniciar el pago. Inténtalo de nuevo.",
       "createError": "No se pudo crear la reserva. Inténtalo de nuevo.",
       "incomplete": "Completa todos los datos obligatorios de la reserva antes de pagar.",
-      "guestLabel": "Huésped {number}"
+      "guestLabel": "Huésped {number}",
+      "partnerReward": "Elige tu recompensa de colaborador",
+      "partnerRewardPercent": "{percent}% después del pago correcto",
+      "projectedVoucher": "Vale estimado del colaborador: {amount}"
     },
     "success": {
       "kicker": "Reserva confirmada",
@@ -423,7 +427,15 @@
       "reference": "Referencia de reserva",
       "status": "Estado",
       "backToExperience": "Volver a la experiencia",
-      "backHome": "Volver al inicio"
+      "backHome": "Volver al inicio",
+      "voucherPending": "Estamos preparando tu vale. Esta página se actualizará automáticamente.",
+      "voucherIssued": "Tu vale del colaborador",
+      "voucherFailed": "Hemos recibido tu pago, pero todavía no podemos mostrar el vale. CostaPulse ha sido avisado.",
+      "voucherCode": "Código del vale",
+      "voucherAmount": "Importe",
+      "voucherPartner": "Válido en",
+      "voucherExpiry": "Caduca",
+      "voucherRestriction": "Canjeable únicamente en {partner}."
     },
     "email": {
       "paymentReceived": {
@@ -440,7 +452,13 @@
         "outro": "Si tienes preguntas, responde a este correo o contacta con CostaPulse.",
         "guestFallback": "hola",
         "whenFallback": "Por confirmar",
-        "notProvided": "—"
+        "notProvided": "—",
+        "voucherCodeLabel": "Código del vale",
+        "voucherAmountLabel": "Importe del vale",
+        "voucherPartnerLabel": "Válido en",
+        "voucherExpiryLabel": "Caducidad del vale",
+        "voucherRestrictionLabel": "Canje",
+        "voucherRestriction": "Este vale solo se puede canjear en {partner}."
       }
     },
     "cancel": {
@@ -474,7 +492,9 @@
   "Dashboards": {
     "navigationLabel": "Navegación del panel",
     "overview": "Resumen",
+    "partnerQr": "Material QR",
     "bookings": "Reservas",
+    "bookingStories": "Historias de reservas",
     "calendar": "Calendario",
     "customers": "Clientes",
     "signOut": "Cerrar sesión",
@@ -489,7 +509,12 @@
     "partner": {
       "title": "Panel de partner",
       "heading": "Resumen de partner",
-      "description": "Tu espacio de partner autorizado de CostaPulse."
+      "description": "Tu espacio de partner autorizado de CostaPulse.",
+      "qrDescription": "Abre el material QR imprimible de cada negocio asignado a tu cuenta.",
+      "fallbackType": "Colaborador",
+      "status": "Estado: {status}",
+      "openQr": "Abrir material QR",
+      "empty": "Todavía no hay negocios asignados a esta cuenta de colaborador."
     },
     "admin": {
       "title": "Administración",
@@ -635,6 +660,49 @@
     "partners": "Socios",
     "locations": "Ubicaciones",
     "team": "Equipo"
+  },
+  "Referral": {
+    "entryTitle": "Empieza con un código QR de colaborador",
+    "entryDescription": "Escanea el código QR mostrado por un colaborador CostaPulse participante para iniciar el recorrido verificado.",
+    "entryCta": "Ver colaboradores CostaPulse",
+    "formKicker": "Recompensa de colaborador CostaPulse",
+    "formTitle": "Verifica tu correo para continuar",
+    "formDescription": "Introduce tus datos para vincular esta visita del colaborador con tu reserva. No necesitas contraseña.",
+    "firstName": "Nombre",
+    "lastName": "Apellidos",
+    "email": "Correo electrónico",
+    "phone": "Teléfono (opcional)",
+    "marketingConsent": "Quiero recibir ocasionalmente noticias y ofertas de CostaPulse.",
+    "whatsappConsent": "Acepto recibir mensajes de WhatsApp relacionados con la reserva.",
+    "submit": "Enviar enlace de verificación",
+    "submitting": "Enviando…",
+    "checkEmailTitle": "Revisa tu correo",
+    "checkEmailDescription": "Hemos enviado un enlace de verificación de un solo uso. Caduca en 15 minutos.",
+    "resend": "Enviar un enlace nuevo",
+    "unavailableTitle": "Esta oferta del colaborador no está disponible",
+    "unavailableDescription": "El enlace puede ser inválido o haber caducado, o el colaborador ya no está activo.",
+    "verifiedTitle": "Recompensa del colaborador verificada",
+    "verifiedDescription": "Elige una experiencia. Tu recompensa elegible estará disponible al revisar la reserva.",
+    "expiredTitle": "Enlace de verificación no disponible",
+    "expiredDescription": "Este enlace no es válido, ha caducado o ya se ha utilizado. Vuelve a la página del colaborador y solicita uno nuevo.",
+    "validationError": "Revisa los campos indicados.",
+    "sendError": "No pudimos enviar el correo de verificación. Inténtalo de nuevo."
+  },
+  "BookingStories": {
+    "kicker": "Historias de huéspedes",
+    "heading": "Aventuras anteriores",
+    "description": "Momentos reales de huéspedes recientes de CostaPulse.",
+    "featured": "Destacada",
+    "viewStory": "Ver historia",
+    "viewStoryLabel": "Ver historia: {title}",
+    "viewerLabel": "Visor de historia: {title}",
+    "mediaCounter": "{current} de {total}",
+    "close": "Cerrar historia",
+    "previousMedia": "Contenido anterior",
+    "nextMedia": "Contenido siguiente",
+    "previousStory": "Historia anterior",
+    "nextStory": "Historia siguiente",
+    "bookExperience": "Reservar esta experiencia"
   },
   "Auth": {
     "login": {

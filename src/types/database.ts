@@ -707,6 +707,207 @@ export type Database = {
           }
         ];
       };
+      booking_stories: {
+        Row: {
+          booking_id: string;
+          consent_received_at: string | null;
+          consent_source: string | null;
+          consent_status: Database["public"]["Enums"]["booking_story_consent_status"];
+          cover_media_asset_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          display_order: number;
+          experience_id: string;
+          guest_country_code: string | null;
+          guest_display_name: string | null;
+          guest_quote: string | null;
+          id: string;
+          is_featured: boolean;
+          published_at: string | null;
+          status: Database["public"]["Enums"]["booking_story_status"];
+          subtitle: string | null;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          booking_id: string;
+          consent_received_at?: string | null;
+          consent_source?: string | null;
+          consent_status?: Database["public"]["Enums"]["booking_story_consent_status"];
+          cover_media_asset_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          display_order?: number;
+          experience_id: string;
+          guest_country_code?: string | null;
+          guest_display_name?: string | null;
+          guest_quote?: string | null;
+          id?: string;
+          is_featured?: boolean;
+          published_at?: string | null;
+          status?: Database["public"]["Enums"]["booking_story_status"];
+          subtitle?: string | null;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          booking_id?: string;
+          consent_received_at?: string | null;
+          consent_source?: string | null;
+          consent_status?: Database["public"]["Enums"]["booking_story_consent_status"];
+          cover_media_asset_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          display_order?: number;
+          experience_id?: string;
+          guest_country_code?: string | null;
+          guest_display_name?: string | null;
+          guest_quote?: string | null;
+          id?: string;
+          is_featured?: boolean;
+          published_at?: string | null;
+          status?: Database["public"]["Enums"]["booking_story_status"];
+          subtitle?: string | null;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "booking_stories_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: true;
+            referencedRelation: "admin_booking_queue";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_stories_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: true;
+            referencedRelation: "booking_detail";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_stories_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: true;
+            referencedRelation: "bookings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_stories_cover_media_asset_id_fkey";
+            columns: ["cover_media_asset_id"];
+            isOneToOne: false;
+            referencedRelation: "media_assets";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_stories_cover_media_asset_id_fkey";
+            columns: ["cover_media_asset_id"];
+            isOneToOne: false;
+            referencedRelation: "published_media_assets";
+            referencedColumns: ["media_asset_id"];
+          },
+          {
+            foreignKeyName: "booking_stories_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_stories_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_experience_health";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_stories_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_map_catalog";
+            referencedColumns: ["experience_id"];
+          },
+          {
+            foreignKeyName: "booking_stories_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_review_summaries";
+            referencedColumns: ["experience_id"];
+          },
+          {
+            foreignKeyName: "booking_stories_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experiences";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      booking_story_media: {
+        Row: {
+          booking_story_id: string;
+          caption: string | null;
+          created_at: string;
+          display_order: number;
+          id: string;
+          is_active: boolean;
+          is_primary: boolean;
+          media_asset_id: string;
+          media_role: Database["public"]["Enums"]["booking_story_media_role"];
+          updated_at: string;
+        };
+        Insert: {
+          booking_story_id: string;
+          caption?: string | null;
+          created_at?: string;
+          display_order?: number;
+          id?: string;
+          is_active?: boolean;
+          is_primary?: boolean;
+          media_asset_id: string;
+          media_role?: Database["public"]["Enums"]["booking_story_media_role"];
+          updated_at?: string;
+        };
+        Update: {
+          booking_story_id?: string;
+          caption?: string | null;
+          created_at?: string;
+          display_order?: number;
+          id?: string;
+          is_active?: boolean;
+          is_primary?: boolean;
+          media_asset_id?: string;
+          media_role?: Database["public"]["Enums"]["booking_story_media_role"];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "booking_story_media_booking_story_id_fkey";
+            columns: ["booking_story_id"];
+            isOneToOne: false;
+            referencedRelation: "booking_stories";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_story_media_media_asset_id_fkey";
+            columns: ["media_asset_id"];
+            isOneToOne: false;
+            referencedRelation: "media_assets";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_story_media_media_asset_id_fkey";
+            columns: ["media_asset_id"];
+            isOneToOne: false;
+            referencedRelation: "published_media_assets";
+            referencedColumns: ["media_asset_id"];
+          }
+        ];
+      };
       bookings: {
         Row: {
           availability_slot_id: string | null;
@@ -736,6 +937,7 @@ export type Database = {
           metadata: Json;
           participant_notes: string | null;
           partner_id: string | null;
+          partner_voucher_percent_basis_points_snapshot: number | null;
           party_size: number;
           payment_status: Database["public"]["Enums"]["payment_status"];
           preferred_language: string;
@@ -783,6 +985,7 @@ export type Database = {
           metadata?: Json;
           participant_notes?: string | null;
           partner_id?: string | null;
+          partner_voucher_percent_basis_points_snapshot?: number | null;
           party_size: number;
           payment_status?: Database["public"]["Enums"]["payment_status"];
           preferred_language?: string;
@@ -830,6 +1033,7 @@ export type Database = {
           metadata?: Json;
           participant_notes?: string | null;
           partner_id?: string | null;
+          partner_voucher_percent_basis_points_snapshot?: number | null;
           party_size?: number;
           payment_status?: Database["public"]["Enums"]["payment_status"];
           preferred_language?: string;
@@ -966,6 +1170,48 @@ export type Database = {
             columns: ["referral_id"];
             isOneToOne: false;
             referencedRelation: "referrals";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      customer_referral_sessions: {
+        Row: {
+          created_at: string;
+          customer_id: string;
+          expires_at: string;
+          id: string;
+          last_seen_at: string;
+          token_hash: string;
+        };
+        Insert: {
+          created_at?: string;
+          customer_id: string;
+          expires_at: string;
+          id?: string;
+          last_seen_at?: string;
+          token_hash: string;
+        };
+        Update: {
+          created_at?: string;
+          customer_id?: string;
+          expires_at?: string;
+          id?: string;
+          last_seen_at?: string;
+          token_hash?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "customer_referral_sessions_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_customer_summary";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "customer_referral_sessions_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
             referencedColumns: ["id"];
           }
         ];
@@ -2058,6 +2304,7 @@ export type Database = {
           focal_x: number;
           focal_y: number;
           folder_path: string | null;
+          generated_filename: string | null;
           height: number | null;
           id: string;
           is_active: boolean;
@@ -2068,6 +2315,7 @@ export type Database = {
           metadata: Json;
           mime_type: string | null;
           open_in_new_tab: boolean;
+          original_filename: string | null;
           page_path: string | null;
           placement_key: string | null;
           published_at: string | null;
@@ -2109,6 +2357,7 @@ export type Database = {
           focal_x?: number;
           focal_y?: number;
           folder_path?: string | null;
+          generated_filename?: string | null;
           height?: number | null;
           id?: string;
           is_active?: boolean;
@@ -2119,6 +2368,7 @@ export type Database = {
           metadata?: Json;
           mime_type?: string | null;
           open_in_new_tab?: boolean;
+          original_filename?: string | null;
           page_path?: string | null;
           placement_key?: string | null;
           published_at?: string | null;
@@ -2160,6 +2410,7 @@ export type Database = {
           focal_x?: number;
           focal_y?: number;
           folder_path?: string | null;
+          generated_filename?: string | null;
           height?: number | null;
           id?: string;
           is_active?: boolean;
@@ -2170,6 +2421,7 @@ export type Database = {
           metadata?: Json;
           mime_type?: string | null;
           open_in_new_tab?: boolean;
+          original_filename?: string | null;
           page_path?: string | null;
           placement_key?: string | null;
           published_at?: string | null;
@@ -2194,6 +2446,251 @@ export type Database = {
             columns: ["created_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      media_placements: {
+        Row: {
+          alt_text_override: string | null;
+          breakpoint: string;
+          caption_override: string | null;
+          created_at: string;
+          display_order: number;
+          entity_id: string;
+          entity_type: string;
+          id: string;
+          is_active: boolean;
+          is_primary: boolean;
+          locale: string | null;
+          media_asset_id: string;
+          parent_entity_id: string | null;
+          updated_at: string;
+          usage: string;
+        };
+        Insert: {
+          alt_text_override?: string | null;
+          breakpoint?: string;
+          caption_override?: string | null;
+          created_at?: string;
+          display_order?: number;
+          entity_id: string;
+          entity_type: string;
+          id?: string;
+          is_active?: boolean;
+          is_primary?: boolean;
+          locale?: string | null;
+          media_asset_id: string;
+          parent_entity_id?: string | null;
+          updated_at?: string;
+          usage: string;
+        };
+        Update: {
+          alt_text_override?: string | null;
+          breakpoint?: string;
+          caption_override?: string | null;
+          created_at?: string;
+          display_order?: number;
+          entity_id?: string;
+          entity_type?: string;
+          id?: string;
+          is_active?: boolean;
+          is_primary?: boolean;
+          locale?: string | null;
+          media_asset_id?: string;
+          parent_entity_id?: string | null;
+          updated_at?: string;
+          usage?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "media_placements_media_asset_id_fkey";
+            columns: ["media_asset_id"];
+            isOneToOne: false;
+            referencedRelation: "media_assets";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "media_placements_media_asset_id_fkey";
+            columns: ["media_asset_id"];
+            isOneToOne: false;
+            referencedRelation: "published_media_assets";
+            referencedColumns: ["media_asset_id"];
+          }
+        ];
+      };
+      partner_promo_content: {
+        Row: {
+          content: Json;
+          created_at: string;
+          is_published: boolean;
+          locale: string;
+          updated_at: string;
+        };
+        Insert: {
+          content: Json;
+          created_at?: string;
+          is_published?: boolean;
+          locale: string;
+          updated_at?: string;
+        };
+        Update: {
+          content?: Json;
+          created_at?: string;
+          is_published?: boolean;
+          locale?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      partner_referral_events: {
+        Row: {
+          booking_id: string | null;
+          created_at: string;
+          customer_id: string | null;
+          event_type: string;
+          id: string;
+          metadata: Json;
+          partner_id: string | null;
+          referral_id: string | null;
+          visit_id: string | null;
+          voucher_id: string | null;
+        };
+        Insert: {
+          booking_id?: string | null;
+          created_at?: string;
+          customer_id?: string | null;
+          event_type: string;
+          id?: string;
+          metadata?: Json;
+          partner_id?: string | null;
+          referral_id?: string | null;
+          visit_id?: string | null;
+          voucher_id?: string | null;
+        };
+        Update: {
+          booking_id?: string | null;
+          created_at?: string;
+          customer_id?: string | null;
+          event_type?: string;
+          id?: string;
+          metadata?: Json;
+          partner_id?: string | null;
+          referral_id?: string | null;
+          visit_id?: string | null;
+          voucher_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "partner_referral_events_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_booking_queue";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_referral_events_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: false;
+            referencedRelation: "booking_detail";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_referral_events_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: false;
+            referencedRelation: "bookings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_referral_events_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_customer_summary";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_referral_events_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_referral_events_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_partner_performance";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_referral_events_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: false;
+            referencedRelation: "partners";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_referral_events_referral_id_fkey";
+            columns: ["referral_id"];
+            isOneToOne: false;
+            referencedRelation: "referrals";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_referral_events_visit_id_fkey";
+            columns: ["visit_id"];
+            isOneToOne: false;
+            referencedRelation: "partner_referral_visits";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_referral_events_voucher_id_fkey";
+            columns: ["voucher_id"];
+            isOneToOne: false;
+            referencedRelation: "vouchers";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      partner_referral_visits: {
+        Row: {
+          created_at: string;
+          id: string;
+          landing_path: string;
+          partner_id: string;
+          public_token: string;
+          visitor_token_hash: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          landing_path?: string;
+          partner_id: string;
+          public_token: string;
+          visitor_token_hash: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          landing_path?: string;
+          partner_id?: string;
+          public_token?: string;
+          visitor_token_hash?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "partner_referral_visits_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_partner_performance";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_referral_visits_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: false;
+            referencedRelation: "partners";
             referencedColumns: ["id"];
           }
         ];
@@ -2360,11 +2857,71 @@ export type Database = {
         };
         Relationships: [];
       };
+      referral_contact_verifications: {
+        Row: {
+          created_at: string;
+          email: string;
+          expires_at: string;
+          first_name: string;
+          id: string;
+          last_name: string;
+          marketing_consent: boolean;
+          phone: string | null;
+          preferred_locale: string;
+          token_hash: string;
+          updated_at: string;
+          verified_at: string | null;
+          visit_id: string;
+          whatsapp_opt_in: boolean;
+        };
+        Insert: {
+          created_at?: string;
+          email: string;
+          expires_at: string;
+          first_name: string;
+          id?: string;
+          last_name: string;
+          marketing_consent?: boolean;
+          phone?: string | null;
+          preferred_locale?: string;
+          token_hash: string;
+          updated_at?: string;
+          verified_at?: string | null;
+          visit_id: string;
+          whatsapp_opt_in?: boolean;
+        };
+        Update: {
+          created_at?: string;
+          email?: string;
+          expires_at?: string;
+          first_name?: string;
+          id?: string;
+          last_name?: string;
+          marketing_consent?: boolean;
+          phone?: string | null;
+          preferred_locale?: string;
+          token_hash?: string;
+          updated_at?: string;
+          verified_at?: string | null;
+          visit_id?: string;
+          whatsapp_opt_in?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "referral_contact_verifications_visit_id_fkey";
+            columns: ["visit_id"];
+            isOneToOne: true;
+            referencedRelation: "partner_referral_visits";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       referrals: {
         Row: {
           attributed_at: string;
           code: string;
           created_at: string;
+          customer_id: string | null;
           expires_at: string | null;
           id: string;
           landing_path: string | null;
@@ -2373,12 +2930,15 @@ export type Database = {
           partner_id: string;
           status: Database["public"]["Enums"]["referral_status"];
           updated_at: string;
+          verified_at: string | null;
+          visit_id: string | null;
           visitor_token: string | null;
         };
         Insert: {
           attributed_at?: string;
           code?: string;
           created_at?: string;
+          customer_id?: string | null;
           expires_at?: string | null;
           id?: string;
           landing_path?: string | null;
@@ -2387,12 +2947,15 @@ export type Database = {
           partner_id: string;
           status?: Database["public"]["Enums"]["referral_status"];
           updated_at?: string;
+          verified_at?: string | null;
+          visit_id?: string | null;
           visitor_token?: string | null;
         };
         Update: {
           attributed_at?: string;
           code?: string;
           created_at?: string;
+          customer_id?: string | null;
           expires_at?: string | null;
           id?: string;
           landing_path?: string | null;
@@ -2401,9 +2964,25 @@ export type Database = {
           partner_id?: string;
           status?: Database["public"]["Enums"]["referral_status"];
           updated_at?: string;
+          verified_at?: string | null;
+          visit_id?: string | null;
           visitor_token?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "referrals_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_customer_summary";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "referrals_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "referrals_partner_id_fkey";
             columns: ["partner_id"];
@@ -2416,6 +2995,13 @@ export type Database = {
             columns: ["partner_id"];
             isOneToOne: false;
             referencedRelation: "partners";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "referrals_visit_id_fkey";
+            columns: ["visit_id"];
+            isOneToOne: false;
+            referencedRelation: "partner_referral_visits";
             referencedColumns: ["id"];
           }
         ];
@@ -2525,6 +3111,33 @@ export type Database = {
             referencedColumns: ["id"];
           }
         ];
+      };
+      site_content_sections: {
+        Row: {
+          created_at: string;
+          id: string;
+          is_active: boolean;
+          label: string;
+          section_key: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          is_active?: boolean;
+          label: string;
+          section_key: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          is_active?: boolean;
+          label?: string;
+          section_key?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
       };
       site_navigation_item_translations: {
         Row: {
@@ -3342,14 +3955,18 @@ export type Database = {
         Row: {
           attribution_window_hours: number | null;
           bookings_count: number | null;
+          conversion_percent: number | null;
           created_at: string | null;
           id: string | null;
           name: string | null;
           paid_revenue_minor: number | null;
           referral_code: string | null;
+          referral_visits: number | null;
           referrals_count: number | null;
           slug: string | null;
           status: Database["public"]["Enums"]["partner_status"] | null;
+          unique_referral_visitors: number | null;
+          verified_referrals: number | null;
           voucher_percent_basis_points: number | null;
           voucher_value_minor: number | null;
           vouchers_issued: number | null;
@@ -3714,6 +4331,7 @@ export type Database = {
           display_order: number | null;
           dominant_color: string | null;
           duration_seconds: number | null;
+          entity_id: string | null;
           focal_x: number | null;
           focal_y: number | null;
           folder_path: string | null;
@@ -3727,6 +4345,7 @@ export type Database = {
           mime_type: string | null;
           open_in_new_tab: boolean | null;
           page_path: string | null;
+          parent_entity_id: string | null;
           placement_id: string | null;
           placement_key: string | null;
           placement_metadata: Json | null;
@@ -3735,83 +4354,10 @@ export type Database = {
           scope_type: string | null;
           section_key: string | null;
           storage_path: string | null;
+          usage: string | null;
           variant: string | null;
           visibility: Database["public"]["Enums"]["media_visibility"] | null;
           width: number | null;
-        };
-        Insert: {
-          alt_text?: never;
-          asset_key?: string | null;
-          asset_metadata?: Json | null;
-          blurhash?: string | null;
-          breakpoint?: string | null;
-          bucket_id?: string | null;
-          caption?: never;
-          component_key?: string | null;
-          display_order?: number | null;
-          dominant_color?: string | null;
-          duration_seconds?: number | null;
-          focal_x?: number | null;
-          focal_y?: number | null;
-          folder_path?: string | null;
-          height?: number | null;
-          id?: string | null;
-          is_primary?: boolean | null;
-          link_url?: string | null;
-          locale?: string | null;
-          media_asset_id?: string | null;
-          media_type?: string | null;
-          mime_type?: string | null;
-          open_in_new_tab?: boolean | null;
-          page_path?: string | null;
-          placement_id?: string | null;
-          placement_key?: string | null;
-          placement_metadata?: Json | null;
-          role?: string | null;
-          scope_key?: string | null;
-          scope_type?: string | null;
-          section_key?: string | null;
-          storage_path?: string | null;
-          variant?: string | null;
-          visibility?: Database["public"]["Enums"]["media_visibility"] | null;
-          width?: number | null;
-        };
-        Update: {
-          alt_text?: never;
-          asset_key?: string | null;
-          asset_metadata?: Json | null;
-          blurhash?: string | null;
-          breakpoint?: string | null;
-          bucket_id?: string | null;
-          caption?: never;
-          component_key?: string | null;
-          display_order?: number | null;
-          dominant_color?: string | null;
-          duration_seconds?: number | null;
-          focal_x?: number | null;
-          focal_y?: number | null;
-          folder_path?: string | null;
-          height?: number | null;
-          id?: string | null;
-          is_primary?: boolean | null;
-          link_url?: string | null;
-          locale?: string | null;
-          media_asset_id?: string | null;
-          media_type?: string | null;
-          mime_type?: string | null;
-          open_in_new_tab?: boolean | null;
-          page_path?: string | null;
-          placement_id?: string | null;
-          placement_key?: string | null;
-          placement_metadata?: Json | null;
-          role?: string | null;
-          scope_key?: string | null;
-          scope_type?: string | null;
-          section_key?: string | null;
-          storage_path?: string | null;
-          variant?: string | null;
-          visibility?: Database["public"]["Enums"]["media_visibility"] | null;
-          width?: number | null;
         };
         Relationships: [];
       };
@@ -3933,12 +4479,112 @@ export type Database = {
       };
     };
     Functions: {
+      admin_archive_booking_story: {
+        Args: { p_story_id: string };
+        Returns: {
+          booking_id: string;
+          consent_received_at: string | null;
+          consent_source: string | null;
+          consent_status: Database["public"]["Enums"]["booking_story_consent_status"];
+          cover_media_asset_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          display_order: number;
+          experience_id: string;
+          guest_country_code: string | null;
+          guest_display_name: string | null;
+          guest_quote: string | null;
+          id: string;
+          is_featured: boolean;
+          published_at: string | null;
+          status: Database["public"]["Enums"]["booking_story_status"];
+          subtitle: string | null;
+          title: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "booking_stories";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       admin_assign_slot_team: {
         Args: { p_slot_id: string; p_team_members: Json };
         Returns: Json;
       };
+      admin_attach_booking_story_media: {
+        Args: {
+          p_caption?: string;
+          p_display_order?: number;
+          p_is_primary?: boolean;
+          p_media_asset_id: string;
+          p_media_role?: Database["public"]["Enums"]["booking_story_media_role"];
+          p_story_id: string;
+        };
+        Returns: {
+          booking_story_id: string;
+          caption: string | null;
+          created_at: string;
+          display_order: number;
+          id: string;
+          is_active: boolean;
+          is_primary: boolean;
+          media_asset_id: string;
+          media_role: Database["public"]["Enums"]["booking_story_media_role"];
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "booking_story_media";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       admin_booking_detail: { Args: { p_booking_id: string }; Returns: Json };
       admin_complete_past_slots: { Args: never; Returns: number };
+      admin_create_booking_story: {
+        Args: {
+          p_booking_id: string;
+          p_consent_source?: string;
+          p_consent_status?: Database["public"]["Enums"]["booking_story_consent_status"];
+          p_description?: string;
+          p_guest_country_code?: string;
+          p_guest_display_name?: string;
+          p_guest_quote?: string;
+          p_subtitle?: string;
+          p_title: string;
+        };
+        Returns: {
+          booking_id: string;
+          consent_received_at: string | null;
+          consent_source: string | null;
+          consent_status: Database["public"]["Enums"]["booking_story_consent_status"];
+          cover_media_asset_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          display_order: number;
+          experience_id: string;
+          guest_country_code: string | null;
+          guest_display_name: string | null;
+          guest_quote: string | null;
+          id: string;
+          is_featured: boolean;
+          published_at: string | null;
+          status: Database["public"]["Enums"]["booking_story_status"];
+          subtitle: string | null;
+          title: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "booking_stories";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       admin_customer_detail: { Args: { p_customer_id: string }; Returns: Json };
       admin_dashboard_overview: {
         Args: { p_from?: string; p_to?: string };
@@ -3952,11 +4598,19 @@ export type Database = {
         Args: { p_id: string; p_reason?: string };
         Returns: boolean;
       };
+      admin_detach_media_placement: {
+        Args: { p_placement_id: string };
+        Returns: boolean;
+      };
       admin_experience_detail: {
         Args: { p_experience_id: string };
         Returns: Json;
       };
       admin_expire_vouchers: { Args: never; Returns: number };
+      admin_finalize_media_upload: {
+        Args: { p_bucket_id: string; p_payload?: Json; p_storage_path: string };
+        Returns: Json;
+      };
       admin_finance_summary: {
         Args: { p_from: string; p_to: string };
         Returns: Json;
@@ -4007,9 +4661,13 @@ export type Database = {
       };
       admin_list_media: {
         Args: {
+          p_entity_id?: string;
+          p_entity_type?: string;
           p_media_type?: string;
+          p_mime_type?: string;
           p_page?: number;
           p_page_size?: number;
+          p_placement_usage?: string;
           p_scope_type?: string;
           p_search?: string;
           p_usage?: string;
@@ -4039,6 +4697,37 @@ export type Database = {
         };
       };
       admin_navigation_tree: { Args: never; Returns: Json };
+      admin_publish_booking_story: {
+        Args: { p_story_id: string };
+        Returns: {
+          booking_id: string;
+          consent_received_at: string | null;
+          consent_source: string | null;
+          consent_status: Database["public"]["Enums"]["booking_story_consent_status"];
+          cover_media_asset_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          display_order: number;
+          experience_id: string;
+          guest_country_code: string | null;
+          guest_display_name: string | null;
+          guest_quote: string | null;
+          id: string;
+          is_featured: boolean;
+          published_at: string | null;
+          status: Database["public"]["Enums"]["booking_story_status"];
+          subtitle: string | null;
+          title: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "booking_stories";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       admin_redeem_voucher: {
         Args: { p_notes?: string; p_voucher_id: string };
         Returns: {
@@ -4069,13 +4758,83 @@ export type Database = {
         };
       };
       admin_reference_data: { Args: never; Returns: Json };
+      admin_remove_booking_story_media: {
+        Args: { p_media_asset_id: string; p_story_id: string };
+        Returns: undefined;
+      };
       admin_replace_experience_collection: {
         Args: { p_collection: string; p_experience_id: string; p_items: Json };
+        Returns: Json;
+      };
+      admin_replace_media_placement: {
+        Args: {
+          p_bucket_id: string;
+          p_payload?: Json;
+          p_placement_id: string;
+          p_storage_path: string;
+        };
         Returns: Json;
       };
       admin_replace_team_collection: {
         Args: { p_collection: string; p_items: Json; p_team_member_id: string };
         Returns: Json;
+      };
+      admin_set_booking_story_cover: {
+        Args: { p_media_asset_id: string; p_story_id: string };
+        Returns: {
+          booking_id: string;
+          consent_received_at: string | null;
+          consent_source: string | null;
+          consent_status: Database["public"]["Enums"]["booking_story_consent_status"];
+          cover_media_asset_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          display_order: number;
+          experience_id: string;
+          guest_country_code: string | null;
+          guest_display_name: string | null;
+          guest_quote: string | null;
+          id: string;
+          is_featured: boolean;
+          published_at: string | null;
+          status: Database["public"]["Enums"]["booking_story_status"];
+          subtitle: string | null;
+          title: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "booking_stories";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      admin_set_media_primary: {
+        Args: { p_placement_id: string };
+        Returns: {
+          alt_text_override: string | null;
+          breakpoint: string;
+          caption_override: string | null;
+          created_at: string;
+          display_order: number;
+          entity_id: string;
+          entity_type: string;
+          id: string;
+          is_active: boolean;
+          is_primary: boolean;
+          locale: string | null;
+          media_asset_id: string;
+          parent_entity_id: string | null;
+          updated_at: string;
+          usage: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "media_placements";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
       admin_set_user_roles: {
         Args: {
@@ -4123,6 +4882,7 @@ export type Database = {
           metadata: Json;
           participant_notes: string | null;
           partner_id: string | null;
+          partner_voucher_percent_basis_points_snapshot: number | null;
           party_size: number;
           payment_status: Database["public"]["Enums"]["payment_status"];
           preferred_language: string;
@@ -4145,6 +4905,37 @@ export type Database = {
         SetofOptions: {
           from: "*";
           to: "bookings";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      admin_update_booking_story: {
+        Args: { p_patch: Json; p_story_id: string };
+        Returns: {
+          booking_id: string;
+          consent_received_at: string | null;
+          consent_source: string | null;
+          consent_status: Database["public"]["Enums"]["booking_story_consent_status"];
+          cover_media_asset_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          display_order: number;
+          experience_id: string;
+          guest_country_code: string | null;
+          guest_display_name: string | null;
+          guest_quote: string | null;
+          id: string;
+          is_featured: boolean;
+          published_at: string | null;
+          status: Database["public"]["Enums"]["booking_story_status"];
+          subtitle: string | null;
+          title: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "booking_stories";
           isOneToOne: true;
           isSetofReturn: false;
         };
@@ -4263,6 +5054,7 @@ export type Database = {
           focal_x: number;
           focal_y: number;
           folder_path: string | null;
+          generated_filename: string | null;
           height: number | null;
           id: string;
           is_active: boolean;
@@ -4273,6 +5065,7 @@ export type Database = {
           metadata: Json;
           mime_type: string | null;
           open_in_new_tab: boolean;
+          original_filename: string | null;
           page_path: string | null;
           placement_key: string | null;
           published_at: string | null;
@@ -4433,6 +5226,10 @@ export type Database = {
         Args: { p_slot_id: string };
         Returns: number;
       };
+      cancel_booking_voucher: {
+        Args: { p_booking_id: string; p_reason?: string };
+        Returns: Json;
+      };
       confirm_paid_booking: {
         Args: { p_booking_id: string; p_provider_payment_id?: string };
         Returns: Json;
@@ -4448,6 +5245,8 @@ export type Database = {
           p_idempotency_key?: string;
           p_party_size: number;
           p_preferred_language?: string;
+          p_referral_session_token_hash?: string;
+          p_selected_referral_id?: string;
           p_special_requests?: string;
           p_terms_accepted?: boolean;
         };
@@ -4553,6 +5352,22 @@ export type Database = {
               title: string;
             }[];
           };
+      get_public_experience_booking_stories: {
+        Args: {
+          p_experience_slug: string;
+          p_limit?: number;
+          p_offset?: number;
+        };
+        Returns: Json;
+      };
+      get_public_referral_landing: {
+        Args: { p_locale?: string; p_visit_token: string };
+        Returns: Json;
+      };
+      get_verified_referral_context: {
+        Args: { p_session_token_hash: string };
+        Returns: Json;
+      };
       has_any_role: {
         Args: {
           p_roles: Database["public"]["Enums"]["app_role"][];
@@ -4568,6 +5383,22 @@ export type Database = {
         Args: { object_name: string };
         Returns: boolean;
       };
+      record_referral_verification_email_outcome: {
+        Args: {
+          p_provider_message_id?: string;
+          p_succeeded: boolean;
+          p_verification_token_hash: string;
+        };
+        Returns: undefined;
+      };
+      register_partner_referral_visit: {
+        Args: {
+          p_landing_path?: string;
+          p_partner_code: string;
+          p_visitor_token_hash: string;
+        };
+        Returns: Json;
+      };
       release_booking_hold: {
         Args: { p_booking_id: string };
         Returns: boolean;
@@ -4575,6 +5406,28 @@ export type Database = {
       release_expired_booking_holds: { Args: never; Returns: number };
       set_booking_participants: {
         Args: { p_booking_id: string; p_participants: Json };
+        Returns: Json;
+      };
+      submit_referral_contact: {
+        Args: {
+          p_email: string;
+          p_expires_at: string;
+          p_first_name: string;
+          p_last_name: string;
+          p_marketing_consent: boolean;
+          p_phone: string;
+          p_preferred_locale: string;
+          p_verification_token_hash: string;
+          p_visit_token: string;
+          p_whatsapp_opt_in: boolean;
+        };
+        Returns: Json;
+      };
+      verify_referral_contact: {
+        Args: {
+          p_session_token_hash: string;
+          p_verification_token_hash: string;
+        };
         Returns: Json;
       };
     };
@@ -4607,6 +5460,14 @@ export type Database = {
         | "refunded"
         | "partially_refunded"
         | "no_show";
+      booking_story_consent_status: "pending" | "granted" | "revoked";
+      booking_story_media_role:
+        | "cover"
+        | "gallery"
+        | "highlight"
+        | "video"
+        | "thumbnail";
+      booking_story_status: "draft" | "published" | "archived";
       media_asset_status: "draft" | "published" | "archived";
       media_focal_unit: "percent";
       media_visibility: "public" | "authenticated" | "private";
@@ -4784,6 +5645,15 @@ export const Constants = {
         "partially_refunded",
         "no_show"
       ],
+      booking_story_consent_status: ["pending", "granted", "revoked"],
+      booking_story_media_role: [
+        "cover",
+        "gallery",
+        "highlight",
+        "video",
+        "thumbnail"
+      ],
+      booking_story_status: ["draft", "published", "archived"],
       media_asset_status: ["draft", "published", "archived"],
       media_focal_unit: ["percent"],
       media_visibility: ["public", "authenticated", "private"],

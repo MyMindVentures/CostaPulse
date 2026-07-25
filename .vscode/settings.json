@@ -18,14 +18,11 @@
     "**/node_modules": true,
     "**/.next": true,
     "**/.next-app": true,
-    "**/coverage": true,
-    "**/playwright-report": true,
-    "**/test-results": true
+    "**/coverage": true
   },
   "tailwindCSS.classFunctions": ["cn", "cva"],
   "files.associations": {
     "*.css": "tailwindcss"
   },
-  "vitest.enable": true,
-  "playwright.reuseBrowser": true
+  "vitest.enable": true
 }

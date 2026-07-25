@@ -29,7 +29,8 @@
     "partners": {
       "kicker": "Partners",
       "title": "Partner with CostaPulse",
-      "description": "Partner opportunities will appear here as they are published."
+      "description": "Partner opportunities will appear here as they are published.",
+      "referralCta": "I have a partner QR code"
     },
     "contact": {
       "kicker": "Contact",
@@ -414,7 +415,10 @@
       "payError": "Payment could not be started. Please try again.",
       "createError": "The booking could not be created. Please try again.",
       "incomplete": "Complete all required booking details before paying.",
-      "guestLabel": "Guest {number}"
+      "guestLabel": "Guest {number}",
+      "partnerReward": "Choose your partner reward",
+      "partnerRewardPercent": "{percent}% back after successful payment",
+      "projectedVoucher": "Projected partner voucher: {amount}"
     },
     "success": {
       "kicker": "Booking confirmed",
@@ -423,7 +427,15 @@
       "reference": "Booking reference",
       "status": "Status",
       "backToExperience": "Back to experience",
-      "backHome": "Back to home"
+      "backHome": "Back to home",
+      "voucherPending": "Your partner voucher is being prepared. This page will update automatically.",
+      "voucherIssued": "Your partner voucher",
+      "voucherFailed": "We received your payment, but your voucher could not be displayed yet. CostaPulse has been notified.",
+      "voucherCode": "Voucher code",
+      "voucherAmount": "Amount",
+      "voucherPartner": "Valid at",
+      "voucherExpiry": "Expires",
+      "voucherRestriction": "Redeem only at {partner}."
     },
     "email": {
       "paymentReceived": {
@@ -440,7 +452,13 @@
         "outro": "If you have questions, reply to this email or contact CostaPulse.",
         "guestFallback": "there",
         "whenFallback": "To be confirmed",
-        "notProvided": "—"
+        "notProvided": "—",
+        "voucherCodeLabel": "Partner voucher code",
+        "voucherAmountLabel": "Voucher amount",
+        "voucherPartnerLabel": "Valid at",
+        "voucherExpiryLabel": "Voucher expires",
+        "voucherRestrictionLabel": "Redemption",
+        "voucherRestriction": "This voucher can only be redeemed at {partner}."
       }
     },
     "cancel": {
@@ -474,7 +492,9 @@
   "Dashboards": {
     "navigationLabel": "Dashboard navigation",
     "overview": "Overview",
+    "partnerQr": "QR material",
     "bookings": "Bookings",
+    "bookingStories": "Booking Stories",
     "calendar": "Calendar",
     "customers": "Customers",
     "signOut": "Sign out",
@@ -489,7 +509,12 @@
     "partner": {
       "title": "Partner dashboard",
       "heading": "Partner overview",
-      "description": "Your authorized CostaPulse partner workspace."
+      "description": "Your authorized CostaPulse partner workspace.",
+      "qrDescription": "Open the printable QR material for each business assigned to your account.",
+      "fallbackType": "Partner",
+      "status": "Status: {status}",
+      "openQr": "Open QR material",
+      "empty": "No businesses are assigned to this partner account yet."
     },
     "admin": {
       "title": "Administration",
@@ -635,6 +660,49 @@
     "partners": "Partners",
     "locations": "Locations",
     "team": "Team"
+  },
+  "Referral": {
+    "entryTitle": "Start with a partner QR code",
+    "entryDescription": "Scan the QR code displayed by a participating CostaPulse partner to unlock their verified referral journey.",
+    "entryCta": "View CostaPulse partners",
+    "formKicker": "CostaPulse partner reward",
+    "formTitle": "Verify your email to continue",
+    "formDescription": "Enter your details to connect this partner visit to your booking. No password is required.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email address",
+    "phone": "Phone (optional)",
+    "marketingConsent": "I would like to receive occasional CostaPulse news and offers.",
+    "whatsappConsent": "I agree to receive booking-related WhatsApp messages.",
+    "submit": "Send verification link",
+    "submitting": "Sending…",
+    "checkEmailTitle": "Check your email",
+    "checkEmailDescription": "We sent a single-use verification link. It expires in 15 minutes.",
+    "resend": "Send a new link",
+    "unavailableTitle": "This partner offer is unavailable",
+    "unavailableDescription": "The link may be invalid, expired, or the partner may no longer be active.",
+    "verifiedTitle": "Partner reward verified",
+    "verifiedDescription": "Choose an experience. Your eligible partner reward will be available during booking review.",
+    "expiredTitle": "Verification link unavailable",
+    "expiredDescription": "This link is invalid, expired, or has already been used. Return to the partner page and request a new link.",
+    "validationError": "Please check the highlighted fields.",
+    "sendError": "We could not send the verification email. Please try again."
+  },
+  "BookingStories": {
+    "kicker": "Guest stories",
+    "heading": "Previous Adventures",
+    "description": "Real moments from recent CostaPulse guests.",
+    "featured": "Featured",
+    "viewStory": "View Story",
+    "viewStoryLabel": "View story: {title}",
+    "viewerLabel": "Story viewer: {title}",
+    "mediaCounter": "{current} of {total}",
+    "close": "Close story",
+    "previousMedia": "Previous media",
+    "nextMedia": "Next media",
+    "previousStory": "Previous story",
+    "nextStory": "Next story",
+    "bookExperience": "Book this experience"
   },
   "Auth": {
     "login": {

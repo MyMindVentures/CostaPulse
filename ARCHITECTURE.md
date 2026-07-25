@@ -18,6 +18,9 @@ Marketing pages live under the `(marketing)` route group and share `AppShell` (N
 | `/experiences/[slug]`                   | Experience detail + booking widget                                    |
 | `/destinations`, `/about`, `/partners`  | Marketing placeholders (content from i18n until CMS-backed)           |
 | `/book`, `/book/[slug]`, success/cancel | Booking wizard and payment outcomes                                   |
+| `/r/[partnerCode]`                      | Partner QR entry, visit registration, and contact redirect            |
+| `/referral/[visitToken]`                | Tokenized public contact verification flow (`noindex`)                |
+| `/partner/qr/[partnerId]`               | Owner-only printable partner QR material (`noindex`)                  |
 | `/admin`                                | Admin dashboard (must remain role-gated before operational mutations) |
 
 Operational endpoints (`/api/health`, `/api/ready`, bookings, availability, Stripe webhooks) and metadata routes (`sitemap`) are not marketing pages.
@@ -32,6 +35,8 @@ Operational endpoints (`/api/health`, `/api/ready`, bookings, availability, Stri
 - `src/lib/view-models` holds pure mappers/schemas for RPCs such as `get_experience_map` and `get_experience_calendar`.
 - `src/lib/map/config.ts` owns MapLibre style URL resolution and Costa Blanca fallback viewport constants.
 - `src/lib/url/catalog-filters.ts` owns typed, shareable catalog/map filter search params.
+- `src/server/referrals` owns hashed referral tokens, secure session contracts, QR generation and verification email delivery.
+- `src/server/repositories/partner-referrals.ts` owns owner-authorized partner QR material reads.
 - `src/lib/supabase/server.ts` creates a cookie-aware user-scoped client and never reads the service key.
 - `src/lib/supabase/admin.ts` is server-only and creates a non-persistent privileged client only when explicitly called.
 - Presentational components never call Supabase directly.

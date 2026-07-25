@@ -13,7 +13,10 @@ describe("dashboard navigation", () => {
       "/account",
       "/account/bookings"
     ]);
-    expect(DASHBOARD_NAVIGATION.partner[0].href).toBe("/partner");
+    expect(DASHBOARD_NAVIGATION.partner.map((item) => item.href)).toEqual([
+      "/partner",
+      "/partner/qr"
+    ]);
     expect(DASHBOARD_NAVIGATION.admin.map((item) => item.href)).toEqual([
       "/admin",
       "/admin/experiences",
@@ -22,6 +25,7 @@ describe("dashboard navigation", () => {
       "/admin/locations",
       "/admin/team",
       "/admin/bookings",
+      "/admin/booking-stories",
       "/admin/calendar",
       "/admin/customers"
     ]);
