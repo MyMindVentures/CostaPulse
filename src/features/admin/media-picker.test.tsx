@@ -10,7 +10,10 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AdminMediaAsset } from "@/server/admin/schemas";
 import { MediaLibraryClient } from "./media-picker";
-import { upsertMediaAssetAction } from "@/server/admin/actions-cms";
+import {
+  deleteMediaAction,
+  upsertMediaAssetAction
+} from "@/server/admin/actions-cms";
 
 vi.mock("sonner", () => ({
   toast: {
@@ -46,7 +49,14 @@ const labels = {
   filterUsage: "Usage",
   used: "Used",
   unused: "Unused",
-  all: "All"
+  all: "All",
+  deleteTitle: "Delete media asset?",
+  deleteDescription:
+    "This permanently deletes the file and its media record. This action cannot be undone.",
+  deleteInUse: "This media asset cannot be deleted because it is still in use.",
+  deleteCancel: "Cancel",
+  deleteConfirm: "Delete asset",
+  deleteSuccess: "Media asset deleted."
 };
 
 function mediaAsset(
@@ -90,6 +100,7 @@ describe("MediaLibraryClient", () => {
         key="unfiltered"
         initial={mediaList([first])}
         labels={labels}
+        canDelete
       />
     );
 
@@ -100,6 +111,7 @@ describe("MediaLibraryClient", () => {
         key="filtered"
         initial={mediaList([second])}
         labels={labels}
+        canDelete
       />
     );
 
@@ -118,7 +130,11 @@ describe("MediaLibraryClient", () => {
       }
     );
     render(
-      <MediaLibraryClient initial={mediaList([archived])} labels={labels} />
+      <MediaLibraryClient
+        initial={mediaList([archived])}
+        labels={labels}
+        canDelete
+      />
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
@@ -138,5 +154,52 @@ describe("MediaLibraryClient", () => {
         }
       })
     );
+  });
+  it("confirms and removes an unused asset without refreshing", async () => {
+    const asset = mediaAsset(
+      "44444444-4444-4444-8444-444444444444",
+      "unused-asset",
+      { title: "Sunset photo" }
+    );
+    vi.mocked(deleteMediaAction).mockResolvedValue({ ok: true });
+    render(
+      <MediaLibraryClient
+        initial={mediaList([asset])}
+        labels={labels}
+        canDelete
+      />
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Delete: Sunset photo" })
+    );
+    expect(screen.getByRole("alertdialog")).toHaveTextContent("Sunset photo");
+    expect(screen.getByText(labels.deleteDescription)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Delete asset" }));
+
+    await waitFor(() =>
+      expect(deleteMediaAction).toHaveBeenCalledWith({ id: asset.id })
+    );
+    await waitFor(() =>
+      expect(screen.queryByText("Sunset photo")).not.toBeInTheDocument()
+    );
+  });
+
+  it("hides delete actions from roles without permission", () => {
+    const asset = mediaAsset(
+      "55555555-5555-4555-8555-555555555555",
+      "protected-asset"
+    );
+    render(
+      <MediaLibraryClient
+        initial={mediaList([asset])}
+        labels={labels}
+        canDelete={false}
+      />
+    );
+
+    expect(
+      screen.queryByRole("button", { name: /Delete:/ })
+    ).not.toBeInTheDocument();
   });
 });

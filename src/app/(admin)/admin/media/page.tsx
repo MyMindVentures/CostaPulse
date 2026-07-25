@@ -4,6 +4,8 @@ import { SectionKicker } from "@/components/shared/section-kicker";
 import { EmptyState } from "@/components/shared/empty-state";
 import { MediaLibraryClient } from "@/features/admin/media-picker";
 import { fetchAdminMedia } from "@/server/repositories/admin-cms";
+import { requireAreaAccess } from "@/server/auth/protected-area";
+import { canDeleteAdminMedia } from "@/server/auth/role-access";
 
 type SearchParams = Promise<{
   q?: string;
@@ -19,6 +21,7 @@ export default async function AdminMediaPage({
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
+  const { roles } = await requireAreaAccess("admin");
   const t = await getTranslations("Dashboards.admin");
   const media = await fetchAdminMedia({
     search: params.q ?? null,
@@ -125,6 +128,7 @@ export default async function AdminMediaPage({
       <MediaLibraryClient
         key={mediaResultKey}
         initial={media}
+        canDelete={canDeleteAdminMedia(roles)}
         labels={{
           upload: t("upload"),
           delete: t("delete"),
@@ -137,7 +141,13 @@ export default async function AdminMediaPage({
           all: t("all"),
           detach: t("mediaDetach"),
           setPrimary: t("mediaSetPrimary"),
-          replace: t("mediaReplace")
+          replace: t("mediaReplace"),
+          deleteTitle: t("mediaDeleteTitle"),
+          deleteDescription: t("mediaDeleteDescription"),
+          deleteInUse: t("mediaDeleteInUse"),
+          deleteCancel: t("mediaDeleteCancel"),
+          deleteConfirm: t("mediaDeleteConfirm"),
+          deleteSuccess: t("mediaDeleteSuccess")
         }}
       />
     </section>
