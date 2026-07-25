@@ -1,9 +1,21 @@
 import { describe, expect, it } from "vitest";
 import {
+  DASHBOARD_NAVIGATION,
   getAccountNav,
   isNavHrefActive,
   isNavItemTreeActive
 } from "./navigation";
+
+describe("dashboard navigation", () => {
+  it("keeps clean public URLs for each protected area", () => {
+    expect(DASHBOARD_NAVIGATION.account.map((item) => item.href)).toEqual([
+      "/account",
+      "/account/bookings"
+    ]);
+    expect(DASHBOARD_NAVIGATION.partner[0].href).toBe("/partner");
+    expect(DASHBOARD_NAVIGATION.admin[0].href).toBe("/admin");
+  });
+});
 
 describe("isNavHrefActive", () => {
   it("matches exact paths", () => {

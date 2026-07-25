@@ -5,6 +5,25 @@
 
 export type NavAudience = "guest" | "customer" | "team" | "admin";
 
+export type UserRole = import("@/types/database").Enums<"app_role">;
+
+export type NavigationItem = {
+  labelKey: string;
+  href: string;
+  icon?: import("react").ComponentType<{ "aria-hidden"?: boolean }>;
+  roles?: readonly UserRole[];
+  children?: readonly NavigationItem[];
+};
+
+export const DASHBOARD_NAVIGATION = {
+  account: [
+    { labelKey: "overview", href: "/account" },
+    { labelKey: "bookings", href: "/account/bookings" }
+  ],
+  partner: [{ labelKey: "overview", href: "/partner" }],
+  admin: [{ labelKey: "overview", href: "/admin" }]
+} as const satisfies Record<string, readonly NavigationItem[]>;
+
 export type AccountNavConfig = {
   href: string;
   /** i18n key under Navigation.account.* */

@@ -30,6 +30,11 @@
       "kicker": "Partners",
       "title": "Partner with CostaPulse",
       "description": "Partner opportunities will appear here as they are published."
+    },
+    "contact": {
+      "kicker": "Contact",
+      "title": "Contact CostaPulse",
+      "description": "Contact options will appear here when they are published."
     }
   },
   "HomePage": {
@@ -423,6 +428,27 @@
       "instant": "Instant confirmation",
       "selectSlot": "Select a time to continue.",
       "continue": "Continue to booking"
+    }
+  },
+  "Dashboards": {
+    "navigationLabel": "Dashboard navigation",
+    "overview": "Overview",
+    "bookings": "Bookings",
+    "account": {
+      "title": "Your account",
+      "heading": "Account overview",
+      "description": "Manage your CostaPulse customer account.",
+      "bookingsHeading": "Your bookings",
+      "bookingsEmpty": "No bookings yet",
+      "bookingsEmptyDescription": "Your bookings will appear here after you make a reservation."
+    },
+    "partner": {
+      "title": "Partner dashboard",
+      "heading": "Partner overview",
+      "description": "Your authorized CostaPulse partner workspace."
+    },
+    "admin": {
+      "title": "Administration"
     }
   }
 }
