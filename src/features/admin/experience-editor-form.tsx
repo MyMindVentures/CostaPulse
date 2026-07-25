@@ -752,6 +752,7 @@ export function ExperienceEditorForm({
             scopeType="experience"
             scopeKey={String(experience.slug)}
             role="gallery"
+            entityId={experience.id}
             libraryItems={mediaLibrary}
             initialSelectedIds={(experience.media ?? [])
               .map((item) => (typeof item.id === "string" ? item.id : null))

@@ -208,7 +208,8 @@ export function TeamMemberEditorForm({
           <MediaPicker
             scopeType="team_member"
             scopeKey={slug}
-            role="profile"
+            role="avatar"
+            entityId={member.id}
             libraryItems={mediaLibrary}
           />
         </div>

@@ -15,3 +15,7 @@ test-results
 .tmp-*
 .tmp/
 .cursor/debug-*.log
+scripts/i18n/_admin_api_min.js
+scripts/i18n/_admin_api_loader.ts
+scripts/i18n/_admin_api_bundle.js
+scripts/_mig_payload.json

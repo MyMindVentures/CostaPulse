@@ -190,6 +190,7 @@ export function PartnerEditorForm({
             scopeType="partner"
             scopeKey={partner.slug}
             role="logo"
+            entityId={partner.id}
             libraryItems={mediaLibrary}
             initialSelectedIds={(partner.media ?? [])
               .filter((item) => item.role === "logo")
@@ -199,6 +200,7 @@ export function PartnerEditorForm({
             scopeType="partner"
             scopeKey={partner.slug}
             role="gallery"
+            entityId={partner.id}
             libraryItems={mediaLibrary}
             initialSelectedIds={(partner.media ?? [])
               .filter((item) => item.role === "gallery")

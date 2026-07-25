@@ -20,15 +20,23 @@ vi.mock("@/server/repositories/admin-cms", () => ({
   upsertAdminMediaAsset: vi.fn(),
   linkAdminMediaToScope: vi.fn(),
   deleteAdminMedia: vi.fn(),
-  createAdminSignedUpload: vi.fn()
+  createAdminSignedUpload: vi.fn(),
+  prepareAdminMediaUpload: vi.fn(),
+  finalizeAdminMediaUpload: vi.fn(),
+  replaceAdminMediaPlacement: vi.fn(),
+  detachAdminMediaPlacement: vi.fn(),
+  setAdminMediaPrimary: vi.fn()
 }));
 
 import { requireAreaAccess } from "@/server/auth/protected-area";
 import {
+  createSignedUploadAction,
   deleteMediaAction,
+  prepareMediaUploadAction,
   publishExperienceAction,
   upsertExperienceAction
 } from "./actions-cms";
+import { prepareAdminMediaUpload } from "@/server/repositories/admin-cms";
 
 describe("upsertExperienceAction", () => {
   beforeEach(() => {
@@ -114,5 +122,69 @@ describe("deleteMediaAction", () => {
         id: "11111111-1111-4111-8111-111111111111"
       })
     ).resolves.toEqual({ ok: false, message: "Forbidden", status: 403 });
+  });
+});
+
+describe("createSignedUploadAction", () => {
+  it("rejects non admin-documents buckets", async () => {
+    vi.mocked(requireAreaAccess).mockResolvedValue({
+      userId: "user-1",
+      roles: ["content_manager"]
+    });
+
+    await expect(
+      createSignedUploadAction({
+        bucket: "experience-media",
+        path: "kayak/hero/file.jpg"
+      })
+    ).resolves.toEqual({
+      ok: false,
+      message:
+        "Only admin-documents signed uploads are allowed from this action"
+    });
+  });
+});
+
+describe("prepareMediaUploadAction", () => {
+  it("rejects callers without content mutation permission", async () => {
+    vi.mocked(requireAreaAccess).mockResolvedValue({
+      userId: "user-1",
+      roles: ["operations_staff"]
+    });
+
+    await expect(
+      prepareMediaUploadAction({
+        entityType: "experience",
+        entityId: "11111111-1111-4111-8111-111111111111",
+        usage: "hero",
+        originalFilename: "hero.jpg",
+        mimeType: "image/jpeg",
+        byteSize: 1024
+      })
+    ).resolves.toEqual({ ok: false, message: "Forbidden", status: 403 });
+  });
+
+  it("forwards prepared upload metadata for content managers", async () => {
+    vi.mocked(requireAreaAccess).mockResolvedValue({
+      userId: "user-1",
+      roles: ["content_manager"]
+    });
+    vi.mocked(prepareAdminMediaUpload).mockResolvedValue({
+      bucket: "experience-media",
+      storage_path: "kayak-mentor/hero/kayak-mentor-hero-abc.jpg",
+      generated_filename: "kayak-mentor-hero-abc.jpg",
+      signedUrl: "https://example.test/upload"
+    } as never);
+
+    await expect(
+      prepareMediaUploadAction({
+        entityType: "experience",
+        entityId: "11111111-1111-4111-8111-111111111111",
+        usage: "hero",
+        originalFilename: "hero.jpg",
+        mimeType: "image/jpeg",
+        byteSize: 1024
+      })
+    ).resolves.toMatchObject({ ok: true });
   });
 });

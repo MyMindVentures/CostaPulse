@@ -202,51 +202,98 @@ export type AdminCalendarItem = z.infer<typeof adminCalendarItemSchema>;
 
 export const adminCalendarListSchema = z.array(adminCalendarItemSchema);
 
-export const adminReferenceDataSchema = z.object({
-  experiences: z.array(
-    z.object({
-      id: z.string().uuid(),
-      slug: z.string(),
-      title: z.string(),
-      status: z.string(),
-      experience_type: z.string().nullable().optional()
-    })
-  ),
-  variants: z.array(
-    z.object({
-      id: z.string().uuid(),
-      experience_id: z.string().uuid(),
-      name: z.string(),
-      slug: z.string(),
-      is_active: z.boolean()
-    })
-  ),
-  locations: z.array(
-    z.object({
-      id: z.string().uuid(),
-      name: z.string(),
-      city: z.string().nullable().optional(),
-      is_active: z.boolean()
-    })
-  ),
-  team_members: z.array(
-    z.object({
-      id: z.string().uuid(),
-      display_name: z.string(),
-      role_title: z.string().nullable().optional(),
-      is_active: z.boolean()
-    })
-  ),
-  partners: z.array(
-    z.object({
-      id: z.string().uuid(),
-      name: z.string(),
-      status: z.string(),
-      referral_code: z.string().nullable().optional()
-    })
-  ),
-  roles: z.array(z.string()).nullable().optional()
-});
+export const adminReferenceDataSchema = z
+  .object({
+    experiences: z.array(
+      z
+        .object({
+          id: z.string().uuid(),
+          slug: z.string(),
+          title: z.string().optional(),
+          name: z.string().optional(),
+          status: z.string(),
+          experience_type: z.string().nullable().optional(),
+          thumbnail: z.string().nullable().optional()
+        })
+        .passthrough()
+        .transform((row) => ({
+          ...row,
+          title: row.title ?? row.name ?? row.slug
+        }))
+    ),
+    variants: z.array(
+      z
+        .object({
+          id: z.string().uuid(),
+          experience_id: z.string().uuid(),
+          parent_id: z.string().uuid().optional(),
+          name: z.string(),
+          slug: z.string(),
+          is_active: z.boolean(),
+          status: z.string().optional()
+        })
+        .passthrough()
+    ),
+    locations: z.array(
+      z
+        .object({
+          id: z.string().uuid(),
+          name: z.string(),
+          slug: z.string().optional(),
+          city: z.string().nullable().optional(),
+          is_active: z.boolean(),
+          status: z.string().optional()
+        })
+        .passthrough()
+    ),
+    team_members: z.array(
+      z
+        .object({
+          id: z.string().uuid(),
+          display_name: z.string().optional(),
+          name: z.string().optional(),
+          slug: z.string().optional(),
+          role_title: z.string().nullable().optional(),
+          is_active: z.boolean(),
+          status: z.string().optional(),
+          thumbnail: z.string().nullable().optional()
+        })
+        .passthrough()
+        .transform((row) => ({
+          ...row,
+          display_name: row.display_name ?? row.name ?? row.slug ?? row.id
+        }))
+    ),
+    partners: z.array(
+      z
+        .object({
+          id: z.string().uuid(),
+          name: z.string(),
+          slug: z.string().optional(),
+          status: z.string(),
+          referral_code: z.string().nullable().optional()
+        })
+        .passthrough()
+    ),
+    site_content_sections: z
+      .array(
+        z
+          .object({
+            id: z.string().uuid(),
+            section_key: z.string().optional(),
+            slug: z.string().optional(),
+            name: z.string().optional(),
+            label: z.string().optional(),
+            is_active: z.boolean().optional(),
+            status: z.string().optional()
+          })
+          .passthrough()
+      )
+      .optional()
+      .default([]),
+    roles: z.array(z.string()).nullable().optional()
+  })
+  .passthrough();
 
 export type AdminReferenceData = z.infer<typeof adminReferenceDataSchema>;
 
@@ -475,3 +522,35 @@ export const signedUploadSchema = z
     token: z.string().optional()
   })
   .passthrough();
+
+export const preparedMediaUploadSchema = z
+  .object({
+    signedUrl: z.string().optional(),
+    signed_url: z.string().optional(),
+    token: z.string().optional(),
+    bucket: z.string(),
+    path: z.string().optional(),
+    storage_path: z.string(),
+    generated_filename: z.string(),
+    folder: z.string().optional(),
+    human_label: z.string().optional(),
+    original_filename: z.string().optional(),
+    mime_type: z.string().optional(),
+    entity_type: z.string().optional(),
+    entity_id: z.string().uuid().optional(),
+    parent_entity_id: z.string().uuid().nullable().optional(),
+    usage: z.string().optional()
+  })
+  .passthrough();
+
+export type PreparedMediaUpload = z.infer<typeof preparedMediaUploadSchema>;
+
+export const finalizedMediaUploadSchema = z
+  .object({
+    asset: adminMediaAssetSchema,
+    placement: z.record(z.string(), z.unknown()),
+    used_by: adminMediaUsedBySchema.optional()
+  })
+  .passthrough();
+
+export type FinalizedMediaUpload = z.infer<typeof finalizedMediaUploadSchema>;
