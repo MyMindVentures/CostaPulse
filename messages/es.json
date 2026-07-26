@@ -807,86 +807,86 @@
   },
   "PartnerInvitation": {
     "meta": {
-      "title": "Invitación Founding Launch Partner para {partner}",
-      "description": "Una invitación personal de CostaPulse para {partner}.",
+      "title": "Invitación para socio fundador de lanzamiento de {partner}",
+      "description": "Una invitación personal de CostaPulse para que {partner} sea socio fundador de lanzamiento.",
       "unavailableTitle": "Invitación no disponible"
     },
-    "eyebrow": "Founding Launch Partner Invitation",
+    "eyebrow": "Invitación para socio fundador de lanzamiento",
     "heading": "Una invitación personal para {partner}",
-    "founderIntro": "From Kevin De Vlieger, Founder of CostaPulse — an invitation to help shape a more thoughtful way to discover the Mediterranean.",
+    "founderIntro": "De Kevin De Vlieger, fundador de CostaPulse: una invitación para contribuir a crear una forma más cuidada de descubrir el Mediterráneo.",
     "meetingCta": "Concertar una reunión personal",
     "exploreCta": "Descubrir CostaPulse",
     "preparedFor": "Preparado personalmente para {partner}",
-    "whyEyebrow": "Por qué este partner",
-    "whyHeading": "Seleccionado con intención",
+    "whyEyebrow": "Por qué este socio",
+    "whyHeading": "Elegido con criterio",
     "reasons": {
-      "identity": "Authentic local identity",
-      "hospitality": "Genuine hospitality",
-      "quality": "A commitment to quality",
-      "vision": "Long-term vision",
-      "region": "Meaningful regional relevance"
+      "identity": "Identidad local auténtica",
+      "hospitality": "Hospitalidad genuina",
+      "quality": "Compromiso con la calidad",
+      "vision": "Visión a largo plazo",
+      "region": "Relevancia significativa para la región"
     },
-    "visionEyebrow": "The CostaPulse vision",
-    "visionHeading": "A considered guide to the Mediterranean",
-    "visionBody": "CostaPulse is a curated premium platform for authentic Mediterranean experiences and local businesses. It is not a mass-market directory: premium storytelling, curated guides and intelligent recommendations put quality before quantity.",
-    "qualityOverQuantity": "Calidad antes que cantidad",
-    "benefitsEyebrow": "Founding Launch Partner",
-    "benefitsHeading": "A partnership built from the beginning",
+    "visionEyebrow": "La visión de CostaPulse",
+    "visionHeading": "Una guía selecta del Mediterráneo",
+    "visionBody": "CostaPulse es una plataforma prémium cuidadosamente seleccionada que reúne experiencias mediterráneas auténticas y negocios locales. No es un directorio para el mercado de masas: las historias de calidad, las guías seleccionadas y las recomendaciones inteligentes anteponen la calidad a la cantidad.",
+    "qualityOverQuantity": "La calidad por encima de la cantidad",
+    "benefitsEyebrow": "Socio fundador de lanzamiento",
+    "benefitsHeading": "Una colaboración construida desde el principio",
     "benefits": {
       "visibility": {
-        "title": "Early featured visibility",
-        "body": "A considered presence within the platform during its launch period."
+        "title": "Visibilidad destacada desde el inicio",
+        "body": "Una presencia cuidada en la plataforma durante su periodo de lanzamiento."
       },
       "storytelling": {
-        "title": "Premium business storytelling",
-        "body": "Editorial presentation that communicates the character and quality of your business."
+        "title": "Narrativa prémium para su negocio",
+        "body": "Una presentación editorial que transmite el carácter y la calidad de su negocio."
       },
       "guides": {
-        "title": "Curated guides",
-        "body": "Eligibility for relevant guides and recommendations selected by CostaPulse."
+        "title": "Guías seleccionadas",
+        "body": "Posibilidad de aparecer en guías y recomendaciones relevantes seleccionadas por CostaPulse."
       },
       "referrals": {
-        "title": "QR and referral opportunities",
-        "body": "The opportunity to explore trackable, guest-friendly partnership touchpoints."
+        "title": "Oportunidades con códigos QR y recomendaciones",
+        "body": "La oportunidad de explorar puntos de contacto de la colaboración que sean fáciles de usar para los clientes y permitan medir resultados."
       },
       "introductions": {
-        "title": "Relevant introductions",
-        "body": "A direct path for interested visitors to discover and contact your business."
+        "title": "Presentaciones relevantes",
+        "body": "Una vía directa para que los visitantes interesados descubran su negocio y se pongan en contacto con él."
       },
       "influence": {
-        "title": "A voice during launch",
-        "body": "Early conversations that can help inform how the partner experience develops."
+        "title": "Una voz durante el lanzamiento",
+        "body": "Conversaciones desde el inicio que pueden ayudar a orientar el desarrollo de la experiencia para socios."
       }
     },
-    "benefitsDisclaimer": "Participation does not guarantee traffic, revenue or commercial results. Every collaboration is explored on fit and shared values.",
+    "benefitsDisclaimer": "La participación no garantiza tráfico, ingresos ni resultados comerciales. Cada colaboración se estudia en función de la afinidad y los valores compartidos.",
     "letterEyebrow": "Su invitación personal",
     "letterSignature": "Un cordial saludo,",
     "founderTitle": "Fundador, CostaPulse",
-    "journeyEyebrow": "Partnership journey",
-    "journeyHeading": "Simple, personal and considered",
+    "journeyEyebrow": "El camino de la colaboración",
+    "journeyHeading": "Sencillo, personal y meditado",
     "journey": {
       "introduction": {
-        "title": "Personal introduction",
-        "body": "Meet Kevin and discover the CostaPulse vision."
+        "title": "Presentación personal",
+        "body": "Conozca a Kevin y descubra la visión de CostaPulse."
       },
       "fit": {
-        "title": "Explore partnership fit",
-        "body": "Discuss values, audience and mutual relevance."
+        "title": "Explorar la afinidad de la colaboración",
+        "body": "Hablemos de valores, público y relevancia mutua."
       },
       "profile": {
-        "title": "Build the partnership",
-        "body": "Shape the partner profile and referral setup together."
+        "title": "Construir la colaboración",
+        "body": "Demos forma juntos al perfil del socio y al sistema de recomendaciones."
       },
       "launch": {
-        "title": "Launch as a Founding Partner",
-        "body": "Join the curated launch collection when both sides are ready."
+        "title": "Lanzamiento como socio fundador",
+        "body": "Únase a la selección de lanzamiento cuando ambas partes estén preparadas."
       }
     },
-    "closingEyebrow": "A personal next step",
+    "closingEyebrow": "Un siguiente paso personal",
     "closingHeading": "Conozcámonos, {partner}",
-    "closingBody": "Kevin would be delighted to introduce CostaPulse personally, listen to your perspective and explore whether there is a natural fit.",
+    "closingBody": "Kevin estará encantado de presentarle CostaPulse personalmente, escuchar su perspectiva y explorar si existe una afinidad natural.",
     "websiteCta": "Visitar CostaPulse",
-    "partnerWebsiteCta": "Web del partner",
+    "partnerWebsiteCta": "Web del socio",
     "loading": "Cargando invitación",
     "errorTitle": "No se pudo cargar la invitación",
     "errorDescription": "Vuelva a intentarlo en unos instantes.",
