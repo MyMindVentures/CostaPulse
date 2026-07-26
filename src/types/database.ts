@@ -5428,6 +5428,29 @@ export type Database = {
           website_url: string | null;
         }[];
       };
+      get_public_partner_invitation: {
+        Args: { p_locale?: string; p_partner_slug: string };
+        Returns: {
+          business_type: string | null;
+          image_alt_text: string | null;
+          image_bucket_id: string | null;
+          image_storage_path: string | null;
+          invitation_body: string;
+          location_city: string | null;
+          location_country_code: string | null;
+          location_name: string | null;
+          location_province: string | null;
+          logo_alt_text: string | null;
+          logo_bucket_id: string | null;
+          logo_storage_path: string | null;
+          outreach_subject: string;
+          partner_description: string | null;
+          partner_id: string;
+          partner_name: string;
+          partner_slug: string;
+          website_url: string | null;
+        }[];
+      };
       get_public_referral_landing: {
         Args: { p_locale?: string; p_visit_token: string };
         Returns: Json;

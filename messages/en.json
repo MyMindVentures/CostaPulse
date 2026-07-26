@@ -804,5 +804,92 @@
       "submit": "Log in",
       "errorTitle": "Sign-in failed"
     }
+  },
+  "PartnerInvitation": {
+    "meta": {
+      "title": "Founding Launch Partner invitation for {partner}",
+      "description": "A personal CostaPulse Founding Launch Partner invitation for {partner}.",
+      "unavailableTitle": "Invitation unavailable"
+    },
+    "eyebrow": "Founding Launch Partner Invitation",
+    "heading": "A personal invitation for {partner}",
+    "founderIntro": "From Kevin De Vlieger, Founder of CostaPulse — an invitation to help shape a more thoughtful way to discover the Mediterranean.",
+    "meetingCta": "Arrange a personal meeting",
+    "exploreCta": "Explore CostaPulse",
+    "preparedFor": "Prepared personally for {partner}",
+    "whyEyebrow": "Why this partner",
+    "whyHeading": "Selected with intention",
+    "reasons": {
+      "identity": "Authentic local identity",
+      "hospitality": "Genuine hospitality",
+      "quality": "A commitment to quality",
+      "vision": "Long-term vision",
+      "region": "Meaningful regional relevance"
+    },
+    "visionEyebrow": "The CostaPulse vision",
+    "visionHeading": "A considered guide to the Mediterranean",
+    "visionBody": "CostaPulse is a curated premium platform for authentic Mediterranean experiences and local businesses. It is not a mass-market directory: premium storytelling, curated guides and intelligent recommendations put quality before quantity.",
+    "qualityOverQuantity": "Quality over quantity",
+    "benefitsEyebrow": "Founding Launch Partner",
+    "benefitsHeading": "A partnership built from the beginning",
+    "benefits": {
+      "visibility": {
+        "title": "Early featured visibility",
+        "body": "A considered presence within the platform during its launch period."
+      },
+      "storytelling": {
+        "title": "Premium business storytelling",
+        "body": "Editorial presentation that communicates the character and quality of your business."
+      },
+      "guides": {
+        "title": "Curated guides",
+        "body": "Eligibility for relevant guides and recommendations selected by CostaPulse."
+      },
+      "referrals": {
+        "title": "QR and referral opportunities",
+        "body": "The opportunity to explore trackable, guest-friendly partnership touchpoints."
+      },
+      "introductions": {
+        "title": "Relevant introductions",
+        "body": "A direct path for interested visitors to discover and contact your business."
+      },
+      "influence": {
+        "title": "A voice during launch",
+        "body": "Early conversations that can help inform how the partner experience develops."
+      }
+    },
+    "benefitsDisclaimer": "Participation does not guarantee traffic, revenue or commercial results. Every collaboration is explored on fit and shared values.",
+    "letterEyebrow": "Your personal invitation",
+    "letterSignature": "Warm regards,",
+    "founderTitle": "Founder, CostaPulse",
+    "journeyEyebrow": "Partnership journey",
+    "journeyHeading": "Simple, personal and considered",
+    "journey": {
+      "introduction": {
+        "title": "Personal introduction",
+        "body": "Meet Kevin and discover the CostaPulse vision."
+      },
+      "fit": {
+        "title": "Explore partnership fit",
+        "body": "Discuss values, audience and mutual relevance."
+      },
+      "profile": {
+        "title": "Build the partnership",
+        "body": "Shape the partner profile and referral setup together."
+      },
+      "launch": {
+        "title": "Launch as a Founding Partner",
+        "body": "Join the curated launch collection when both sides are ready."
+      }
+    },
+    "closingEyebrow": "A personal next step",
+    "closingHeading": "Let’s meet, {partner}",
+    "closingBody": "Kevin would be delighted to introduce CostaPulse personally, listen to your perspective and explore whether there is a natural fit.",
+    "websiteCta": "Visit CostaPulse",
+    "partnerWebsiteCta": "Partner website",
+    "loading": "Loading invitation",
+    "errorTitle": "The invitation could not be loaded",
+    "errorDescription": "Please try again in a moment.",
+    "retry": "Try again"
   }
 }

@@ -804,5 +804,92 @@
       "submit": "Inloggen",
       "errorTitle": "Inloggen mislukt"
     }
+  },
+  "PartnerInvitation": {
+    "meta": {
+      "title": "Founding Launch Partner-uitnodiging voor {partner}",
+      "description": "Een persoonlijke CostaPulse Founding Launch Partner-uitnodiging voor {partner}.",
+      "unavailableTitle": "Uitnodiging niet beschikbaar"
+    },
+    "eyebrow": "Founding Launch Partner Invitation",
+    "heading": "Een persoonlijke uitnodiging voor {partner}",
+    "founderIntro": "Van Kevin De Vlieger, oprichter van CostaPulse — een uitnodiging om mee vorm te geven aan een bewustere manier om de Middellandse Zee te ontdekken.",
+    "meetingCta": "Plan een persoonlijk gesprek",
+    "exploreCta": "Ontdek CostaPulse",
+    "preparedFor": "Persoonlijk samengesteld voor {partner}",
+    "whyEyebrow": "Waarom deze partner",
+    "whyHeading": "Bewust geselecteerd",
+    "reasons": {
+      "identity": "Authentieke lokale identiteit",
+      "hospitality": "Oprechte gastvrijheid",
+      "quality": "Toewijding aan kwaliteit",
+      "vision": "Langetermijnvisie",
+      "region": "Betekenisvolle regionale relevantie"
+    },
+    "visionEyebrow": "De CostaPulse-visie",
+    "visionHeading": "Een doordachte gids voor de Middellandse Zee",
+    "visionBody": "CostaPulse is een gecureerd premium platform voor authentieke mediterrane ervaringen en lokale ondernemingen. Geen massale bedrijvengids: premium verhalen, gecureerde gidsen en intelligente aanbevelingen zetten kwaliteit boven kwantiteit.",
+    "qualityOverQuantity": "Kwaliteit boven kwantiteit",
+    "benefitsEyebrow": "Founding Launch Partner",
+    "benefitsHeading": "Een partnerschap vanaf het allereerste begin",
+    "benefits": {
+      "visibility": {
+        "title": "Vroege prominente zichtbaarheid",
+        "body": "Een zorgvuldig gekozen aanwezigheid op het platform tijdens de lancering."
+      },
+      "storytelling": {
+        "title": "Premium bedrijfsverhaal",
+        "body": "Een redactionele presentatie die het karakter en de kwaliteit van uw onderneming overbrengt."
+      },
+      "guides": {
+        "title": "Gecureerde gidsen",
+        "body": "Mogelijke opname in relevante gidsen en aanbevelingen van CostaPulse."
+      },
+      "referrals": {
+        "title": "QR- en referral-kansen",
+        "body": "De mogelijkheid om meetbare, gastvriendelijke contactmomenten te verkennen."
+      },
+      "introductions": {
+        "title": "Relevante introducties",
+        "body": "Een directe route voor geïnteresseerde bezoekers om uw onderneming te ontdekken."
+      },
+      "influence": {
+        "title": "Inspraak tijdens de lancering",
+        "body": "Vroege gesprekken die de partnerervaring mee kunnen helpen ontwikkelen."
+      }
+    },
+    "benefitsDisclaimer": "Deelname garandeert geen verkeer, omzet of commercieel resultaat. Elke samenwerking wordt onderzocht op basis van aansluiting en gedeelde waarden.",
+    "letterEyebrow": "Uw persoonlijke uitnodiging",
+    "letterSignature": "Met hartelijke groet,",
+    "founderTitle": "Oprichter, CostaPulse",
+    "journeyEyebrow": "Het partnertraject",
+    "journeyHeading": "Eenvoudig, persoonlijk en doordacht",
+    "journey": {
+      "introduction": {
+        "title": "Persoonlijke kennismaking",
+        "body": "Ontmoet Kevin en ontdek de CostaPulse-visie."
+      },
+      "fit": {
+        "title": "Verken de samenwerking",
+        "body": "Bespreek waarden, publiek en wederzijdse relevantie."
+      },
+      "profile": {
+        "title": "Bouw het partnerschap",
+        "body": "Geef samen vorm aan het profiel en de referral-opzet."
+      },
+      "launch": {
+        "title": "Lanceer als Founding Partner",
+        "body": "Sluit aan bij de gecureerde lancering wanneer beide partijen klaar zijn."
+      }
+    },
+    "closingEyebrow": "Een persoonlijke volgende stap",
+    "closingHeading": "Laten we kennismaken, {partner}",
+    "closingBody": "Kevin licht CostaPulse graag persoonlijk toe, luistert naar uw perspectief en verkent of er een natuurlijke match is.",
+    "websiteCta": "Bezoek CostaPulse",
+    "partnerWebsiteCta": "Website van partner",
+    "loading": "Uitnodiging laden",
+    "errorTitle": "De uitnodiging kon niet worden geladen",
+    "errorDescription": "Probeer het over een ogenblik opnieuw.",
+    "retry": "Opnieuw proberen"
   }
 }
