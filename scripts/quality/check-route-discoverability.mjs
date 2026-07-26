@@ -76,12 +76,12 @@ function pagePathToRoute(pagePath) {
 }
 
 /**
- * Nested detail/action pages are discoverable through their static section
- * parent. Static pages require their own navigation href.
+ * Nested detail/action pages are discoverable through their nearest existing
+ * static section parent. Static pages require their own navigation href.
  * @param {string} route
  * @returns {string}
  */
-function requiredNavigationHref(route) {
+function requiredNavigationHref(route, knownRoutes = new Set()) {
   const segments = route.split("/").filter(Boolean);
   const firstDynamicIndex = segments.findIndex((segment) =>
     segment.startsWith("[")
@@ -89,6 +89,11 @@ function requiredNavigationHref(route) {
 
   if (firstDynamicIndex >= 0) {
     segments.splice(firstDynamicIndex);
+    while (segments.length > 1) {
+      const candidate = `/${segments.join("/")}`;
+      if (knownRoutes.has(candidate)) break;
+      segments.pop();
+    }
   } else if (segments.length > 1 && FLOW_TERMINALS.has(segments.at(-1) ?? "")) {
     segments.pop();
   }
@@ -133,6 +138,9 @@ const trackedFiles = git(["ls-files"])
   .split(/\r?\n/)
   .map(toPosix)
   .filter(Boolean);
+const knownPageRoutes = new Set(
+  trackedFiles.filter((file) => PAGE_PATTERN.test(file)).map(pagePathToRoute)
+);
 const navigationFiles = trackedFiles.filter(
   (file) =>
     NAVIGATION_PATHS.has(file) ||
@@ -155,7 +163,7 @@ const violations = [];
 
 for (const page of pages) {
   const route = pagePathToRoute(page);
-  const navigationHref = requiredNavigationHref(route);
+  const navigationHref = requiredNavigationHref(route, knownPageRoutes);
 
   if (!containsHref(navigationSource, navigationHref)) {
     violations.push(
