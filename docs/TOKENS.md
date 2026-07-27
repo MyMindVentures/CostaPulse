@@ -1,5 +1,7 @@
 # Design tokens
 
+Binding visual policy: [`docs/FRONTEND-STYLE-GUARDRAILS.md`](FRONTEND-STYLE-GUARDRAILS.md).
+
 Source of truth: brand CSS variables in [`src/app/globals.css`](../src/app/globals.css).
 
 ## Brand tokens
