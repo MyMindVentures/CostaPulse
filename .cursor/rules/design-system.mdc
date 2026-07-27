@@ -1,21 +1,22 @@
 ---
-description: CostaPulse design tokens and reusable UI primitives
-globs: src/components/ui/**/*,src/components/shared/**/*,src/app/globals.css,**/*.stories.*
-alwaysApply: false
+description: Mandatory CostaPulse visual language, design tokens and reusable UI primitives
+globs: src/**/*.{ts,tsx,css},**/*.stories.*
+alwaysApply: true
 ---
 
-# Design system
+# CostaPulse design system
 
-## Tokens
+Before editing frontend code, read and obey:
 
-- Source of truth: brand CSS variables in `src/app/globals.css` (`--navy`, `--coral`, `--turquoise`, `--sand`, …).
-- shadcn semantic tokens (`--background`, `--primary`, `--ring`, …) alias those brand values.
-- Do not introduce a second palette or default purple/neutral shadcn theme.
+1. `docs/FRONTEND-STYLE-GUARDRAILS.md` — binding visual rules.
+2. `docs/TOKENS.md` — token usage.
+3. `src/app/globals.css` — actual token values and typography.
 
-## Components
+## Non-negotiable
 
-- `src/components/ui` — foundational primitives only (no domain data).
-- `src/components/shared` — cross-domain compositions and universal states.
-- Add new shadcn primitives only when ≥2 real use cases exist.
-- Mobile-first; target WCAG 2.2 AA; handle loading, empty, error, disabled, focus, validation, responsive states.
-- Prefer Storybook stories for `ui` + `shared` when documenting visuals.
+- Preserve the premium Mediterranean CostaPulse visual language.
+- Use existing CSS/Tailwind tokens only; no second palette, arbitrary brand hex values or default purple/neutral shadcn theme.
+- Reuse `src/components/ui` and `src/components/shared`; do not create page-specific copies.
+- No new fonts, decorative gradients, glassmorphism, excessive blur/shadows or emoji UI icons without explicit approval.
+- Mobile-first, WCAG 2.2 AA, complete focus/loading/empty/error/disabled states.
+- When uncertain, preserve established patterns rather than inventing a new visual direction.
