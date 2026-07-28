@@ -279,6 +279,14 @@ npm run build
 npm run start
 ```
 
+### Local quality gates
+
+GitHub Actions are not used. The repository relies on local hooks:
+
+- `pre-commit` runs fast staged checks through `npm run precommit:check`.
+- `pre-push` must run `npm run prepush:check`, including lint, typecheck, tests, production build and the standalone SSR smoke test.
+- Never bypass hooks or push when the production smoke test fails.
+
 Never remove, weaken or skip tests merely to make checks pass.
 
 ## Definition of done
