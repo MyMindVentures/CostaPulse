@@ -20,10 +20,7 @@ export type SiteLogoAsset = {
  * same source asset to keep branding consistent.
  */
 export async function getSiteLogoAsset(): Promise<SiteLogoAsset> {
-  const url = getPublicStorageUrl(
-    BRAND_ASSETS_BUCKET,
-    SITE_LOGO_STORAGE_PATH
-  );
+  const url = getPublicStorageUrl(BRAND_ASSETS_BUCKET, SITE_LOGO_STORAGE_PATH);
 
   if (!url) {
     throw new Error(

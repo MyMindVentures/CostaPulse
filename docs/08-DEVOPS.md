@@ -30,22 +30,22 @@ Use `.env.example` as the committed inventory and `.env.local` for real local cr
 
 ## Environment variable inventory
 
-| Variable | Phase | Visibility | Required | Purpose |
-| --- | --- | --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Build | Public | Production | Canonical metadata and sitemap origin |
-| `NEXT_PUBLIC_SUPABASE_URL` | Build | Public | Supabase enabled | Project API URL |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Build | Public | Supabase enabled | RLS-bound public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Runtime | Secret | Privileged jobs only | Bypasses RLS; server only |
-| `STRIPE_SECRET_KEY` | Runtime | Secret | Payments | Stripe server client |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Build | Public | Client payments | Stripe.js initialization |
-| `STRIPE_WEBHOOK_SECRET` | Runtime | Secret | Webhooks | Signature verification |
-| `RESEND_API_KEY` | Runtime | Secret | Email | Transactional email |
-| `RESEND_FROM_EMAIL` | Runtime | Secret | Email | Verified sender |
-| `NEXT_PUBLIC_SENTRY_DSN` | Build | Public | Optional | Error destination |
-| `SENTRY_AUTH_TOKEN` | Build | Secret | Source maps | Build authentication |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Build | Public | Optional | Consent-gated analytics |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Build | Public | Optional | Regional PostHog host |
-| `PORT` | Runtime | Platform | Railway | Injected listening port |
+| Variable                               | Phase   | Visibility | Required             | Purpose                               |
+| -------------------------------------- | ------- | ---------- | -------------------- | ------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`                 | Build   | Public     | Production           | Canonical metadata and sitemap origin |
+| `NEXT_PUBLIC_SUPABASE_URL`             | Build   | Public     | Supabase enabled     | Project API URL                       |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Build   | Public     | Supabase enabled     | RLS-bound public key                  |
+| `SUPABASE_SERVICE_ROLE_KEY`            | Runtime | Secret     | Privileged jobs only | Bypasses RLS; server only             |
+| `STRIPE_SECRET_KEY`                    | Runtime | Secret     | Payments             | Stripe server client                  |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`   | Build   | Public     | Client payments      | Stripe.js initialization              |
+| `STRIPE_WEBHOOK_SECRET`                | Runtime | Secret     | Webhooks             | Signature verification                |
+| `RESEND_API_KEY`                       | Runtime | Secret     | Email                | Transactional email                   |
+| `RESEND_FROM_EMAIL`                    | Runtime | Secret     | Email                | Verified sender                       |
+| `NEXT_PUBLIC_SENTRY_DSN`               | Build   | Public     | Optional             | Error destination                     |
+| `SENTRY_AUTH_TOKEN`                    | Build   | Secret     | Source maps          | Build authentication                  |
+| `NEXT_PUBLIC_POSTHOG_KEY`              | Build   | Public     | Optional             | Consent-gated analytics               |
+| `NEXT_PUBLIC_POSTHOG_HOST`             | Build   | Public     | Optional             | Regional PostHog host                 |
+| `PORT`                                 | Runtime | Platform   | Railway              | Injected listening port               |
 
 Public values are not secrets. Server credentials must never use `NEXT_PUBLIC_`. Optional integrations fail closed. Rotate any value exposed through logs, Git history or browser bundles.
 
@@ -72,11 +72,11 @@ Do not remove, weaken or bypass quality gates to make CI pass.
 
 Husky local gates:
 
-| Hook | Responsibility |
-| --- | --- |
+| Hook         | Responsibility                                                 |
+| ------------ | -------------------------------------------------------------- |
 | `pre-commit` | Secrets, staged formatting/lint and fast repository guardrails |
-| `commit-msg` | Conventional Commits through commitlint |
-| `pre-push` | Typecheck and tests |
+| `commit-msg` | Conventional Commits through commitlint                        |
+| `pre-push`   | Typecheck and tests                                            |
 
 CI remains authoritative for formatting verification, coverage, repository-wide linting, production build and Storybook. Skipping hooks is for genuine emergencies only and must be disclosed.
 

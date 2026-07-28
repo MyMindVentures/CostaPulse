@@ -57,7 +57,7 @@ export function PartnerCard({ item, selected, onSelect }: PartnerCardProps) {
           </p>
 
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="bg-navy text-white inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold">
+            <span className="bg-navy inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-white">
               <Star className="size-3 fill-current" aria-hidden />
               {t("trustedPartner")}
             </span>
@@ -73,7 +73,9 @@ export function PartnerCard({ item, selected, onSelect }: PartnerCardProps) {
               <MapPin className="text-turquoise size-4 shrink-0" aria-hidden />
               <span className="truncate">{item.location.city}</span>
             </p>
-            <span className="text-navy text-sm font-semibold">{t("seeAll")}</span>
+            <span className="text-navy text-sm font-semibold">
+              {t("seeAll")}
+            </span>
           </div>
         </div>
       </button>

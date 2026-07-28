@@ -22,17 +22,17 @@ Never generic SaaS, corporate blue, neon, cartoonish, tropical-tiki, cheap beach
 
 Brand CSS variables in `src/app/globals.css` are authoritative. Semantic shadcn tokens alias these values. Do not introduce a second palette.
 
-| Token | Role |
-| --- | --- |
-| `--navy`, `--navy-deep`, `--navy-soft` | Primary surfaces, headings and shell |
-| `--turquoise`, `--turquoise-deep` | Water-inspired accents, links, active and focus states |
-| `--coral`, `--coral-dark` | Primary CTA and destructive state |
-| `--gold` | Restrained premium highlight |
-| `--sand`, `--white`, `--panel` | Page and card surfaces |
-| `--ink`, `--muted` | Primary and secondary text |
-| `--border` | Borders and inputs |
-| `--shadow` | Elevation |
-| `--shell-nav-height` | Layout chrome |
+| Token                                  | Role                                                   |
+| -------------------------------------- | ------------------------------------------------------ |
+| `--navy`, `--navy-deep`, `--navy-soft` | Primary surfaces, headings and shell                   |
+| `--turquoise`, `--turquoise-deep`      | Water-inspired accents, links, active and focus states |
+| `--coral`, `--coral-dark`              | Primary CTA and destructive state                      |
+| `--gold`                               | Restrained premium highlight                           |
+| `--sand`, `--white`, `--panel`         | Page and card surfaces                                 |
+| `--ink`, `--muted`                     | Primary and secondary text                             |
+| `--border`                             | Borders and inputs                                     |
+| `--shadow`                             | Elevation                                              |
+| `--shell-nav-height`                   | Layout chrome                                          |
 
 Current palette references:
 
