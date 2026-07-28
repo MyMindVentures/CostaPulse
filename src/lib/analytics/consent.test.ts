@@ -31,4 +31,11 @@ describe("analytics consent", () => {
     ).toBeNull();
     expect(parseAnalyticsConsentCookie(null)).toBeNull();
   });
+
+  it("does not throw for malformed percent encoding", () => {
+    const malformed = `${ANALYTICS_CONSENT_COOKIE}=%E0%A4%A`;
+
+    expect(() => parseAnalyticsConsentCookie(malformed)).not.toThrow();
+    expect(parseAnalyticsConsentCookie(malformed)).toBeNull();
+  });
 });
