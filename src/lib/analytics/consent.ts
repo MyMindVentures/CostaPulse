@@ -27,10 +27,15 @@ export function parseAnalyticsConsentCookie(
     return null;
   }
 
-  const value = decodeURIComponent(
-    match.slice(ANALYTICS_CONSENT_COOKIE.length + 1)
-  );
-  return isAnalyticsConsent(value) ? value : null;
+  try {
+    const value = decodeURIComponent(
+      match.slice(ANALYTICS_CONSENT_COOKIE.length + 1)
+    );
+    return isAnalyticsConsent(value) ? value : null;
+  } catch {
+    // A malformed cookie must never crash React hydration or the entire app.
+    return null;
+  }
 }
 
 export function readAnalyticsConsentFromDocument(): AnalyticsConsent | null {
@@ -38,7 +43,11 @@ export function readAnalyticsConsentFromDocument(): AnalyticsConsent | null {
     return null;
   }
 
-  return parseAnalyticsConsentCookie(document.cookie);
+  try {
+    return parseAnalyticsConsentCookie(document.cookie);
+  } catch {
+    return null;
+  }
 }
 
 export function subscribeAnalyticsConsent(onStoreChange: () => void) {
