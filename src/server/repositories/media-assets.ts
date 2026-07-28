@@ -1,7 +1,8 @@
 import "server-only";
 import {
   BRAND_ASSETS_BUCKET,
-  getPublicStorageUrl
+  getPublicStorageUrl,
+  SITE_LOGO_FALLBACK_SRC
 } from "@/lib/media/experience-media";
 
 const SITE_LOGO_STORAGE_PATH = "logos/CostaPulse Logo.png";
@@ -23,9 +24,13 @@ export async function getSiteLogoAsset(): Promise<SiteLogoAsset> {
   const url = getPublicStorageUrl(BRAND_ASSETS_BUCKET, SITE_LOGO_STORAGE_PATH);
 
   if (!url) {
-    throw new Error(
-      "NEXT_PUBLIC_SUPABASE_URL is missing; the CostaPulse brand logo cannot be resolved."
-    );
+    return {
+      url: SITE_LOGO_FALLBACK_SRC,
+      alt: "CostaPulse",
+      storagePath: SITE_LOGO_FALLBACK_SRC,
+      bucketId: "public",
+      isFallback: true
+    };
   }
 
   return {
