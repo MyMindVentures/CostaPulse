@@ -23,11 +23,6 @@ jobs:
     env:
       CI: true
       NEXT_TELEMETRY_DISABLED: 1
-      NEXT_PUBLIC_SITE_URL: https://www.costapulse.club
-      NEXT_PUBLIC_SUPABASE_URL: https://fbxhevctqrkulmaehrcw.supabase.co
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
-      NEXT_PUBLIC_MAP_STYLE_URL: https://tiles.openfreemap.org/styles/liberty
-      NEXT_PUBLIC_POSTHOG_HOST: https://eu.i.posthog.com
 
     steps:
       - name: Checkout repository
@@ -43,6 +38,8 @@ jobs:
 
       - name: Validate required CI environment
         shell: bash
+        env:
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
         run: |
           set -euo pipefail
           if [[ -z "${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:-}" ]]; then
@@ -69,10 +66,22 @@ jobs:
         run: npm run test
 
       - name: Build production application
+        env:
+          NEXT_PUBLIC_SITE_URL: https://www.costapulse.club
+          NEXT_PUBLIC_SUPABASE_URL: https://fbxhevctqrkulmaehrcw.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_MAP_STYLE_URL: https://tiles.openfreemap.org/styles/liberty
+          NEXT_PUBLIC_POSTHOG_HOST: https://eu.i.posthog.com
         run: npm run build
 
       - name: Run standalone SSR smoke test
         shell: bash
+        env:
+          NEXT_PUBLIC_SITE_URL: https://www.costapulse.club
+          NEXT_PUBLIC_SUPABASE_URL: https://fbxhevctqrkulmaehrcw.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_MAP_STYLE_URL: https://tiles.openfreemap.org/styles/liberty
+          NEXT_PUBLIC_POSTHOG_HOST: https://eu.i.posthog.com
         run: |
           set -o pipefail
           npm run smoke:production 2>&1 | tee smoke-production.log
