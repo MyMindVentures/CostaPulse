@@ -1,6 +1,10 @@
 import { z } from "zod";
 
 const text = z.string().trim().min(1);
+const optionalTextList = z
+  .array(z.string().trim().min(1))
+  .nullish()
+  .transform((value) => value ?? []);
 
 const winWinSchema = z.object({
   beneficiary_role: text,
@@ -35,12 +39,18 @@ export const strategyRowSchema = z.object({
   summary: text,
   description: z.string().trim().nullable().optional(),
   objective: text,
-  target_audience: z.array(z.string()).nullable().optional(),
-  channels: z.array(z.string()).nullable().optional(),
-  success_metrics: z.array(z.string()).default([]),
-  action_plan: z.array(z.string()).default([]),
-  win_win: z.array(winWinSchema).default([]),
-  mission_statements: z.array(missionSchema).default([]),
+  target_audience: optionalTextList,
+  channels: optionalTextList,
+  success_metrics: optionalTextList,
+  action_plan: optionalTextList,
+  win_win: z
+    .array(winWinSchema)
+    .nullish()
+    .transform((value) => value ?? []),
+  mission_statements: z
+    .array(missionSchema)
+    .nullish()
+    .transform((value) => value ?? []),
   sort_order: z.number().int(),
   status: z.string().nullable().optional(),
   priority: z.string().nullable().optional(),
@@ -54,9 +64,11 @@ export type StrategyCardViewModel = z.infer<typeof strategyRowSchema> & {
 
 export function parseStrategyRows(value: unknown): StrategyCardViewModel[] {
   const rows = z.array(strategyRowSchema).parse(value);
-  return rows.map((row, index) => ({
+  return rows.map((row) => ({
     ...row,
-    id: `${row.audience_key}-${row.stakeholder_key ?? row.user_role ?? index}`,
+    id: `strategy-${row.audience_key}-${row.sort_order}`
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]+/g, "-"),
     ecosystemLoop:
       z.array(text).safeParse(row.metadata?.ecosystem_loop).data ?? []
   }));

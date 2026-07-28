@@ -55,4 +55,23 @@ describe("parseStrategyRows", () => {
     expect(strategy?.ecosystemLoop).toEqual([]);
     expect(strategy?.description).toBeNull();
   });
+
+  it("normalizes nullable public-view collections to truthful empty lists", () => {
+    const [strategy] = parseStrategyRows([
+      {
+        ...validRow,
+        target_audience: null,
+        channels: null,
+        action_plan: null,
+        success_metrics: null,
+        win_win: null,
+        mission_statements: null
+      }
+    ]);
+
+    expect(strategy?.action_plan).toEqual([]);
+    expect(strategy?.success_metrics).toEqual([]);
+    expect(strategy?.win_win).toEqual([]);
+    expect(strategy?.mission_statements).toEqual([]);
+  });
 });

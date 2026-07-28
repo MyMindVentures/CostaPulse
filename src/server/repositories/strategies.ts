@@ -14,8 +14,9 @@ export async function getPublicStrategies(): Promise<StrategiesResult> {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return { status: "error" };
 
-  // The deployed public view is newer than the checked-in generated types. Zod
-  // remains the runtime contract until the next generated-types sync.
+  // The issue-specified public view is absent from the checked-in generated
+  // types. Keep this narrow adapter here; Zod validates every field before the
+  // result can cross the repository boundary.
   const from = supabase.from as unknown as (relation: string) => {
     select: (columns: string) => {
       order: (

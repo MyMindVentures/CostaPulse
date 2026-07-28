@@ -7,9 +7,17 @@ import { EmptyState } from "@/components/shared/empty-state";
 import type { StrategyCardViewModel } from "./strategy-view-model";
 import { RoleSelector } from "./role-selector";
 
-function RoleBadge({ children }: { children: React.ReactNode }) {
+function RoleBadge({
+  children,
+  inverted = false
+}: {
+  children: React.ReactNode;
+  inverted?: boolean;
+}) {
   return (
-    <span className="border-gold/50 text-navy inline-flex rounded-full border px-3 py-1 text-xs font-semibold tracking-widest uppercase">
+    <span
+      className={`border-gold/50 inline-flex rounded-full border px-3 py-1 text-xs font-semibold tracking-widest uppercase ${inverted ? "text-gold" : "text-navy"}`}
+    >
       {children}
     </span>
   );
@@ -77,7 +85,7 @@ function StrategyCard({
       id={strategy.id}
       className={`scroll-mt-28 rounded-3xl border p-6 shadow-sm sm:p-9 lg:p-12 ${founder ? "border-gold bg-navy text-white" : "border-border bg-white"}`}
     >
-      <RoleBadge>{role}</RoleBadge>
+      <RoleBadge inverted={founder}>{role}</RoleBadge>
       <h2
         className={`mt-5 font-serif text-3xl sm:text-4xl ${founder ? "text-white" : "text-navy"}`}
       >
