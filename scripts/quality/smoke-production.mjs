@@ -5,7 +5,7 @@ const port = 3210;
 const host = "127.0.0.1";
 const baseUrl = `http://${host}:${port}`;
 const readinessRoute = "/api/health";
-const routes = ["/", "/?locale=nl"];
+const routes = ["/", "/?locale=nl", "/why-costapulse"];
 const startupTimeoutMs = 12_000;
 const requestTimeoutMs = 3_000;
 const totalTimeoutMs = 20_000;
