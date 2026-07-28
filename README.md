@@ -23,6 +23,8 @@ CostaPulse has exactly twelve approved documentation files:
 
 Do not create additional documentation files. Update the relevant approved file instead. Use GitHub Issues for concrete tasks and Supabase for operational data.
 
+Before implementation, feature work must be structured through [`.github/ISSUE_TEMPLATE/feature.md`](.github/ISSUE_TEMPLATE/feature.md). The issue must define the relevant database, Storage, backend, authorization, routing, user flow, acceptance criteria, tests and definition of done. Mark non-applicable sections explicitly instead of omitting them, and keep every issue atomic.
+
 ## Core architecture
 
 ```text
