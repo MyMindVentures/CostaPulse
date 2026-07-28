@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import path from "node:path";
 
 const port = 3210;
 const host = "127.0.0.1";
@@ -9,8 +10,17 @@ const startupTimeoutMs = 12_000;
 const requestTimeoutMs = 3_000;
 const totalTimeoutMs = 20_000;
 const shutdownTimeoutMs = 1_500;
+const serverPath = path.join(
+  process.cwd(),
+  ".next-app",
+  "standalone",
+  "server.js"
+);
 
-const child = spawn(process.execPath, ["start-standalone.cjs"], {
+// Start the actual Next.js standalone server directly. Starting it through
+// start-standalone.cjs creates a grandchild process that survives when the
+// wrapper is killed, leaving GitHub Actions stuck on the smoke-test step.
+const child = spawn(process.execPath, [serverPath], {
   env: {
     ...process.env,
     HOSTNAME: host,
@@ -34,8 +44,8 @@ child.stderr.on("data", (chunk) => {
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function request(path) {
-  return fetch(`${baseUrl}${path}`, {
+async function request(route) {
+  return fetch(`${baseUrl}${route}`, {
     redirect: "manual",
     signal: AbortSignal.timeout(requestTimeoutMs)
   });
@@ -53,7 +63,7 @@ async function waitUntilReady() {
 
     try {
       const response = await request(readinessRoute);
-      if (response.status < 500) {
+      if (response.status === 200) {
         console.log(
           `smoke-production: ready via ${readinessRoute} -> HTTP ${response.status}`
         );
@@ -83,18 +93,24 @@ async function assertRoute(route) {
   console.log(`smoke-production: ${route} -> HTTP ${response.status}`);
 }
 
+async function waitForExit(timeoutMs) {
+  if (child.exitCode !== null) return true;
+
+  return Promise.race([
+    new Promise((resolve) => child.once("exit", () => resolve(true))),
+    delay(timeoutMs).then(() => false)
+  ]);
+}
+
 async function shutdown() {
   if (child.exitCode !== null) return;
 
   child.kill("SIGTERM");
-  await Promise.race([
-    new Promise((resolve) => child.once("exit", resolve)),
-    delay(shutdownTimeoutMs)
-  ]);
+  const exitedGracefully = await waitForExit(shutdownTimeoutMs);
+  if (exitedGracefully) return;
 
-  if (child.exitCode === null) {
-    child.kill("SIGKILL");
-  }
+  child.kill("SIGKILL");
+  await waitForExit(shutdownTimeoutMs);
 }
 
 async function runSmokeTest() {
