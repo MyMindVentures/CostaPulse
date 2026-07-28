@@ -63,10 +63,6 @@ export function Navbar({
     return () => window.clearTimeout(timeout);
   }, [menuPhase]);
 
-  useEffect(() => {
-    setMenuPhase("closed");
-  }, [pathname]);
-
   const closeMenu = useCallback(() => {
     setMenuPhase((phase) => (phase === "open" ? "closing" : phase));
   }, []);
