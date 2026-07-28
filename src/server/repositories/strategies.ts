@@ -10,31 +10,25 @@ export type StrategiesResult =
   | { status: "error" };
 
 type StrategyQueryClient = {
-  from: (relation: string) => {
-    select: (columns: string) => {
-      order: (
-        column: string,
-        options: { ascending: boolean }
-      ) => Promise<{ data: unknown; error: unknown }>;
-    };
-  };
+  rpc: (
+    functionName: "get_public_strategy_cards",
+    parameters: { requested_locale: string }
+  ) => Promise<{ data: unknown; error: unknown }>;
 };
 
 /** Public, RLS-scoped strategy read model. Malformed JSON never crosses this boundary. */
-export async function getPublicStrategies(): Promise<StrategiesResult> {
+export async function getPublicStrategies(
+  locale: string
+): Promise<StrategiesResult> {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return { status: "error" };
 
-  // The deployed public view is newer than the checked-in generated types. Zod
-  // remains the runtime contract until the next generated-types sync. Cast the
-  // client, not the `from` method, so Supabase keeps the method's `this` binding.
+  // The localized RPC is newer than the checked-in generated types. Zod remains
+  // the runtime contract until the next generated-types sync.
   const queryClient = supabase as unknown as StrategyQueryClient;
-  const { data, error } = await queryClient
-    .from("strategy_cards_public")
-    .select(
-      "slug,audience_key,user_role,stakeholder_key,title,summary,description,strategy_type,status,priority,objective,target_audience,channels,success_metrics,action_plan,win_win,mission_statements,sort_order,metadata"
-    )
-    .order("sort_order", { ascending: true });
+  const { data, error } = await queryClient.rpc("get_public_strategy_cards", {
+    requested_locale: locale
+  });
 
   if (error) return { status: "error" };
   const parsed = (() => {
