@@ -1,6 +1,33 @@
 # CostaPulse — Coding Agent Guardrails
 
-Binding instructions for every coding agent working in this repository. Focused Cursor rules and playbooks hold operational detail — keep this file as the policy source of truth.
+Binding instructions for every coding agent working in this repository. Keep this file as the policy source of truth.
+
+## Documentation guardrail
+
+The repository has exactly twelve approved documentation files:
+
+- `README.md`
+- `AGENTS.md`
+- `docs/01-PROJECT-CONTEXT.md`
+- `docs/02-PRODUCT-SCOPE.md`
+- `docs/03-ARCHITECTURE.md`
+- `docs/04-DATABASE.md`
+- `docs/05-BACKEND.md`
+- `docs/06-FRONTEND.md`
+- `docs/07-DESIGN-SYSTEM.md`
+- `docs/08-DEVOPS.md`
+- `docs/09-SECURITY.md`
+- `docs/10-ROADMAP.md`
+
+Do not create any additional documentation, notes, plans, reports, summaries, instruction files or temporary text files in any format or directory.
+
+This prohibition includes `.md`, `.mdx`, `.txt`, `.rst` and similarly purposed files, including files such as `NOTES.md`, `TODO.md`, `PLAN.md`, `IMPLEMENTATION.md`, feature documentation, architecture variants, generated reports and temporary agent summaries.
+
+When project knowledge changes, update the relevant existing approved document. When work must be planned or tracked, use a GitHub Issue. Live customer, booking, partner, crew and other operational data belongs in Supabase.
+
+Source code, tests, database migrations, configuration files, lockfiles, required framework files and tooling files are not considered documentation files.
+
+Never delete, rename or replace one of the twelve approved documentation files unless the current task explicitly instructs it.
 
 ## Role boundary
 
@@ -12,27 +39,33 @@ The coding agent must consume that architecture exactly as it exists. It may not
 
 ## Read first
 
-| Doc                                                      | Purpose                                                       |
-| -------------------------------------------------------- | ------------------------------------------------------------- |
-| [docs/AGENT-PLAYBOOK.md](docs/AGENT-PLAYBOOK.md)         | Commands, file map, before-edit checklist, definition of done |
-| [docs/ARCHITECTURE-INDEX.md](docs/ARCHITECTURE-INDEX.md) | Path → responsibility index                                   |
-| [docs/DATA-CONTRACTS.md](docs/DATA-CONTRACTS.md)         | Repository → view-model → UI contract                         |
-| [docs/TOKENS.md](docs/TOKENS.md)                         | Design token source of truth                                  |
-| [ARCHITECTURE.md](ARCHITECTURE.md)                       | Runtime, routes, boundaries, design tokens                    |
-| [SUPABASE.md](SUPABASE.md)                               | Clients, RLS, Storage                                         |
-| [ENVIRONMENT.md](ENVIRONMENT.md)                         | Validated environment variables                               |
+Read `AGENTS.md` first, then only the approved documents relevant to the current task:
+
+| Doc | Purpose |
+| --- | --- |
+| [README.md](README.md) | Concise human entry point |
+| [docs/01-PROJECT-CONTEXT.md](docs/01-PROJECT-CONTEXT.md) | Project identity and durable context |
+| [docs/02-PRODUCT-SCOPE.md](docs/02-PRODUCT-SCOPE.md) | Product domains, roles and flows |
+| [docs/03-ARCHITECTURE.md](docs/03-ARCHITECTURE.md) | System boundaries and architectural decisions |
+| [docs/04-DATABASE.md](docs/04-DATABASE.md) | Database intent, relationships and RLS principles |
+| [docs/05-BACKEND.md](docs/05-BACKEND.md) | Server-side workflows and contracts |
+| [docs/06-FRONTEND.md](docs/06-FRONTEND.md) | Frontend architecture and integration rules |
+| [docs/07-DESIGN-SYSTEM.md](docs/07-DESIGN-SYSTEM.md) | Visual language and reusable UI principles |
+| [docs/08-DEVOPS.md](docs/08-DEVOPS.md) | Development, deployment and infrastructure guidance |
+| [docs/09-SECURITY.md](docs/09-SECURITY.md) | Security boundaries and review requirements |
+| [docs/10-ROADMAP.md](docs/10-ROADMAP.md) | Major milestones and durable technical debt |
 
 ## Cursor rules (`.cursor/rules/`)
 
-| Rule                     | Scope                                     |
-| ------------------------ | ----------------------------------------- |
-| `core-stack.mdc`         | Always — stack, workflow, quality bar     |
-| `no-hardcoding.mdc`      | Always — no mocks / magic business values |
-| `react-architecture.mdc` | UI / features / app                       |
-| `supabase-backend.mdc`   | Server, migrations, Supabase clients      |
-| `testing.mdc`            | Test files                                |
-| `i18n.mdc`               | Locales and messages                      |
-| `design-system.mdc`      | Tokens, `ui` / `shared`, stories          |
+| Rule | Scope |
+| --- | --- |
+| `core-stack.mdc` | Always — stack, workflow, quality bar |
+| `no-hardcoding.mdc` | Always — no mocks / magic business values |
+| `react-architecture.mdc` | UI / features / app |
+| `supabase-backend.mdc` | Server, migrations, Supabase clients |
+| `testing.mdc` | Test files |
+| `i18n.mdc` | Locales and messages |
+| `design-system.mdc` | Tokens, `ui` / `shared`, stories |
 
 ## Stack
 
@@ -84,6 +117,7 @@ The coding agent must never:
 - Hardcode customer copy, prices, discounts, capacities, durations, locations, URLs, currencies, roles, statuses, locale lists or business rules.
 - Use Storage files as a content database.
 - Stop after the interface looks correct without verifying real functionality.
+- Create documentation outside the twelve approved documentation files.
 
 Empty database states must render truthful empty states. Missing backend support must be reported as a blocker rather than replaced with invented data or behavior.
 
@@ -102,29 +136,20 @@ Every frontend implementation must:
 - Preserve all enabled locales and existing route, query, referral and booking context.
 - Work correctly for zero, one or many records and missing optional media or metadata.
 - Produce no console errors, TypeScript errors, broken routes or dead interactions.
+- Update the relevant approved documentation file when a lasting contract, architecture, convention or project fact changes.
 
 ## Route discoverability and sitemap
 
-Every new App Router page must be reachable through the website in the same
-change set.
+Every new App Router page must be reachable through the website in the same change set.
 
-- Add every new public static page to the verified database-backed site
-  navigation, including translations for every enabled locale.
-- Add every new account, partner or admin section page to the appropriate
-  navigation configuration.
-- Detail, create, result and other nested flow pages do not need a global
-  navigation item when their nearest static parent section is in navigation and
-  the new page is linked from that real, working section flow.
-- Add every new indexable public page to `src/app/sitemap.ts`. Dynamic public
-  pages must be emitted from their real backend records; private, authenticated,
-  transactional, success/cancel and `noindex` pages must not be added.
-- Update route documentation and navigation/sitemap tests when the route
-  surface changes.
+- Add every new public static page to the verified database-backed site navigation, including translations for every enabled locale.
+- Add every new account, partner or admin section page to the appropriate navigation configuration.
+- Detail, create, result and other nested flow pages do not need a global navigation item when their nearest static parent section is in navigation and the new page is linked from that real, working section flow.
+- Add every new indexable public page to `src/app/sitemap.ts`. Dynamic public pages must be emitted from their real backend records; private, authenticated, transactional, success/cancel and `noindex` pages must not be added.
+- Update route information in the relevant approved documentation file and update navigation/sitemap tests when the route surface changes.
 - Never ship an orphan page that is only reachable by manually typing its URL.
 
-The staged-page discoverability guardrail runs in pre-commit. Do not bypass it
-or satisfy it with a dead link, fabricated navigation record or inappropriate
-sitemap entry.
+The staged-page discoverability guardrail runs in pre-commit. Do not bypass it or satisfy it with a dead link, fabricated navigation record or inappropriate sitemap entry.
 
 ## Responsive by default
 
@@ -266,9 +291,7 @@ A frontend task is complete only when:
 - No schema, contract, data or behavior was invented.
 - No production mocks, placeholder functionality or static mockups remain.
 - The requested user flow works end-to-end.
-- Every new page is reachable through global navigation or a real navigated
-  parent flow, and every indexable public route is represented correctly in the
-  sitemap.
+- Every new page is reachable through global navigation or a real navigated parent flow, and every indexable public route is represented correctly in the sitemap.
 - Loading, empty, error, validation, success and authorization states work.
 - The UI follows the CostaPulse design system and works responsively and accessibly.
 - The implementation was verified on representative smartphone, tablet, laptop and desktop viewports.
@@ -279,6 +302,8 @@ A frontend task is complete only when:
 - Presentational components contain no direct database calls or duplicated business logic.
 - Relevant automated tests, type checks and build checks pass.
 - No secrets, unrelated changes, debug code or unsupported infrastructure entered the repository.
+- No documentation file was created outside the twelve approved files.
+- Lasting changes were recorded in the relevant approved documentation file.
 
 ## Required final report
 
@@ -287,9 +312,10 @@ The coding agent's final report must state:
 1. Which Supabase schema objects, RLS policies, Storage buckets and backend contracts were inspected through MCP.
 2. Which existing repository components, types, hooks, queries and utilities were reused.
 3. Which frontend files were created or changed.
-4. Which real end-to-end flows were verified.
-5. Which smartphone, tablet, laptop and desktop viewport sizes were tested and what responsive issues were fixed.
-6. Which browsers, browser engines, operating systems and input methods were verified and what platform-specific issues were fixed.
-7. Which commands and tests were run and their results.
-8. Anything that could not be verified.
-9. Any missing backend capability that blocked implementation, without inventing a workaround.
+4. Which approved documentation files were updated, or why no documentation update was required.
+5. Which real end-to-end flows were verified.
+6. Which smartphone, tablet, laptop and desktop viewport sizes were tested and what responsive issues were fixed.
+7. Which browsers, browser engines, operating systems and input methods were verified and what platform-specific issues were fixed.
+8. Which commands and tests were run and their results.
+9. Anything that could not be verified.
+10. Any missing backend capability that blocked implementation, without inventing a workaround.
