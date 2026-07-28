@@ -1,3 +1,1 @@
-export {
-  ExperiencePreview as ExperienceCard
-} from "@/features/experiences/preview/experience-preview";
+export { ExperiencePreview as ExperienceCard } from "@/features/experiences/preview/experience-preview";

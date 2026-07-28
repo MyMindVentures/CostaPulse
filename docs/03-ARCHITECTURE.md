@@ -44,56 +44,56 @@ Agents must never guess a table, field, route, role or backend contract.
 
 ## Public routes
 
-| Route | Responsibility |
-| --- | --- |
-| `/` | Home and catalog teaser |
-| `/experiences` | Published experience catalog |
-| `/experiences/map` | MapLibre discovery using `get_experience_map` |
-| `/experiences/[slug]` | Experience detail and booking widget |
-| `/destinations`, `/about`, `/partners` | Marketing pages, currently i18n-backed until CMS-backed |
-| `/book`, `/book/[slug]`, success/cancel | Booking wizard and payment outcomes |
-| `/r/[partnerCode]` | Partner QR entry and visit registration |
-| `/referral/[visitToken]` | Tokenized contact verification, `noindex` |
-| `/partner/qr/[partnerId]` | Owner-only printable partner material, `noindex` |
-| `/admin` | Role-protected admin dashboard |
+| Route                                   | Responsibility                                          |
+| --------------------------------------- | ------------------------------------------------------- |
+| `/`                                     | Home and catalog teaser                                 |
+| `/experiences`                          | Published experience catalog                            |
+| `/experiences/map`                      | MapLibre discovery using `get_experience_map`           |
+| `/experiences/[slug]`                   | Experience detail and booking widget                    |
+| `/destinations`, `/about`, `/partners`  | Marketing pages, currently i18n-backed until CMS-backed |
+| `/book`, `/book/[slug]`, success/cancel | Booking wizard and payment outcomes                     |
+| `/r/[partnerCode]`                      | Partner QR entry and visit registration                 |
+| `/referral/[visitToken]`                | Tokenized contact verification, `noindex`               |
+| `/partner/qr/[partnerId]`               | Owner-only printable partner material, `noindex`        |
+| `/admin`                                | Role-protected admin dashboard                          |
 
 Operational endpoints such as `/api/health`, `/api/ready`, booking, availability and Stripe webhook routes are not marketing pages.
 
 ## Code ownership map
 
-| Path | Responsibility |
-| --- | --- |
-| `src/app` | Thin routes, layouts, loading and error boundaries |
-| `src/app/(marketing)` | Public marketing route group and layout |
-| `src/app/book` | Booking wizard routes |
-| `src/app/api` | Health, readiness, webhooks and trusted API routes |
-| `src/features` | Page and domain compositions |
-| `src/features/referrals` | Public referral UI |
-| `src/features/partner` | Partner-owned QR material |
-| `src/features/admin` | Admin dashboard composition |
-| `src/features/analytics` | Consent and PostHog provider |
-| `src/features/shell` | Public AppShell data loading |
-| `src/components/ui` | Design-system primitives without business data |
-| `src/components/shared` | Cross-domain composed UI and universal states |
-| `src/components/layout` | App shell, navbar and mobile navigation |
-| `src/server/repositories` | Supabase I/O, validation and boundary mapping |
-| `src/server/auth` | Role and access helpers |
-| `src/server/bookings` | Booking schemas and pricing logic |
-| `src/server/referrals` | Hashed tokens, sessions, QR and verification email |
-| `src/server/availability` | Slot filters and summaries |
-| `src/server/payments` | Stripe webhook handling |
-| `src/server/readiness` | Readiness report assembly |
-| `src/lib/view-models` | Pure RPC/database-to-UI mappers |
-| `src/lib/supabase/server.ts` | Cookie-aware user-scoped client |
-| `src/lib/supabase/admin.ts` | Server-only privileged client |
-| `src/lib/url` | Typed shareable URL state |
-| `src/lib/map/config.ts` | Map style and fallback viewport |
-| `src/lib/media` | Storage path resolution |
-| `src/lib/env` | Validated environment access |
-| `src/types/database.ts` | Generated Supabase types |
-| `supabase/migrations` | Schema, RLS, RPCs and Storage policies |
-| `messages` | next-intl catalogs |
-| `src/i18n` | Locale registry |
+| Path                         | Responsibility                                     |
+| ---------------------------- | -------------------------------------------------- |
+| `src/app`                    | Thin routes, layouts, loading and error boundaries |
+| `src/app/(marketing)`        | Public marketing route group and layout            |
+| `src/app/book`               | Booking wizard routes                              |
+| `src/app/api`                | Health, readiness, webhooks and trusted API routes |
+| `src/features`               | Page and domain compositions                       |
+| `src/features/referrals`     | Public referral UI                                 |
+| `src/features/partner`       | Partner-owned QR material                          |
+| `src/features/admin`         | Admin dashboard composition                        |
+| `src/features/analytics`     | Consent and PostHog provider                       |
+| `src/features/shell`         | Public AppShell data loading                       |
+| `src/components/ui`          | Design-system primitives without business data     |
+| `src/components/shared`      | Cross-domain composed UI and universal states      |
+| `src/components/layout`      | App shell, navbar and mobile navigation            |
+| `src/server/repositories`    | Supabase I/O, validation and boundary mapping      |
+| `src/server/auth`            | Role and access helpers                            |
+| `src/server/bookings`        | Booking schemas and pricing logic                  |
+| `src/server/referrals`       | Hashed tokens, sessions, QR and verification email |
+| `src/server/availability`    | Slot filters and summaries                         |
+| `src/server/payments`        | Stripe webhook handling                            |
+| `src/server/readiness`       | Readiness report assembly                          |
+| `src/lib/view-models`        | Pure RPC/database-to-UI mappers                    |
+| `src/lib/supabase/server.ts` | Cookie-aware user-scoped client                    |
+| `src/lib/supabase/admin.ts`  | Server-only privileged client                      |
+| `src/lib/url`                | Typed shareable URL state                          |
+| `src/lib/map/config.ts`      | Map style and fallback viewport                    |
+| `src/lib/media`              | Storage path resolution                            |
+| `src/lib/env`                | Validated environment access                       |
+| `src/types/database.ts`      | Generated Supabase types                           |
+| `supabase/migrations`        | Schema, RLS, RPCs and Storage policies             |
+| `messages`                   | next-intl catalogs                                 |
+| `src/i18n`                   | Locale registry                                    |
 
 ## Data flow
 

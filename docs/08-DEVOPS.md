@@ -30,22 +30,22 @@ Use `.env.example` as the committed inventory and `.env.local` for real local cr
 
 ## Environment variable inventory
 
-| Variable | Phase | Visibility | Required | Purpose |
-| --- | --- | --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Build | Public | Production | Canonical metadata and sitemap origin |
-| `NEXT_PUBLIC_SUPABASE_URL` | Build | Public | Supabase enabled | Project API URL |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Build | Public | Supabase enabled | RLS-bound public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Runtime | Secret | Privileged jobs only | Bypasses RLS; server only |
-| `STRIPE_SECRET_KEY` | Runtime | Secret | Payments | Stripe server client |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Build | Public | Client payments | Stripe.js initialization |
-| `STRIPE_WEBHOOK_SECRET` | Runtime | Secret | Webhooks | Signature verification |
-| `RESEND_API_KEY` | Runtime | Secret | Email | Transactional email |
-| `RESEND_FROM_EMAIL` | Runtime | Secret | Email | Verified sender |
-| `NEXT_PUBLIC_SENTRY_DSN` | Build | Public | Optional | Error destination |
-| `SENTRY_AUTH_TOKEN` | Build | Secret | Source maps | Build authentication |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Build | Public | Optional | Consent-gated analytics |
-| `NEXT_PUBLIC_POSTHOG_HOST` | Build | Public | Optional | Regional PostHog host |
-| `PORT` | Runtime | Platform | Railway | Injected listening port |
+| Variable                               | Phase   | Visibility | Required             | Purpose                               |
+| -------------------------------------- | ------- | ---------- | -------------------- | ------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`                 | Build   | Public     | Production           | Canonical metadata and sitemap origin |
+| `NEXT_PUBLIC_SUPABASE_URL`             | Build   | Public     | Supabase enabled     | Project API URL                       |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Build   | Public     | Supabase enabled     | RLS-bound public key                  |
+| `SUPABASE_SERVICE_ROLE_KEY`            | Runtime | Secret     | Privileged jobs only | Bypasses RLS; server only             |
+| `STRIPE_SECRET_KEY`                    | Runtime | Secret     | Payments             | Stripe server client                  |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`   | Build   | Public     | Client payments      | Stripe.js initialization              |
+| `STRIPE_WEBHOOK_SECRET`                | Runtime | Secret     | Webhooks             | Signature verification                |
+| `RESEND_API_KEY`                       | Runtime | Secret     | Email                | Transactional email                   |
+| `RESEND_FROM_EMAIL`                    | Runtime | Secret     | Email                | Verified sender                       |
+| `NEXT_PUBLIC_SENTRY_DSN`               | Build   | Public     | Optional             | Error destination                     |
+| `SENTRY_AUTH_TOKEN`                    | Build   | Secret     | Source maps          | Build authentication                  |
+| `NEXT_PUBLIC_POSTHOG_KEY`              | Build   | Public     | Optional             | Consent-gated analytics               |
+| `NEXT_PUBLIC_POSTHOG_HOST`             | Build   | Public     | Optional             | Regional PostHog host                 |
+| `PORT`                                 | Runtime | Platform   | Railway              | Injected listening port               |
 
 Public values are not secrets. Server credentials must never use `NEXT_PUBLIC_`. Optional integrations fail closed. Rotate any value exposed through logs, Git history or browser bundles.
 
@@ -72,11 +72,11 @@ Do not remove, weaken or bypass quality gates to make CI pass.
 
 Husky local gates:
 
-| Hook | Responsibility |
-| --- | --- |
+| Hook         | Responsibility                                                 |
+| ------------ | -------------------------------------------------------------- |
 | `pre-commit` | Secrets, staged formatting/lint and fast repository guardrails |
-| `commit-msg` | Conventional Commits through commitlint |
-| `pre-push` | Typecheck and tests |
+| `commit-msg` | Conventional Commits through commitlint                        |
+| `pre-push`   | Typecheck and tests                                            |
 
 CI remains authoritative for formatting verification, coverage, repository-wide linting, production build and Storybook. Skipping hooks is for genuine emergencies only and must be disclosed.
 
@@ -102,7 +102,7 @@ Review generated migrations before pushing. After schema or RPC changes, regener
 
 ## Railway production deployment
 
-Railway is the production host. Production tracks `main` and uses Railpack through root `railway.json`. Docker is not part of the deployment path, and the repository must not contain a root deployment Dockerfile because Railway automatically prefers it when present.
+Railway is the production host. Production tracks `main` and uses the root `railway.json`, which selects the repository's multi-stage `Dockerfile`. The configuration and Dockerfile must remain synchronized: deleting or renaming the Dockerfile makes Railway fail before the build begins.
 
 ### Railway service settings
 
@@ -110,20 +110,20 @@ Railway is the production host. Production tracks `main` and uses Railpack throu
 - Production branch: `main`
 - Root directory: `/`
 - Config file: `/railway.json`
-- Builder: Railpack
-- Dockerfile path: empty
-- Build command: empty; allow Railpack to detect `npm run build`
-- Start command: empty; allow Railpack to detect the `start` script
+- Builder: Dockerfile
+- Dockerfile path: `/Dockerfile`
+- Build command: defined by the Dockerfile
+- Start command: defined by the Dockerfile image
 - Health-check path: `/api/health`
 - Health-check timeout: `300`
 - Restart policy: on failure, maximum 5 retries
 - Serverless mode: disabled
 
-Remove stale dashboard overrides for Docker, build or start commands so they cannot conflict with repository configuration.
+Keep dashboard settings aligned with `railway.json`; repository configuration remains authoritative for the Dockerfile path, health check and restart policy.
 
 ### Runtime
 
-Next.js produces standalone output. `start-standalone.cjs` launches `.next/standalone/server.js`, forces `HOSTNAME=0.0.0.0`, and uses Railway's injected `PORT`. Do not define `PORT` manually.
+Next.js produces standalone output. The Docker image launches `.next-app/standalone/server.js` as an unprivileged user with `HOSTNAME=0.0.0.0` and Railway's injected `PORT`. The local `start-standalone.cjs` wrapper provides equivalent host and port behavior outside the container. Do not define `PORT` manually.
 
 `GET /api/health` is the Railway liveness check. `GET /api/ready` is an operator-facing dependency/configuration check and must not replace the liveness endpoint.
 
@@ -133,8 +133,8 @@ The service is stateless. Store uploads and operational data in Supabase Databas
 
 1. Merge a reviewed change into `main`.
 2. Railway detects the commit.
-3. Railpack installs dependencies and runs the Next.js build.
-4. Railway starts the standalone server.
+3. Railway builds the configured multi-stage Dockerfile.
+4. Railway starts the standalone server from the final image.
 5. Railway waits for `/api/health` to return HTTP 200.
 6. Verify `/`, `/admin`, `/api/health`, `/api/ready`, `/sitemap.xml` and `/robots.txt`.
 

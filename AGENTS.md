@@ -41,31 +41,31 @@ The coding agent must consume that architecture exactly as it exists. It may not
 
 Read `AGENTS.md` first, then only the approved documents relevant to the current task:
 
-| Doc | Purpose |
-| --- | --- |
-| [README.md](README.md) | Concise human entry point |
-| [docs/01-PROJECT-CONTEXT.md](docs/01-PROJECT-CONTEXT.md) | Project identity and durable context |
-| [docs/02-PRODUCT-SCOPE.md](docs/02-PRODUCT-SCOPE.md) | Product domains, roles and flows |
-| [docs/03-ARCHITECTURE.md](docs/03-ARCHITECTURE.md) | System boundaries and architectural decisions |
-| [docs/04-DATABASE.md](docs/04-DATABASE.md) | Database intent, relationships and RLS principles |
-| [docs/05-BACKEND.md](docs/05-BACKEND.md) | Server-side workflows and contracts |
-| [docs/06-FRONTEND.md](docs/06-FRONTEND.md) | Frontend architecture and integration rules |
-| [docs/07-DESIGN-SYSTEM.md](docs/07-DESIGN-SYSTEM.md) | Visual language and reusable UI principles |
-| [docs/08-DEVOPS.md](docs/08-DEVOPS.md) | Development, deployment and infrastructure guidance |
-| [docs/09-SECURITY.md](docs/09-SECURITY.md) | Security boundaries and review requirements |
-| [docs/10-ROADMAP.md](docs/10-ROADMAP.md) | Major milestones and durable technical debt |
+| Doc                                                      | Purpose                                             |
+| -------------------------------------------------------- | --------------------------------------------------- |
+| [README.md](README.md)                                   | Concise human entry point                           |
+| [docs/01-PROJECT-CONTEXT.md](docs/01-PROJECT-CONTEXT.md) | Project identity and durable context                |
+| [docs/02-PRODUCT-SCOPE.md](docs/02-PRODUCT-SCOPE.md)     | Product domains, roles and flows                    |
+| [docs/03-ARCHITECTURE.md](docs/03-ARCHITECTURE.md)       | System boundaries and architectural decisions       |
+| [docs/04-DATABASE.md](docs/04-DATABASE.md)               | Database intent, relationships and RLS principles   |
+| [docs/05-BACKEND.md](docs/05-BACKEND.md)                 | Server-side workflows and contracts                 |
+| [docs/06-FRONTEND.md](docs/06-FRONTEND.md)               | Frontend architecture and integration rules         |
+| [docs/07-DESIGN-SYSTEM.md](docs/07-DESIGN-SYSTEM.md)     | Visual language and reusable UI principles          |
+| [docs/08-DEVOPS.md](docs/08-DEVOPS.md)                   | Development, deployment and infrastructure guidance |
+| [docs/09-SECURITY.md](docs/09-SECURITY.md)               | Security boundaries and review requirements         |
+| [docs/10-ROADMAP.md](docs/10-ROADMAP.md)                 | Major milestones and durable technical debt         |
 
 ## Cursor rules (`.cursor/rules/`)
 
-| Rule | Scope |
-| --- | --- |
-| `core-stack.mdc` | Always — stack, workflow, quality bar |
-| `no-hardcoding.mdc` | Always — no mocks / magic business values |
-| `react-architecture.mdc` | UI / features / app |
-| `supabase-backend.mdc` | Server, migrations, Supabase clients |
-| `testing.mdc` | Test files |
-| `i18n.mdc` | Locales and messages |
-| `design-system.mdc` | Tokens, `ui` / `shared`, stories |
+| Rule                     | Scope                                     |
+| ------------------------ | ----------------------------------------- |
+| `core-stack.mdc`         | Always — stack, workflow, quality bar     |
+| `no-hardcoding.mdc`      | Always — no mocks / magic business values |
+| `react-architecture.mdc` | UI / features / app                       |
+| `supabase-backend.mdc`   | Server, migrations, Supabase clients      |
+| `testing.mdc`            | Test files                                |
+| `i18n.mdc`               | Locales and messages                      |
+| `design-system.mdc`      | Tokens, `ui` / `shared`, stories          |
 
 ## Stack
 
