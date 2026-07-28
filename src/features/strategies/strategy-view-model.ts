@@ -50,6 +50,7 @@ export const strategyRowSchema = z.object({
   success_metrics: z.record(z.string(), metricSchema).default({}),
   action_plan: z.array(actionStepSchema).default([]),
   win_win: z.array(winWinSchema).default([]),
+  simple_workflow_steps: z.array(text).default([]),
   mission_statements: z.array(missionSchema).default([]),
   sort_order: z.number().int(),
   metadata: z.record(z.string(), z.unknown()).default({})

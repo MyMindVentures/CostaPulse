@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ErrorState } from "@/components/shared/error-state";
 import { Container } from "@/components/ui/container";
 import { StrategyPageStatic } from "@/features/strategies/strategy-page-static";
@@ -11,7 +11,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function WhyCostaPulsePage() {
-  const result = await getPublicStrategies();
+  const locale = await getLocale();
+  const result = await getPublicStrategies(locale);
 
   if (result.status === "error") {
     const t = await getTranslations("WhyCostaPulse");
