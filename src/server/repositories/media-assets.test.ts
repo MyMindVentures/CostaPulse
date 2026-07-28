@@ -27,11 +27,15 @@ describe("getSiteLogoAsset", () => {
     });
   });
 
-  it("fails explicitly when the public Supabase URL is unavailable", async () => {
+  it("uses the bundled brand mark when the public Supabase URL is unavailable", async () => {
     delete process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-    await expect(getSiteLogoAsset()).rejects.toThrow(
-      "NEXT_PUBLIC_SUPABASE_URL is missing"
-    );
+    await expect(getSiteLogoAsset()).resolves.toEqual({
+      url: "/brand/costapulse-mark.svg",
+      alt: "CostaPulse",
+      storagePath: "/brand/costapulse-mark.svg",
+      bucketId: "public",
+      isFallback: true
+    });
   });
 });
