@@ -919,6 +919,13 @@
     "emptyDescription": "Noch sind keine veröffentlichten Strategien verfügbar.",
     "errorTitle": "Das Ökosystem ist vorübergehend nicht verfügbar",
     "errorDescription": "Die veröffentlichten Strategien konnten nicht geladen werden. Bitte versuche es später erneut.",
-    "loading": "Das CostaPulse-Ökosystem wird geladen"
+    "loading": "Das CostaPulse-Ökosystem wird geladen",
+    "roles": {
+      "founder": "Gründer",
+      "partner": "Partner",
+      "customer": "Kunde",
+      "experienceProvider": "Erlebnisanbieter",
+      "teamMember": "Teammitglied"
+    }
   }
 }

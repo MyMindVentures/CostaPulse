@@ -919,6 +919,13 @@
     "emptyDescription": "Todavía no hay estrategias publicadas.",
     "errorTitle": "El ecosistema no está disponible temporalmente",
     "errorDescription": "No pudimos cargar las estrategias publicadas. Inténtalo más tarde.",
-    "loading": "Cargando el ecosistema CostaPulse"
+    "loading": "Cargando el ecosistema CostaPulse",
+    "roles": {
+      "founder": "Fundador",
+      "partner": "Socio",
+      "customer": "Cliente",
+      "experienceProvider": "Proveedor de experiencias",
+      "teamMember": "Miembro del equipo"
+    }
   }
 }
