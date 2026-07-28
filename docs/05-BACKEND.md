@@ -50,6 +50,25 @@ Document durable workflow contracts using:
 - Make externally retried operations idempotent.
 - Record status transitions and reasons.
 
+## Partner attribution and voucher principles
+
+- Attribution is established from a verified partner identity and preserved with the booking snapshot.
+- Voucher eligibility is evaluated only after the booking reaches the required server-authoritative payment and acceptance state.
+- Voucher percentage, amount, currency, validity and redemption scope come from current backend configuration or immutable booking/referral snapshots; the frontend must not hardcode them.
+- One qualifying booking may create at most one voucher for the attributed partner unless the verified contract explicitly states otherwise.
+- Issuance and redemption are idempotent, auditable and protected against duplicate processing.
+- A voucher may be redeemed only within its configured scope and only by an authorized actor.
+- Refunds and finance corrections must adjust voucher liability through an explicit audited workflow rather than silent mutation.
+- Magic links and QR redemption flows expose only scoped, time-limited capabilities and never privileged database or Storage access.
+
+## Booking-story workflow principles
+
+- Booking stories are created only for verified bookings and authorized media.
+- Admin mutations control story publication state, media ordering and cover selection.
+- Public reads expose only approved and published story data through the verified backend contract.
+- Presentational clients never infer publication rights or query protected story records directly.
+- File and media access follows the canonical media architecture and Storage authorization rules.
+
 ## Payment principles
 
 - Stripe is the external payment source.
