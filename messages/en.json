@@ -919,6 +919,13 @@
     "emptyDescription": "No published strategy records are available yet. Please return soon.",
     "errorTitle": "The ecosystem is temporarily unavailable",
     "errorDescription": "We could not load the published strategies. Please try again later.",
-    "loading": "Loading the CostaPulse ecosystem"
+    "loading": "Loading the CostaPulse ecosystem",
+    "roles": {
+      "founder": "Founder",
+      "partner": "Partner",
+      "customer": "Customer",
+      "experienceProvider": "Experience Provider",
+      "teamMember": "Team Member"
+    }
   }
 }

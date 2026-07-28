@@ -919,6 +919,13 @@
     "emptyDescription": "Aucune stratégie publiée n’est encore disponible.",
     "errorTitle": "L’écosystème est temporairement indisponible",
     "errorDescription": "Impossible de charger les stratégies publiées. Réessayez plus tard.",
-    "loading": "Chargement de l’écosystème CostaPulse"
+    "loading": "Chargement de l’écosystème CostaPulse",
+    "roles": {
+      "founder": "Fondateur",
+      "partner": "Partenaire",
+      "customer": "Client",
+      "experienceProvider": "Prestataire d’expériences",
+      "teamMember": "Membre de l’équipe"
+    }
   }
 }

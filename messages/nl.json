@@ -919,6 +919,13 @@
     "emptyDescription": "Er zijn nog geen gepubliceerde strategieën beschikbaar.",
     "errorTitle": "Het ecosysteem is tijdelijk niet beschikbaar",
     "errorDescription": "De gepubliceerde strategieën konden niet worden geladen. Probeer het later opnieuw.",
-    "loading": "Het CostaPulse-ecosysteem wordt geladen"
+    "loading": "Het CostaPulse-ecosysteem wordt geladen",
+    "roles": {
+      "founder": "Oprichter",
+      "partner": "Partner",
+      "customer": "Klant",
+      "experienceProvider": "Ervaringsaanbieder",
+      "teamMember": "Teamlid"
+    }
   }
 }
