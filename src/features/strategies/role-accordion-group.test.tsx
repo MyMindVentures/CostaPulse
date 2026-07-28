@@ -23,6 +23,7 @@ function strategy(id: string): StrategyCardViewModel {
     target_audience: [],
     channels: [],
     win_win: [],
+    simple_workflow_steps: [],
     sort_order: 1,
     metadata: {},
     metrics: [],
@@ -41,7 +42,11 @@ const items: RoleAccordionItem[] = [
   }
 ];
 
-const labels = { gain: "What they gain", matters: "Why it matters" };
+const labels = {
+  gain: "What they gain",
+  matters: "Why it matters",
+  workflow: "How it works"
+};
 
 beforeEach(() => {
   window.history.replaceState(null, "", "/why-costapulse");

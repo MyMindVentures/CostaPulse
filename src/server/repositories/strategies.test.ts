@@ -13,16 +13,16 @@ describe("strategies repository", () => {
 
   it("returns a truthful error when Supabase is unavailable", async () => {
     vi.mocked(createSupabaseServerClient).mockResolvedValue(null);
-    await expect(getPublicStrategies()).resolves.toEqual({ status: "error" });
+    await expect(getPublicStrategies("nl")).resolves.toEqual({
+      status: "error"
+    });
   });
 
-  it("returns an empty success state for a valid empty read model", async () => {
-    const order = vi.fn().mockResolvedValue({ data: [], error: null });
-    const select = vi.fn().mockReturnValue({ order });
-    const from = vi.fn().mockReturnValue({ select });
-    vi.mocked(createSupabaseServerClient).mockResolvedValue({ from } as never);
+  it("passes the active locale to the localized RPC", async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: [], error: null });
+    vi.mocked(createSupabaseServerClient).mockResolvedValue({ rpc } as never);
 
-    await expect(getPublicStrategies()).resolves.toEqual({
+    await expect(getPublicStrategies("fr")).resolves.toEqual({
       status: "success",
       page: {
         strategies: [],
@@ -31,19 +31,20 @@ describe("strategies repository", () => {
         primaryMission: null
       }
     });
-    expect(from).toHaveBeenCalledWith("strategy_cards_public");
-    expect(select).toHaveBeenCalledWith(expect.stringContaining("slug"));
+    expect(rpc).toHaveBeenCalledWith("get_public_strategy_cards", {
+      requested_locale: "fr"
+    });
   });
 
-  it("contains malformed JSON at the repository boundary", async () => {
-    const order = vi.fn().mockResolvedValue({
+  it("contains malformed RPC data at the repository boundary", async () => {
+    const rpc = vi.fn().mockResolvedValue({
       data: [{ audience_key: "partner" }],
       error: null
     });
-    const select = vi.fn().mockReturnValue({ order });
-    const from = vi.fn().mockReturnValue({ select });
-    vi.mocked(createSupabaseServerClient).mockResolvedValue({ from } as never);
+    vi.mocked(createSupabaseServerClient).mockResolvedValue({ rpc } as never);
 
-    await expect(getPublicStrategies()).resolves.toEqual({ status: "error" });
+    await expect(getPublicStrategies("en")).resolves.toEqual({
+      status: "error"
+    });
   });
 });

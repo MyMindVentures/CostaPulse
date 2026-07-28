@@ -32,7 +32,7 @@ Never guess database fields, RPC names, routes or permissions.
 
 Includes discovery, experience cards, experience profiles, team profiles, partner referral entry points, the `/why-costapulse` shared-value strategy page and booking journeys. The strategy page consumes the public, RLS-scoped `strategy_cards_public` read model through the strategies repository and maps its nested JSON into frontend view models before rendering.
 
-The strategy page presents its five public ecosystem roles through a single-open, accessible accordion. Stable role anchors such as `#customer-strategy` open the matching panel and retain the sticky-navigation scroll offset; localized display labels must be resolved through the centralized role display map so database role keys are never exposed as customer-facing copy.
+The strategy page passes the active locale to `get_public_strategy_cards`, validates exactly five distinct public ecosystem roles, and presents them through a single-open, accessible accordion. Each expanded card renders its translated, database-owned workflow as semantic numbered steps. Stable role anchors such as `#customer-strategy` open the matching panel and retain the sticky-navigation scroll offset; localized display labels must be resolved through the centralized role display map so database role keys are never exposed as customer-facing copy.
 
 ### Partner discovery
 

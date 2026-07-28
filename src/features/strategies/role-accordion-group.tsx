@@ -21,6 +21,7 @@ type RoleAccordionGroupProps = {
   labels: {
     gain: string;
     matters: string;
+    workflow: string;
   };
 };
 
@@ -192,7 +193,16 @@ function RoleAccordionCard({
         </div>
 
         {strategy.simple_workflow_steps.length ? (
-          <section className="border-gold/50 border-t px-5 py-6 sm:px-6 sm:py-8">
+          <section
+            className="border-gold/50 border-t px-5 py-6 sm:px-6 sm:py-8"
+            aria-labelledby={`${contentId}-workflow`}
+          >
+            <h4
+              id={`${contentId}-workflow`}
+              className="text-gold mb-4 font-sans text-sm font-bold tracking-widest uppercase"
+            >
+              {labels.workflow}
+            </h4>
             <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {strategy.simple_workflow_steps.map((step, index) => (
                 <li

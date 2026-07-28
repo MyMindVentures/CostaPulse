@@ -110,7 +110,11 @@ export async function StrategyPageStatic({
 
           <RoleAccordionGroup
             items={roleItems}
-            labels={{ gain: t("gain"), matters: t("matters") }}
+            labels={{
+              gain: t("gain"),
+              matters: t("matters"),
+              workflow: t("workflow")
+            }}
           />
         </Container>
       </section>
