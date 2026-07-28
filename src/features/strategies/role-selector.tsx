@@ -1,5 +1,3 @@
-"use client";
-
 type RoleSelectorProps = {
   roles: { id: string; label: string; founder: boolean }[];
   label: string;
