@@ -32,6 +32,25 @@ Never guess database fields, RPC names, routes or permissions.
 
 Includes discovery, experience cards, experience profiles, team profiles, partner referral entry points and booking journeys.
 
+### Partner discovery
+
+The public partner directory is an editorial discovery experience rather than an analytics dashboard. Partner cards and map markers are synchronized views of the same selected partner. Selection, filters, sorting and relevant shareable state should remain URL-aware where established, while the map remains usable as an enhancement rather than the only way to access partner content.
+
+Public partner surfaces must use the verified public read model and may not expose private outreach notes, internal performance data or unrestricted customer information.
+
+### Booking stories and previous adventures
+
+Experience detail pages may render approved booking stories as a reusable public section. The frontend must:
+
+- consume only the verified published story contract;
+- keep public story media tied to the related experience;
+- support image and video presentation where the backend allows it;
+- provide an accessible fullscreen or focused viewer with keyboard, touch and reduced-motion behavior;
+- preserve truthful empty and unavailable states;
+- avoid duplicating admin or publication logic in React.
+
+Admin story management must reuse the established media and upload architecture for record editing, media ordering and cover selection.
+
 ### Customer area
 
 Includes user-specific bookings, vouchers, confirmations, profile information and permitted actions.
@@ -53,6 +72,8 @@ Includes role-aware modules for content, bookings, availability, customers, part
 - Keep forms typed and validate on both client and server.
 - Provide meaningful error recovery.
 - Avoid generic placeholder UI when real domain states are known.
+- Map/list interfaces must maintain one canonical selected record and synchronize all visual representations through stable identifiers.
+- Public media viewers must expose accessible fallbacks and must not depend on hover-only controls.
 
 ## Routing and navigation
 
@@ -70,6 +91,8 @@ Includes role-aware modules for content, bookings, availability, customers, part
 - Fast loading with deliberate skeleton or progress states.
 - Clear empty states and actionable errors.
 - No silent failures.
+- Map canvases and media viewers must retain measurable responsive dimensions after third-party runtime classes initialize.
+- Selected cards, markers, dialogs and viewer state must remain synchronized without causing horizontal overflow or inaccessible hidden content.
 
 ## Documentation discipline
 
