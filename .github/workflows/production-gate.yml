@@ -1,0 +1,104 @@
+name: CostaPulse Production Gate
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production-gate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  production-gate:
+    name: Production Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      CI: true
+      NEXT_TELEMETRY_DISABLED: 1
+      NEXT_PUBLIC_SITE_URL: https://www.costapulse.club
+      NEXT_PUBLIC_SUPABASE_URL: https://fbxhevctqrkulmaehrcw.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      NEXT_PUBLIC_MAP_STYLE_URL: https://tiles.openfreemap.org/styles/liberty
+      NEXT_PUBLIC_POSTHOG_HOST: https://eu.i.posthog.com
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Validate required CI environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:-}" ]]; then
+            echo "::error::Missing GitHub Actions secret NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY. Add the public Supabase publishable key under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Validate repository guardrails
+        run: npm run guardrails
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run test suite
+        run: npm run test
+
+      - name: Build production application
+        run: npm run build
+
+      - name: Run standalone SSR smoke test
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run smoke:production 2>&1 | tee smoke-production.log
+
+      - name: Upload production diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-gate-diagnostics-${{ github.run_id }}
+          if-no-files-found: ignore
+          retention-days: 7
+          path: |
+            smoke-production.log
+            .next/BUILD_ID
+            .next/routes-manifest.json
+            .next/server/app-paths-manifest.json
+            .next/standalone/package.json
+
+      - name: Production gate summary
+        if: success()
+        run: |
+          echo "## CostaPulse Production Gate ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Guardrails passed" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Formatting passed" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Lint passed" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Typecheck passed" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tests passed" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Production build passed" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Standalone SSR smoke test passed" >> "$GITHUB_STEP_SUMMARY"
