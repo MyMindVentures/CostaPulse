@@ -1,3 +1,1 @@
-export {
-  ExperienceDetail as ExperienceDetailPageFeature
-} from "@/features/experiences/detail/experience-detail";
+export { ExperienceDetail as ExperienceDetailPageFeature } from "@/features/experiences/detail/experience-detail";

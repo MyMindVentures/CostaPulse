@@ -55,19 +55,19 @@ The admin environment manages application content and workflows, including exper
 
 CostaPulse uses role-based access combined with ownership and assignment rules. One authenticated user may hold multiple roles.
 
-| Role | Primary purpose | Typical scope |
-| --- | --- | --- |
-| Guest | Browse and begin public journeys | Published public content only |
-| Customer | Book and manage personal experiences | Own profile, participants and bookings |
+| Role                | Primary purpose                      | Typical scope                                                        |
+| ------------------- | ------------------------------------ | -------------------------------------------------------------------- |
+| Guest               | Browse and begin public journeys     | Published public content only                                        |
+| Customer            | Book and manage personal experiences | Own profile, participants and bookings                               |
 | Experience Provider | Deliver and manage owned experiences | Own provider profile, experiences, availability and related bookings |
-| Team Member | Perform assigned work | Assigned experiences, shifts and bookings |
-| Partner | Refer customers and track rewards | Own partner profile, campaigns and attributed results |
-| Operations Staff | Coordinate delivery | Operational bookings, capacity, resources and incidents |
-| Customer Support | Assist customers | Support-relevant customer, booking and communication data |
-| Finance Manager | Reconcile money flows | Payments, refunds, settlements and finance reporting |
-| Content Manager | Manage public content | Experiences, profiles, media, SEO and reviews |
-| Administrator | Manage most platform functions | Broad non-super-admin access |
-| Super Administrator | Control security-critical settings | Full platform authority with safeguards |
+| Team Member         | Perform assigned work                | Assigned experiences, shifts and bookings                            |
+| Partner             | Refer customers and track rewards    | Own partner profile, campaigns and attributed results                |
+| Operations Staff    | Coordinate delivery                  | Operational bookings, capacity, resources and incidents              |
+| Customer Support    | Assist customers                     | Support-relevant customer, booking and communication data            |
+| Finance Manager     | Reconcile money flows                | Payments, refunds, settlements and finance reporting                 |
+| Content Manager     | Manage public content                | Experiences, profiles, media, SEO and reviews                        |
+| Administrator       | Manage most platform functions       | Broad non-super-admin access                                         |
+| Super Administrator | Control security-critical settings   | Full platform authority with safeguards                              |
 
 ### Guest
 

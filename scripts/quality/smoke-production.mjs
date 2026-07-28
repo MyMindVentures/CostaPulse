@@ -35,7 +35,9 @@ async function waitUntilReady() {
 
   while (Date.now() < deadline) {
     if (child.exitCode !== null) {
-      throw new Error(`Production server exited early with code ${child.exitCode}.`);
+      throw new Error(
+        `Production server exited early with code ${child.exitCode}.`
+      );
     }
 
     try {
@@ -57,7 +59,9 @@ async function assertRoute(route) {
   const response = await fetch(`${baseUrl}${route}`, { redirect: "manual" });
 
   if (response.status >= 500) {
-    throw new Error(`SSR smoke test failed for ${route}: HTTP ${response.status}.`);
+    throw new Error(
+      `SSR smoke test failed for ${route}: HTTP ${response.status}.`
+    );
   }
 
   console.log(`smoke-production: ${route} -> HTTP ${response.status}`);

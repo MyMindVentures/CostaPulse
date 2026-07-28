@@ -1,13 +1,38 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { fail } from "./shared.mjs";
+import { fail, git, toPosix } from "./shared.mjs";
 
 const root = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../.."
 );
 const packageJsonPath = path.join(root, "package.json");
+
+const APPROVED_DOCUMENTATION = new Set([
+  "AGENTS.md",
+  "public/robots.txt",
+  "README.md",
+  ...Array.from(
+    { length: 10 },
+    (_, index) =>
+      `docs/${String(index + 1).padStart(2, "0")}-${
+        [
+          "PROJECT-CONTEXT",
+          "PRODUCT-SCOPE",
+          "ARCHITECTURE",
+          "DATABASE",
+          "BACKEND",
+          "FRONTEND",
+          "DESIGN-SYSTEM",
+          "DEVOPS",
+          "SECURITY",
+          "ROADMAP"
+        ][index]
+      }.md`
+  )
+]);
+const DOCUMENTATION_EXTENSION = /\.(?:md|mdx|rst|txt)$/i;
 
 const REQUIRED_DEV_DEPENDENCIES = [
   "@commitlint/cli",
@@ -39,6 +64,26 @@ if (!packageJson.scripts?.prepare?.includes("husky")) {
 
 if (!packageJson.scripts?.guardrails) {
   missing.push("scripts.guardrails");
+}
+
+if (fs.existsSync(path.join(root, "Dockerfile"))) {
+  missing.push(
+    "root Dockerfile must remain absent so Railway uses the configured Railpack deployment"
+  );
+}
+
+const unapprovedDocumentation = git("ls-files")
+  .split(/\r?\n/)
+  .map(toPosix)
+  .filter(
+    (file) =>
+      fs.existsSync(path.join(root, file)) &&
+      DOCUMENTATION_EXTENSION.test(file) &&
+      !APPROVED_DOCUMENTATION.has(file)
+  );
+
+for (const file of unapprovedDocumentation) {
+  missing.push(`unapproved documentation file: ${file}`);
 }
 
 if (missing.length > 0) {
