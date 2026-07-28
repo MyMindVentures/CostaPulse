@@ -190,6 +190,29 @@ function RoleAccordionCard({
             ))}
           </section>
         </div>
+
+        {strategy.simple_workflow_steps.length ? (
+          <section className="border-gold/50 border-t px-5 py-6 sm:px-6 sm:py-8">
+            <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {strategy.simple_workflow_steps.map((step, index) => (
+                <li
+                  key={`${strategy.id}-workflow-${index}`}
+                  className="flex gap-4 rounded-xl border border-white/15 bg-white/5 p-4"
+                >
+                  <span
+                    className="bg-gold text-navy flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+                    aria-hidden="true"
+                  >
+                    {index + 1}
+                  </span>
+                  <span className="pt-1 text-base leading-relaxed text-white">
+                    {step}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ) : null}
       </div>
     </article>
   );
