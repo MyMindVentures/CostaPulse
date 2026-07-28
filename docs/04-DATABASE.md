@@ -74,6 +74,7 @@ Rules:
 4. Presentational components must not import Supabase clients, server modules or generated database rows directly.
 5. Public map and calendar flows consume `get_experience_map` and `get_experience_calendar` through repositories and view models.
 6. After migrations, regenerate types and update Zod and view-model parsers in the same change set.
+7. Public strategy cards are loaded through `get_public_strategy_cards(requested_locale text)`; translated strategy rows include role-specific `simple_workflow_steps` JSON arrays and are validated at the repository boundary.
 
 ## Database baseline
 

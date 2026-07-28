@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { resolveStrategyRoleKey, STRATEGY_ROLE_KEYS } from "./role-display-map";
 
 const text = z.string().trim().min(1);
 
@@ -92,6 +93,20 @@ export type StrategyPageViewModel = {
 
 export function parseStrategyRows(value: unknown): StrategyPageViewModel {
   const rows = z.array(strategyRowSchema).parse(value);
+  const roles = rows.map((row) =>
+    resolveStrategyRoleKey(row.audience_key, row.user_role, row.stakeholder_key)
+  );
+
+  if (
+    rows.length !== 0 &&
+    (rows.length !== STRATEGY_ROLE_KEYS.length ||
+      roles.some((role) => role === null) ||
+      new Set(roles).size !== STRATEGY_ROLE_KEYS.length)
+  ) {
+    throw new Error(
+      "The public strategy contract must contain every role once"
+    );
+  }
   const strategies = rows
     .map((row): StrategyCardViewModel => {
       const voucherBasisPoints = z

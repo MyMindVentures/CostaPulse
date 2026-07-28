@@ -3140,6 +3140,81 @@ export type Database = {
           }
         ];
       };
+      mission_statement_translations: {
+        Row: {
+          created_at: string;
+          locale: string;
+          mission_statement_id: string;
+          principles: Json | null;
+          rationale: string | null;
+          statement: string;
+          supporting_statement: string | null;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          locale: string;
+          mission_statement_id: string;
+          principles?: Json | null;
+          rationale?: string | null;
+          statement: string;
+          supporting_statement?: string | null;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          locale?: string;
+          mission_statement_id?: string;
+          principles?: Json | null;
+          rationale?: string | null;
+          statement?: string;
+          supporting_statement?: string | null;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      strategy_translations: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          locale: string;
+          objective: string;
+          simple_workflow_steps: Json;
+          strategy_id: string;
+          summary: string;
+          title: string;
+          updated_at: string;
+          win_win: Json;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          locale: string;
+          objective: string;
+          simple_workflow_steps?: Json;
+          strategy_id: string;
+          summary: string;
+          title: string;
+          updated_at?: string;
+          win_win?: Json;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          locale?: string;
+          objective?: string;
+          simple_workflow_steps?: Json;
+          strategy_id?: string;
+          summary?: string;
+          title?: string;
+          updated_at?: string;
+          win_win?: Json;
+        };
+        Relationships: [];
+      };
       site_content_sections: {
         Row: {
           created_at: string;
@@ -5380,6 +5455,10 @@ export type Database = {
               title: string;
             }[];
           };
+      get_public_strategy_cards: {
+        Args: { requested_locale: string };
+        Returns: Json;
+      };
       get_public_experience_booking_stories: {
         Args: {
           p_experience_slug: string;
@@ -5466,6 +5545,7 @@ export type Database = {
         };
         Returns: boolean;
       };
+      is_nonempty_text_array: { Args: { value: Json }; Returns: boolean };
       mark_booking_payment_processing: {
         Args: { p_booking_id: string; p_provider_payment_id?: string };
         Returns: Json;
