@@ -1,6 +1,5 @@
 "use client";
 
-import posthog from "posthog-js";
 import {
   createContext,
   useCallback,
@@ -39,22 +38,7 @@ function getPostHogHost() {
     : null;
 }
 
-function isPostHogLoaded() {
-  return Boolean((posthog as typeof posthog & { __loaded?: boolean }).__loaded);
-}
-
-function stopPostHog() {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  if (isPostHogLoaded()) {
-    posthog.opt_out_capturing();
-    posthog.reset();
-  }
-}
-
-function startPostHog() {
+async function updatePostHog(consent: AnalyticsConsent) {
   const key = getPostHogKey();
   const host = getPostHogHost();
 
@@ -62,17 +46,34 @@ function startPostHog() {
     return;
   }
 
-  if (isPostHogLoaded()) {
-    posthog.opt_in_capturing();
-    return;
-  }
+  try {
+    const { default: posthog } = await import("posthog-js");
+    const loaded = Boolean(
+      (posthog as typeof posthog & { __loaded?: boolean }).__loaded
+    );
 
-  posthog.init(key, {
-    api_host: host,
-    capture_pageview: true,
-    persistence: "localStorage+cookie",
-    person_profiles: "identified_only"
-  });
+    if (consent === "granted") {
+      if (loaded) {
+        posthog.opt_in_capturing();
+        return;
+      }
+
+      posthog.init(key, {
+        api_host: host,
+        capture_pageview: true,
+        persistence: "localStorage+cookie",
+        person_profiles: "identified_only"
+      });
+      return;
+    }
+
+    if (loaded) {
+      posthog.opt_out_capturing();
+      posthog.reset();
+    }
+  } catch {
+    // Analytics is non-essential and must never take down the application.
+  }
 }
 
 function subscribeIsClient(onStoreChange: () => void) {
@@ -101,18 +102,11 @@ export function PostHogProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    if (!consentReady) {
+    if (!consentReady || consent === null) {
       return;
     }
 
-    if (consent === "granted") {
-      startPostHog();
-      return;
-    }
-
-    if (consent === "denied") {
-      stopPostHog();
-    }
+    void updatePostHog(consent);
   }, [consent, consentReady]);
 
   const setConsent = useCallback((value: AnalyticsConsent) => {
