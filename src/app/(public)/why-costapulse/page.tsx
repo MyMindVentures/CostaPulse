@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { ErrorState } from "@/components/shared/error-state";
 import { Container } from "@/components/ui/container";
-import { StrategyPage } from "@/features/strategies/strategy-page";
+import { StrategyPageStatic } from "@/features/strategies/strategy-page-static";
 import { getPublicStrategies } from "@/server/repositories/strategies";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -23,5 +23,6 @@ export default async function WhyCostaPulsePage() {
       </Container>
     );
   }
-  return <StrategyPage page={result.page} />;
+
+  return <StrategyPageStatic page={result.page} />;
 }
