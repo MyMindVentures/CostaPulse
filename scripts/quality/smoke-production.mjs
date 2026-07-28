@@ -3,8 +3,12 @@ import { spawn } from "node:child_process";
 const port = 3210;
 const host = "127.0.0.1";
 const baseUrl = `http://${host}:${port}`;
+const readinessRoute = "/api/health";
 const routes = ["/", "/?locale=nl"];
-const timeoutMs = 30_000;
+const startupTimeoutMs = 12_000;
+const requestTimeoutMs = 3_000;
+const totalTimeoutMs = 20_000;
+const shutdownTimeoutMs = 1_500;
 
 const child = spawn(process.execPath, ["start-standalone.cjs"], {
   env: {
@@ -30,37 +34,49 @@ child.stderr.on("data", (chunk) => {
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+async function request(path) {
+  return fetch(`${baseUrl}${path}`, {
+    redirect: "manual",
+    signal: AbortSignal.timeout(requestTimeoutMs)
+  });
+}
+
 async function waitUntilReady() {
-  const deadline = Date.now() + timeoutMs;
+  const deadline = Date.now() + startupTimeoutMs;
 
   while (Date.now() < deadline) {
     if (child.exitCode !== null) {
       throw new Error(
-        `Production server exited early with code ${child.exitCode}.`
+        `Production server exited early with code ${child.exitCode}.\n${output}`
       );
     }
 
     try {
-      const response = await fetch(baseUrl, { redirect: "manual" });
-      if (response.status > 0) {
+      const response = await request(readinessRoute);
+      if (response.status < 500) {
+        console.log(
+          `smoke-production: ready via ${readinessRoute} -> HTTP ${response.status}`
+        );
         return;
       }
     } catch {
-      // Server is still starting.
+      // The server is still starting or the request timed out.
     }
 
-    await delay(250);
+    await delay(200);
   }
 
-  throw new Error(`Production server was not ready within ${timeoutMs}ms.`);
+  throw new Error(
+    `Production server was not ready within ${startupTimeoutMs}ms.\n${output}`
+  );
 }
 
 async function assertRoute(route) {
-  const response = await fetch(`${baseUrl}${route}`, { redirect: "manual" });
+  const response = await request(route);
 
   if (response.status >= 500) {
     throw new Error(
-      `SSR smoke test failed for ${route}: HTTP ${response.status}.`
+      `SSR smoke test failed for ${route}: HTTP ${response.status}.\n${output}`
     );
   }
 
@@ -68,20 +84,20 @@ async function assertRoute(route) {
 }
 
 async function shutdown() {
-  if (child.exitCode === null) {
-    child.kill("SIGTERM");
-    await Promise.race([
-      new Promise((resolve) => child.once("exit", resolve)),
-      delay(5_000)
-    ]);
-  }
+  if (child.exitCode !== null) return;
+
+  child.kill("SIGTERM");
+  await Promise.race([
+    new Promise((resolve) => child.once("exit", resolve)),
+    delay(shutdownTimeoutMs)
+  ]);
 
   if (child.exitCode === null) {
     child.kill("SIGKILL");
   }
 }
 
-try {
+async function runSmokeTest() {
   await waitUntilReady();
 
   for (const route of routes) {
@@ -93,6 +109,24 @@ try {
   }
 
   console.log("smoke-production: all routes passed");
+}
+
+let timeoutId;
+
+try {
+  await Promise.race([
+    runSmokeTest(),
+    new Promise((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(
+          new Error(
+            `Production smoke test exceeded the hard ${totalTimeoutMs}ms limit.\n${output}`
+          )
+        );
+      }, totalTimeoutMs);
+    })
+  ]);
 } finally {
+  clearTimeout(timeoutId);
   await shutdown();
 }
