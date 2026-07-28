@@ -2,74 +2,122 @@
 
 ## Purpose
 
-This document defines the durable visual and interaction principles for CostaPulse. Actual tokens and components remain implemented in source code.
+This document defines the binding visual and interaction principles for CostaPulse. Actual tokens and components remain implemented in source code.
 
-## Brand direction
+## Brand character
 
-CostaPulse should feel like a premium Mediterranean experience brand rather than a generic booking marketplace or SaaS dashboard.
+CostaPulse must feel like an international premium Mediterranean lifestyle and experiences brand rooted in the Costa Blanca: sun, sea, white coastal architecture, warm stone, sand, teak, bamboo, linen, rope, salt air and relaxed southern hospitality.
 
-Core qualities:
+The visual language is:
 
-- Premium but approachable
-- Adventurous and energetic
-- Trustworthy and operationally clear
-- Personal and authentic
-- Mediterranean without becoming decorative or cliché
+- premium, editorial and cinematic;
+- warm, natural and sun-soaked;
+- coastal, refined and adventurous;
+- subtly bohemian, never rustic or improvised;
+- international, timeless and suitable for expansion beyond Spain.
 
-## Visual direction
+Never generic SaaS, corporate blue, neon, cartoonish, tropical-tiki, cheap beach-club, overly nautical, glassmorphism-heavy or default shadcn.
 
-- Deep navy for depth, trust and premium framing
-- Warm ivory and sand tones for surfaces
-- Aqua accents for active, maritime and operational states
-- Restrained gold accents for premium highlights and important value indicators
-- Generous spacing and strong hierarchy
-- Soft borders and limited shadows
-- High-quality photography with consistent treatment
+## Token source of truth
 
-Exact colors, typography scales, radii and spacing values must be defined as reusable tokens in code rather than repeated manually.
+Brand CSS variables in `src/app/globals.css` are authoritative. Semantic shadcn tokens alias these values. Do not introduce a second palette.
+
+| Token | Role |
+| --- | --- |
+| `--navy`, `--navy-deep`, `--navy-soft` | Primary surfaces, headings and shell |
+| `--turquoise`, `--turquoise-deep` | Water-inspired accents, links, active and focus states |
+| `--coral`, `--coral-dark` | Primary CTA and destructive state |
+| `--gold` | Restrained premium highlight |
+| `--sand`, `--white`, `--panel` | Page and card surfaces |
+| `--ink`, `--muted` | Primary and secondary text |
+| `--border` | Borders and inputs |
+| `--shadow` | Elevation |
+| `--shell-nav-height` | Layout chrome |
+
+Current palette references:
+
+- Navy `#061B2C`
+- Deep navy `#02101F`
+- Turquoise `#18B7BD`
+- Coral `#EB674D`
+- Coral dark `#CF4F38`
+- Gold `#E4B967`
+- Sand `#F6EFE4`
+- Warm white `#FFFDF8`
+- Panel `#F3F5F3`
+- Ink `#102A35`
+- Muted `#667981`
+
+Consume colors through variables or semantic Tailwind classes such as `bg-primary`, `text-navy` and `bg-card`. Dark navy and warm sand or ivory dominate; turquoise, coral and gold are accents.
 
 ## Typography
 
-- Use a clear, premium display treatment for major marketing headings.
-- Use a highly readable interface typeface for forms, tables and operational screens.
-- Maintain consistent heading, body, label and helper-text scales.
-- Avoid excessive font weights and visual noise.
+- Headings use the existing editorial serif stack: elegant, spacious and cinematic.
+- Body text and controls use the existing Manrope/Inter stack.
+- Use confident headlines with controlled line lengths and generous whitespace.
+- Avoid ultra-bold SaaS typography, condensed display fonts and scripts.
+- Never add a font without explicit approval.
+
+## Materials and texture
+
+Express the Mediterranean feeling through photography, spacing, tone and subtle material references rather than literal decoration.
+
+Preferred cues include sun-faded linen, bamboo, teak, natural rope, pale stone, whitewashed walls, warm terraces, coastal cliffs, clear blue water, sunset light, natural shadows and authentic human moments.
+
+Do not add fake wood textures, obvious bamboo patterns, shells, anchors, waves, palm icons or decorative beach illustrations.
 
 ## Component principles
 
-- Build reusable buttons, fields, cards, dialogs, tables, status indicators, navigation elements and feedback states.
-- Variants should be intentional and limited.
-- Components must support keyboard use, focus visibility and appropriate semantics.
+- Reuse `src/components/ui` and `src/components/shared` before creating anything new.
+- Cards use warm-white or deep-navy surfaces, subtle borders, restrained shadows and existing radius tokens.
+- Buttons use coral for the primary action and navy or warm neutrals for secondary actions. Keep one obvious primary action per section.
+- Inputs require clear labels, a visible turquoise focus ring and complete validation states.
+- Use one consistent icon library and stroke style; never use emoji as interface icons.
+- Badges stay compact and editorial; use gold or turquoise only when semantically meaningful.
+- Variants must be typed and intentional rather than copied components.
 - Status color must never be the only carrier of meaning.
-- Domain-specific components should compose shared primitives.
+- New reusable patterns belong in the shared or design-system layer and should be documented in Storybook.
+
+## Layout and composition
+
+- Build mobile-first with shared containers, spacing and grid patterns.
+- Prefer generous negative space, asymmetrical editorial compositions and image-led sections.
+- Alternate immersive dark sections with warm sand and ivory sections where appropriate.
+- Maintain a calm visual rhythm without overcrowded cards, badges or competing calls to action.
+- Minimum interactive target size is 44 × 44 CSS pixels.
+- Prevent horizontal overflow, clipped content and cramped layouts.
 
 ## Public experience UI
 
-Prioritize immersive media, clear value, transparent pricing, host credibility, availability and a confident booking call to action.
+Prioritize immersive, authentic imagery, clear value, transparent pricing, host credibility, availability and a confident booking call to action. Avoid generic stock-tourism clichés and low-quality placeholders.
 
 ## Admin UI
 
 The admin interface should feel like a premium Mediterranean operations platform:
 
-- Compact but readable data presentation
-- Meaningful metrics rather than decorative cards
-- Clear status systems
-- Fast filtering and quick actions
-- Desktop-first operational density with strong tablet support
+- compact but readable data presentation;
+- meaningful metrics rather than decorative cards;
+- clear status systems;
+- fast filtering and quick actions;
+- desktop-first operational density with strong tablet support.
 
-## Responsive behavior
+## Motion
 
-- Design mobile experiences deliberately rather than stacking desktop layouts blindly.
-- Keep primary actions visible and reachable.
-- Use drawers, sheets or progressive disclosure for dense details.
-- Protect readability and touch target sizes.
+Motion should feel smooth, calm and premium, like water or a sea breeze. Use subtle fades, reveals and restrained parallax only when they improve the experience. Avoid bouncy, flashy or high-frequency animation and always respect `prefers-reduced-motion`.
 
-## Media rules
+## Accessibility
 
-- Use authentic, high-quality Costa Blanca and activity imagery.
-- Avoid inconsistent aspect ratios within repeated card systems.
-- Provide meaningful alt text where imagery communicates content.
-- Keep decorative images separate from essential information.
+Meet WCAG 2.2 AA for contrast, keyboard use, focus visibility and screen-reader behavior. Protect readability and touch targets across all supported viewports.
+
+## Non-negotiable implementation rules
+
+1. No arbitrary Tailwind colors, radii, shadows or one-off CSS when a token or established pattern exists.
+2. No page-specific visual language; every surface must feel native to CostaPulse.
+3. Do not copy components to create visual variants.
+4. No new palette, font, icon style, gradient language or visual trend without explicit approval.
+5. Compare every completed frontend change against this document, `src/app/globals.css`, existing shared components and relevant Storybook stories.
+6. When uncertain, choose the more refined, natural, calm and timeless option.
+7. CostaPulse must never look like a local hobby website or generic booking template.
 
 ## Change discipline
 
