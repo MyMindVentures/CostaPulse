@@ -75,6 +75,7 @@ jobs:
         run: npm run build
 
       - name: Run standalone SSR smoke test
+        timeout-minutes: 2
         shell: bash
         env:
           NEXT_PUBLIC_SITE_URL: https://www.costapulse.club
