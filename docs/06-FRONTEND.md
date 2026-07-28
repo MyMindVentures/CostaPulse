@@ -30,7 +30,7 @@ Never guess database fields, RPC names, routes or permissions.
 
 ### Public website
 
-Includes discovery, experience cards, experience profiles, team profiles, partner referral entry points and booking journeys.
+Includes discovery, experience cards, experience profiles, team profiles, partner referral entry points, the `/why-costapulse` shared-value strategy page and booking journeys. The strategy page consumes the public, RLS-scoped `strategy_cards_public` read model through the strategies repository and maps its nested JSON into frontend view models before rendering.
 
 ### Customer area
 

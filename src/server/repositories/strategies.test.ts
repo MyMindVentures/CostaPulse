@@ -24,9 +24,15 @@ describe("strategies repository", () => {
 
     await expect(getPublicStrategies()).resolves.toEqual({
       status: "success",
-      strategies: []
+      page: {
+        strategies: [],
+        founderStrategy: null,
+        roleStrategies: [],
+        primaryMission: null
+      }
     });
     expect(from).toHaveBeenCalledWith("strategy_cards_public");
+    expect(select).toHaveBeenCalledWith(expect.stringContaining("slug"));
   });
 
   it("contains malformed JSON at the repository boundary", async () => {

@@ -23,5 +23,5 @@ export default async function WhyCostaPulsePage() {
       </Container>
     );
   }
-  return <StrategyPage strategies={result.strategies} />;
+  return <StrategyPage page={result.page} />;
 }
