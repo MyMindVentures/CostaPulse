@@ -8,134 +8,56 @@ const winWinSchema = z.object({
   motivation: text
 });
 
-const actionStepSchema = z.object({
-  step: z.number().int(),
-  action: text
-});
-
-const metricSchema = z.object({
-  target: z.number(),
-  unit: text
-});
-
-const principleSchema = z.object({
-  key: text,
-  label: text
-});
-
-const missionSchema = z.object({
-  slug: text,
-  title: text,
-  statement: text,
-  supporting_statement: z.string().trim().nullable().optional(),
-  principles: z.array(principleSchema).nullable().optional(),
-  relationship_type: text,
-  rationale: z.string().trim().nullable().optional()
-});
+const missionSchema = z.union([
+  text.transform((statement) => ({
+    title: null,
+    statement,
+    supportingStatement: null
+  })),
+  z
+    .object({
+      title: z.string().trim().nullable().optional(),
+      statement: text,
+      supporting_statement: z.string().trim().nullable().optional()
+    })
+    .transform((value) => ({
+      title: value.title ?? null,
+      statement: value.statement,
+      supportingStatement: value.supporting_statement ?? null
+    }))
+]);
 
 export const strategyRowSchema = z.object({
-  slug: text,
   audience_key: text,
   user_role: z.string().trim().nullable().optional(),
   stakeholder_key: z.string().trim().nullable().optional(),
   title: text,
   summary: text,
   description: z.string().trim().nullable().optional(),
-  strategy_type: text,
-  status: text,
-  priority: z.number(),
   objective: text,
-  target_audience: z.array(text).default([]),
-  channels: z.array(text).default([]),
-  success_metrics: z.record(z.string(), metricSchema).default({}),
-  action_plan: z.array(actionStepSchema).default([]),
+  target_audience: z.array(z.string()).nullable().optional(),
+  channels: z.array(z.string()).nullable().optional(),
+  success_metrics: z.array(z.string()).default([]),
+  action_plan: z.array(z.string()).default([]),
   win_win: z.array(winWinSchema).default([]),
   mission_statements: z.array(missionSchema).default([]),
   sort_order: z.number().int(),
-  metadata: z.record(z.string(), z.unknown()).default({})
+  status: z.string().nullable().optional(),
+  priority: z.string().nullable().optional(),
+  metadata: z.record(z.string(), z.unknown()).nullable().optional()
 });
 
-export type StrategyMetricViewModel = {
-  key: string;
-  target: number;
-  unit: string;
-};
-
-export type StrategyMissionViewModel = {
-  slug: string;
-  title: string;
-  statement: string;
-  supportingStatement: string | null;
-  principles: Array<{ key: string; label: string }>;
-  relationshipType: string;
-  rationale: string | null;
-};
-
-export type StrategyCardViewModel = Omit<
-  z.infer<typeof strategyRowSchema>,
-  "success_metrics" | "action_plan" | "mission_statements"
-> & {
+export type StrategyCardViewModel = z.infer<typeof strategyRowSchema> & {
   id: string;
-  metrics: StrategyMetricViewModel[];
-  actionSteps: Array<{ step: number; action: string }>;
-  missionStatements: StrategyMissionViewModel[];
-  voucherBasisPoints: number | null;
+  ecosystemLoop: string[];
 };
 
-export type StrategyPageViewModel = {
-  strategies: StrategyCardViewModel[];
-  founderStrategy: StrategyCardViewModel | null;
-  roleStrategies: StrategyCardViewModel[];
-  primaryMission: StrategyMissionViewModel | null;
-};
-
-export function parseStrategyRows(value: unknown): StrategyPageViewModel {
+export function parseStrategyRows(value: unknown): StrategyCardViewModel[] {
   const rows = z.array(strategyRowSchema).parse(value);
-  const strategies = rows
-    .map((row): StrategyCardViewModel => {
-      const voucherBasisPoints = z.number().nonnegative().safeParse(
-        row.metadata.customer_voucher_basis_points
-      );
-
-      return {
-        ...row,
-        id: row.slug,
-        metrics: Object.entries(row.success_metrics).map(([key, metric]) => ({
-          key,
-          target: metric.target,
-          unit: metric.unit
-        })),
-        actionSteps: [...row.action_plan].sort((a, b) => a.step - b.step),
-        missionStatements: row.mission_statements.map((mission) => ({
-          slug: mission.slug,
-          title: mission.title,
-          statement: mission.statement,
-          supportingStatement: mission.supporting_statement ?? null,
-          principles: mission.principles ?? [],
-          relationshipType: mission.relationship_type,
-          rationale: mission.rationale ?? null
-        })),
-        voucherBasisPoints: voucherBasisPoints.success
-          ? voucherBasisPoints.data
-          : null
-      };
-    })
-    .sort((a, b) => a.sort_order - b.sort_order);
-
-  const founderStrategy =
-    strategies.find((strategy) => strategy.audience_key === "founder") ?? null;
-  const roleStrategies = strategies.filter(
-    (strategy) => strategy.audience_key !== "founder"
-  );
-  const primaryMission =
-    founderStrategy?.missionStatements[0] ??
-    strategies.flatMap((strategy) => strategy.missionStatements)[0] ??
-    null;
-
-  return {
-    strategies,
-    founderStrategy,
-    roleStrategies,
-    primaryMission
-  };
+  return rows.map((row, index) => ({
+    ...row,
+    id: `${row.audience_key}-${row.stakeholder_key ?? row.user_role ?? index}`,
+    ecosystemLoop:
+      z.array(text).safeParse(row.metadata?.ecosystem_loop).data ?? []
+  }));
 }
