@@ -2,11 +2,11 @@ import "server-only";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   parseStrategyRows,
-  type StrategyCardViewModel
+  type StrategyPageViewModel
 } from "@/features/strategies/strategy-view-model";
 
 export type StrategiesResult =
-  | { status: "success"; strategies: StrategyCardViewModel[] }
+  | { status: "success"; page: StrategyPageViewModel }
   | { status: "error" };
 
 /** Public, RLS-scoped strategy read model. Malformed JSON never crosses this boundary. */
@@ -26,7 +26,7 @@ export async function getPublicStrategies(): Promise<StrategiesResult> {
   };
   const { data, error } = await from("strategy_cards_public")
     .select(
-      "audience_key,user_role,stakeholder_key,title,summary,description,objective,target_audience,channels,success_metrics,action_plan,win_win,mission_statements,sort_order,status,priority,metadata"
+      "slug,audience_key,user_role,stakeholder_key,title,summary,description,strategy_type,status,priority,objective,target_audience,channels,success_metrics,action_plan,win_win,mission_statements,sort_order,metadata"
     )
     .order("sort_order", { ascending: true });
 
@@ -38,7 +38,5 @@ export async function getPublicStrategies(): Promise<StrategiesResult> {
       return null;
     }
   })();
-  return parsed
-    ? { status: "success", strategies: parsed }
-    : { status: "error" };
+  return parsed ? { status: "success", page: parsed } : { status: "error" };
 }

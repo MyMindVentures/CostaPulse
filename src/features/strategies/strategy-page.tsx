@@ -4,7 +4,10 @@ import { getTranslations } from "next-intl/server";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
-import type { StrategyCardViewModel } from "./strategy-view-model";
+import type {
+  StrategyCardViewModel,
+  StrategyPageViewModel
+} from "./strategy-view-model";
 import { RoleSelector } from "./role-selector";
 
 function RoleBadge({ children }: { children: React.ReactNode }) {
@@ -109,8 +112,7 @@ function StrategyCard({
         gain={labels.gain}
         matters={labels.matters}
       />
-      {(strategy.action_plan.length > 0 ||
-        strategy.success_metrics.length > 0) && (
+      {(strategy.actionSteps.length > 0 || strategy.metrics.length > 0) && (
         <details
           className={`mt-8 border-t pt-2 ${founder ? "border-white/20" : "border-border"}`}
         >
@@ -118,22 +120,24 @@ function StrategyCard({
             {labels.details}
           </summary>
           <div className="grid gap-8 pb-4 md:grid-cols-2">
-            {strategy.action_plan.length > 0 && (
+            {strategy.actionSteps.length > 0 && (
               <div>
                 <h3 className="font-serif text-2xl">{labels.action}</h3>
                 <ul className="mt-3 list-disc space-y-2 pl-5">
-                  {strategy.action_plan.map((item) => (
-                    <li key={item}>{item}</li>
+                  {strategy.actionSteps.map((item) => (
+                    <li key={item.step}>{item.action}</li>
                   ))}
                 </ul>
               </div>
             )}
-            {strategy.success_metrics.length > 0 && (
+            {strategy.metrics.length > 0 && (
               <div>
                 <h3 className="font-serif text-2xl">{labels.metrics}</h3>
                 <ul className="mt-3 list-disc space-y-2 pl-5">
-                  {strategy.success_metrics.map((item) => (
-                    <li key={item}>{item}</li>
+                  {strategy.metrics.map((item) => (
+                    <li key={item.key}>
+                      {item.target} {item.unit}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -141,7 +145,7 @@ function StrategyCard({
           </div>
         </details>
       )}
-      {strategy.mission_statements.map((mission) => (
+      {strategy.missionStatements.map((mission) => (
         <blockquote
           key={mission.statement}
           className={`mt-8 border-t pt-8 font-serif text-xl ${founder ? "border-white/20 text-white/90" : "border-border text-navy"}`}
@@ -156,12 +160,9 @@ function StrategyCard({
   );
 }
 
-export async function StrategyPage({
-  strategies
-}: {
-  strategies: StrategyCardViewModel[];
-}) {
+export async function StrategyPage({ page }: { page: StrategyPageViewModel }) {
   const t = await getTranslations("WhyCostaPulse");
+  const { strategies, primaryMission: mission } = page;
   if (!strategies.length)
     return (
       <Container className="py-24">
@@ -171,10 +172,6 @@ export async function StrategyPage({
         />
       </Container>
     );
-  const mission = strategies.flatMap((item) => item.mission_statements)[0];
-  const loop = strategies
-    .flatMap((item) => item.ecosystemLoop)
-    .filter((value, index, all) => all.indexOf(value) === index);
   const labels = {
     objective: t("objective"),
     gain: t("gain"),
@@ -263,28 +260,6 @@ export async function StrategyPage({
           </div>
         </Container>
       </section>
-      {loop.length > 0 && (
-        <section className="bg-white py-20 sm:py-28">
-          <Container>
-            <h2 className="text-navy font-serif text-4xl">
-              {t("exampleTitle")}
-            </h2>
-            <ol className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {loop.map((step, index) => (
-                <li
-                  key={step}
-                  className="border-border flex gap-4 rounded-2xl border p-5"
-                >
-                  <span className="text-gold font-serif text-2xl">
-                    {index + 1}
-                  </span>
-                  <span>{step}</span>
-                </li>
-              ))}
-            </ol>
-          </Container>
-        </section>
-      )}
       <section className="bg-sand py-20 text-center sm:py-28">
         <Container>
           <h2 className="text-navy font-serif text-4xl sm:text-5xl">
