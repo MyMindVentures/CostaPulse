@@ -46,6 +46,7 @@ export function AppShellFrame({
     >
       <PageBackground variant={backgroundVariant} />
       <Navbar
+        key={pathname}
         audience={audience}
         navigation={navigation}
         logoSrc={logoSrc}
