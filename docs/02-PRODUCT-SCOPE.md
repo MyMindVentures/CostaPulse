@@ -12,13 +12,34 @@ Visitors can discover experiences and services, view experience and team profile
 
 An experience can include public content and media, variants, locations, availability, capacity rules, pricing, add-ons, hosts, team members, requirements, policies, languages, itinerary and highlights.
 
+## Partner discovery domain
+
+The public partner experience helps visitors discover active CostaPulse partners by location and category. Map markers and partner cards are synchronized representations of the same selected partner, while partner details and nearby experiences remain part of the real navigated flow.
+
+Public partner presentation must not expose internal notes, unrestricted analytics, private customer data or operational controls. The public experience remains editorial and discovery-led rather than an internal dashboard.
+
 ## Partner and referral domain
 
-CostaPulse supports local partners through referral links and QR codes. A referred customer can complete a booking and, when configured conditions are met, receive a partner voucher. Attribution, voucher percentages and redemption rules are controlled by the application.
+CostaPulse supports local partners through referral links, QR codes and attributed campaigns. A partner may recommend CostaPulse to a customer, the customer may complete an eligible booking, and configured rewards can then bring the customer back to the referring partner while also creating value for the provider, team and wider CostaPulse network.
+
+Core product principles:
+
+- every referral has a server-authoritative partner identity;
+- attribution is measurable and tied to the verified booking flow;
+- voucher percentages, validity, eligibility and redemption rules come from the application contract, not frontend constants;
+- one participant's benefit should create measurable value for the other roles;
+- partners receive only the minimum customer and booking information needed for their role;
+- historical attribution and issued reward snapshots remain auditable.
+
+This shared-value model reduces dependence on isolated paid marketing by connecting customers, partners, providers, team members and CostaPulse through measurable reciprocal benefits.
 
 ## Customer domain
 
 Customers can manage a profile, bookings, participants, payments, refunds, reviews, vouchers, waivers, confirmations and communication preferences.
+
+## Booking stories and previous adventures
+
+Completed experiences may expose approved booking-story media as public social proof on the related experience page. Public stories use only published, authorized media returned by the backend. Admin users manage story records, media ordering and cover selection through the approved admin workflow.
 
 ## Crew and team platform
 
