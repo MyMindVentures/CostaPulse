@@ -40,6 +40,7 @@ export type AdminNavSection =
   | "customers"
   | "experiences"
   | "media"
+  | "documents"
   | "documentsShares"
   | "partners"
   | "locations"
@@ -77,6 +78,7 @@ const adminNavRoles: Record<AdminNavSection, ReadonlySet<AppRole>> = {
     "super_administrator"
   ]),
   media: opsContentRoles,
+  documents: adminRoles,
   documentsShares: contentRoles,
   partners: new Set<AppRole>([
     "operations_staff",
