@@ -1,10 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
   availabilityBasePath,
+  availabilityDateUrl,
   dateKeyInTimeZone
 } from "./availability-calendar.utils";
 
 const DISPLAY_TIME_ZONE = "Europe/Madrid";
+const emptyFilters = {
+  serviceCategory: "",
+  status: "",
+  location: "",
+  availableOnly: false
+};
 
 describe("dateKeyInTimeZone", () => {
   it.each([
@@ -32,6 +39,39 @@ describe("availabilityBasePath", () => {
     expect(availabilityBasePath("/availability")).toBe("/availability");
     expect(availabilityBasePath("/team/kevin/availability")).toBe(
       "/team/kevin/availability"
+    );
+  });
+});
+
+describe("availabilityDateUrl", () => {
+  it("uses the public noindex date-detail route", () => {
+    expect(
+      availabilityDateUrl("/availability", "2026-07-30", emptyFilters)
+    ).toBe("/availability/2026-07-30?month=2026-07");
+  });
+
+  it("preserves filters on the public date-detail route", () => {
+    expect(
+      availabilityDateUrl("/availability", "2026-07-30", {
+        serviceCategory: "watersports",
+        status: "limited",
+        location: "Alicante",
+        availableOnly: true
+      })
+    ).toBe(
+      "/availability/2026-07-30?month=2026-07&service_category=watersports&status=limited&location=Alicante&available_only=true"
+    );
+  });
+
+  it("uses query date state where no nested date route exists", () => {
+    expect(
+      availabilityDateUrl(
+        "/team/kevin/availability",
+        "2026-07-30",
+        emptyFilters
+      )
+    ).toBe(
+      "/team/kevin/availability?month=2026-07&date=2026-07-30"
     );
   });
 });
