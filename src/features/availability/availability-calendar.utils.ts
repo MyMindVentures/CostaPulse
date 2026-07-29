@@ -46,12 +46,11 @@ export function groupEntriesByDay(entries: PublicAvailabilityEntry[]) {
   return grouped;
 }
 
-export function availabilityUrl(
-  pathname: string,
+function availabilitySearchParams(
   month: string,
   filters: AvailabilityFilters,
   selectedDate?: string | null
-): string {
+): URLSearchParams {
   const params = new URLSearchParams();
   params.set("month", month);
   if (selectedDate) params.set("date", selectedDate);
@@ -61,6 +60,31 @@ export function availabilityUrl(
   if (filters.status) params.set("status", filters.status);
   if (filters.location) params.set("location", filters.location);
   if (filters.availableOnly) params.set("available_only", "true");
+  return params;
+}
+
+export function availabilityUrl(
+  pathname: string,
+  month: string,
+  filters: AvailabilityFilters,
+  selectedDate?: string | null
+): string {
+  return `${pathname}?${availabilitySearchParams(month, filters, selectedDate).toString()}`;
+}
+
+export function availabilityDateUrl(
+  pathname: string,
+  selectedDate: string,
+  filters: AvailabilityFilters
+): string {
+  const params = availabilitySearchParams(selectedDate.slice(0, 7), filters);
+  const query = params.toString();
+
+  if (pathname === "/availability") {
+    return `/availability/${selectedDate}${query ? `?${query}` : ""}`;
+  }
+
+  params.set("date", selectedDate);
   return `${pathname}?${params.toString()}`;
 }
 
