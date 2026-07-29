@@ -85,7 +85,7 @@ export async function StrategyPageStatic({
               “{mission.statement}”
             </blockquote>
             {mission.supportingStatement ? (
-              <p className="text-muted mt-6 max-w-2xl text-lg">
+              <p className="text-muted-foreground mt-6 max-w-2xl text-lg">
                 {mission.supportingStatement}
               </p>
             ) : null}
@@ -124,7 +124,7 @@ export async function StrategyPageStatic({
           <h2 className="text-navy font-serif text-4xl sm:text-5xl">
             {t("closingTitle")}
           </h2>
-          <p className="text-muted mx-auto mt-5 max-w-2xl">
+          <p className="text-muted-foreground mx-auto mt-5 max-w-2xl">
             {t("closingIntro")}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
