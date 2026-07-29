@@ -254,6 +254,34 @@ export default async function AdminDocumentsPage({
     new Set(teamCertificates.map((certificate) => certificate.certificate_type))
   ).sort((a, b) => a.localeCompare(b));
 
+  const activeCertificateTypeFilter =
+    type &&
+    certificateTypeValues.some(
+      (candidate) =>
+        normalizeFilterValue(candidate) === normalizeFilterValue(type)
+    )
+      ? type
+      : null;
+
+  const activeComputedStatusFilter = DOCUMENT_COMPUTED_STATUS_VALUES.includes(
+    computedStatus as (typeof DOCUMENT_COMPUTED_STATUS_VALUES)[number]
+  )
+    ? computedStatus
+    : null;
+
+  const activeVerificationFilter = DOCUMENT_VERIFICATION_VALUES.includes(
+    verification as (typeof DOCUMENT_VERIFICATION_VALUES)[number]
+  )
+    ? verification
+    : null;
+
+  const activeExpiryFilter: (typeof DOCUMENT_EXPIRY_FILTER_VALUES)[number] =
+    DOCUMENT_EXPIRY_FILTER_VALUES.includes(
+      expiry as (typeof DOCUMENT_EXPIRY_FILTER_VALUES)[number]
+    )
+      ? (expiry as (typeof DOCUMENT_EXPIRY_FILTER_VALUES)[number])
+      : "all";
+
   const teamCertificatesWithComputedStatus = teamCertificates.map(
     (certificate) => ({
       ...certificate,
@@ -268,8 +296,10 @@ export default async function AdminDocumentsPage({
 
   const filteredTeamCertificates = teamCertificatesWithComputedStatus
     .filter((certificate) => {
-      if (type) {
-        const normalizedType = normalizeFilterValue(type);
+      if (activeCertificateTypeFilter) {
+        const normalizedType = normalizeFilterValue(
+          activeCertificateTypeFilter
+        );
         if (
           normalizeFilterValue(certificate.certificate_type) !== normalizedType
         ) {
@@ -277,20 +307,29 @@ export default async function AdminDocumentsPage({
         }
       }
 
-      if (verification && certificate.verification_status !== verification) {
-        return false;
-      }
-
-      if (computedStatus && certificate.computed_status !== computedStatus) {
-        return false;
-      }
-
-      if (expiry === "expired" && certificate.computed_status !== "expired") {
+      if (
+        activeVerificationFilter &&
+        certificate.verification_status !== activeVerificationFilter
+      ) {
         return false;
       }
 
       if (
-        expiry === "expiring" &&
+        activeComputedStatusFilter &&
+        certificate.computed_status !== activeComputedStatusFilter
+      ) {
+        return false;
+      }
+
+      if (
+        activeExpiryFilter === "expired" &&
+        certificate.computed_status !== "expired"
+      ) {
+        return false;
+      }
+
+      if (
+        activeExpiryFilter === "expiring" &&
         ![
           "expires_within_180_days",
           "expires_within_90_days",
@@ -301,7 +340,10 @@ export default async function AdminDocumentsPage({
         return false;
       }
 
-      if (expiry === "non_expiring" && !certificate.does_not_expire) {
+      if (
+        activeExpiryFilter === "non_expiring" &&
+        !certificate.does_not_expire
+      ) {
         return false;
       }
 
@@ -460,7 +502,11 @@ export default async function AdminDocumentsPage({
             />
             <select
               name="type"
-              defaultValue={type ?? ""}
+              defaultValue={
+                isCertificateMode
+                  ? (activeCertificateTypeFilter ?? "")
+                  : (type ?? "")
+              }
               className="border-border min-h-11 rounded-md border px-3"
               aria-label={t("documentsTableType")}
             >
@@ -491,7 +537,7 @@ export default async function AdminDocumentsPage({
             )}
             <select
               name="computed_status"
-              defaultValue={computedStatus ?? ""}
+              defaultValue={activeComputedStatusFilter ?? ""}
               className="border-border min-h-11 rounded-md border px-3"
               aria-label={t("documentsTableStatus")}
             >
@@ -506,7 +552,7 @@ export default async function AdminDocumentsPage({
             </select>
             <select
               name="verification"
-              defaultValue={verification ?? ""}
+              defaultValue={activeVerificationFilter ?? ""}
               className="border-border min-h-11 rounded-md border px-3"
               aria-label={t("documentsTableVerification")}
             >
@@ -536,7 +582,7 @@ export default async function AdminDocumentsPage({
             )}
             <select
               name="expiry"
-              defaultValue={expiry ?? "all"}
+              defaultValue={activeExpiryFilter}
               className="border-border min-h-11 rounded-md border px-3"
               aria-label={t("documentsFilterExpiry")}
             >

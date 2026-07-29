@@ -55,6 +55,7 @@
     "maplibre-gl": "^5.24.0",
     "next": "16.2.11",
     "next-intl": "4.13.4",
+    "pdfjs-dist": "^6.2.108",
     "posthog-js": "1.280.1",
     "qrcode": "1.5.4",
     "react": "19.2.0",

@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ProtectedFilePreview } from "@/components/shared/protected-file-preview";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { requireAreaAccess } from "@/server/auth/protected-area";
 import { canAccessAdminSection } from "@/server/auth/role-access";
@@ -366,35 +366,11 @@ export default async function AdminCertificateDetailPage({
                   </div>
 
                   <div className="border-navy/10 bg-sand/20 mt-3 overflow-hidden rounded-lg border">
-                    {file.mime_type.startsWith("image/") ? (
-                      <Image
-                        src={viewHref}
-                        alt={fileLabel}
-                        width={1200}
-                        height={880}
-                        unoptimized
-                        loading="lazy"
-                        className="h-[22rem] w-full object-contain"
-                      />
-                    ) : file.mime_type === "application/pdf" ? (
-                      <iframe
-                        src={viewHref}
-                        title={`Preview ${fileLabel}`}
-                        loading="lazy"
-                        className="h-[22rem] w-full"
-                      />
-                    ) : (
-                      <object
-                        data={viewHref}
-                        type={file.mime_type}
-                        className="h-[22rem] w-full"
-                      >
-                        <div className="text-navy/70 flex h-full items-center justify-center p-4 text-sm">
-                          Inline preview is niet beschikbaar voor dit
-                          bestandstype.
-                        </div>
-                      </object>
-                    )}
+                    <ProtectedFilePreview
+                      fileId={file.id}
+                      fileName={fileLabel}
+                      mimeType={file.mime_type}
+                    />
                   </div>
                 </li>
               );

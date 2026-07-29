@@ -1,8 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-
-const SIGNED_URL_TTL_SECONDS = 120;
+import { canAccessAdminArea, type AppRole } from "@/server/auth/role-access";
 
 function parseIntent(value: string | null): "view" | "download" {
   return value === "download" ? "download" : "view";
@@ -28,18 +27,18 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { data: roleRows, error: roleError } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("profile_id", user.id);
+
+  const roles = (roleRows ?? []).map(({ role }) => role as AppRole);
+  if (roleError || !canAccessAdminArea(roles)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const { fileId } = await context.params;
   const intent = parseIntent(request.nextUrl.searchParams.get("intent"));
-
-  const { data: fileRow, error: fileError } = await supabase
-    .from("professional_document_files")
-    .select("id, storage_bucket, storage_path, original_filename")
-    .eq("id", fileId)
-    .single();
-
-  if (fileError || !fileRow) {
-    return NextResponse.json({ error: "File not found" }, { status: 404 });
-  }
 
   const admin = createSupabaseAdminClient();
   if (!admin) {
@@ -49,19 +48,41 @@ export async function GET(
     );
   }
 
-  const options =
-    intent === "download" ? { download: fileRow.original_filename } : undefined;
+  const { data: fileRow, error: fileError } = await admin
+    .from("professional_document_files")
+    .select("id, storage_bucket, storage_path, original_filename, mime_type")
+    .eq("id", fileId)
+    .single();
 
-  const { data, error } = await admin.storage
+  if (fileError || !fileRow) {
+    return NextResponse.json({ error: "File not found" }, { status: 404 });
+  }
+
+  const { data: binary, error: downloadError } = await admin.storage
     .from(fileRow.storage_bucket)
-    .createSignedUrl(fileRow.storage_path, SIGNED_URL_TTL_SECONDS, options);
+    .download(fileRow.storage_path);
 
-  if (error || !data?.signedUrl) {
+  if (downloadError || !binary) {
     return NextResponse.json(
-      { error: error?.message ?? "Failed to generate file link." },
+      { error: downloadError?.message ?? "Failed to read file." },
       { status: 500 }
     );
   }
 
-  return NextResponse.redirect(data.signedUrl, 302);
+  const contentType = fileRow.mime_type || "application/octet-stream";
+  const dispositionType = intent === "download" ? "attachment" : "inline";
+  const encodedFileName = encodeURIComponent(
+    fileRow.original_filename || "file"
+  );
+
+  return new NextResponse(await binary.arrayBuffer(), {
+    status: 200,
+    headers: {
+      "Content-Type": contentType,
+      "Content-Disposition": `${dispositionType}; filename*=UTF-8''${encodedFileName}`,
+      "Cache-Control": "private, no-store",
+      "X-Frame-Options": "SAMEORIGIN",
+      "Content-Security-Policy": "frame-ancestors 'self'"
+    }
+  });
 }
