@@ -1,0 +1,101 @@
+name: PR Guardrails
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+
+jobs:
+  workflow-rules:
+    name: Validate issue, branch and architecture report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate linked issue
+        env:
+          PR_BODY: ${{ github.event.pull_request.body || '' }}
+        run: |
+          if ! printf '%s' "$PR_BODY" | grep -Eiq '(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)[[:space:]]+#[0-9]+'; then
+            echo 'PR description must link an issue, for example: Closes #74'
+            exit 1
+          fi
+
+      - name: Validate branch name
+        env:
+          BRANCH_NAME: ${{ github.head_ref }}
+        run: |
+          if ! printf '%s' "$BRANCH_NAME" | grep -Eq '^(feature|fix|refactor|chore|docs|test)/[0-9]+-[a-z0-9-]+$'; then
+            echo 'Branch must follow: type/issue-number-description'
+            echo 'Example: refactor/61-why-costapulse-components'
+            exit 1
+          fi
+
+      - name: Validate architecture checklist
+        env:
+          PR_BODY: ${{ github.event.pull_request.body || '' }}
+        run: |
+          required_items=(
+            'I searched for existing components'
+            'I reused existing code where appropriate'
+            'Page files primarily compose the page'
+            'Data access, authorization and business logic are kept outside presentational components'
+            'Existing components/hooks/utilities reused:'
+            'New reusable components created:'
+          )
+
+          for item in "${required_items[@]}"; do
+            if ! printf '%s' "$PR_BODY" | grep -Fq "$item"; then
+              echo "Missing required PR template section: $item"
+              exit 1
+            fi
+          done
+
+          if printf '%s' "$PR_BODY" | grep -Eq '^- \[ \] (I searched for existing components|I reused existing code where appropriate|Page files primarily compose the page|Data access, authorization and business logic are kept outside presentational components)' ; then
+            echo 'Complete the required architecture checklist before merging.'
+            exit 1
+          fi
+
+  architecture-size:
+    name: Flag oversized changed React files
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check changed React file sizes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          MAX_PAGE_LINES: '350'
+          MAX_COMPONENT_LINES: '500'
+        run: |
+          failed=0
+          while IFS= read -r file; do
+            [ -f "$file" ] || continue
+            case "$file" in
+              *.tsx|*.jsx) ;;
+              *) continue ;;
+            esac
+
+            lines=$(wc -l < "$file")
+            limit="$MAX_COMPONENT_LINES"
+
+            case "$file" in
+              src/app/*/page.tsx|src/app/page.tsx|src/pages/*.tsx|src/pages/**/*.tsx)
+                limit="$MAX_PAGE_LINES"
+                ;;
+            esac
+
+            if [ "$lines" -gt "$limit" ]; then
+              echo "::error file=$file::$file has $lines lines; limit is $limit. Split responsibilities or explain and reduce the file before merging."
+              failed=1
+            fi
+          done < <(git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA")
+
+          exit "$failed"
