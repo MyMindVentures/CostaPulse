@@ -31,6 +31,7 @@ export function AvailabilityCalendar(props: AvailabilityCalendarProps) {
         month={props.month}
         monthHref={calendar.monthHref}
         monthLabel={monthLabel}
+        todayHref={calendar.dateHref(props.todayDateKey)}
       />
       <AvailabilityLegend />
       <AvailabilityDesktopCalendar
@@ -39,6 +40,7 @@ export function AvailabilityCalendar(props: AvailabilityCalendarProps) {
         entriesByDay={calendar.entriesByDay}
         locale={props.locale}
         month={props.month}
+        selectedDate={props.selectedDate}
         setActiveEntry={calendar.setActiveEntry}
         weekdayLabels={weekdayLabels}
       />
@@ -46,6 +48,7 @@ export function AvailabilityCalendar(props: AvailabilityCalendarProps) {
         activeEntry={calendar.activeEntry}
         agendaDays={calendar.agendaDays}
         locale={props.locale}
+        selectedDate={props.selectedDate}
         setActiveEntry={calendar.setActiveEntry}
       />
     </div>

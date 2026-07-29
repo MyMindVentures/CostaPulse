@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import type { Dispatch, SetStateAction } from "react";
 import { leadingEmptyCellCountForMonth } from "@/lib/datetime/calendar-grid";
 import {
   getAvailabilityStatusSemantic,
@@ -19,7 +18,8 @@ type Props = {
   entriesByDay: Map<string, PublicAvailabilityEntry[]>;
   locale: string;
   month: string;
-  setActiveEntry: Dispatch<SetStateAction<PublicAvailabilityEntry | null>>;
+  selectedDate?: string | null;
+  setActiveEntry: (entry: PublicAvailabilityEntry | null) => void;
   weekdayLabels: string[];
 };
 
@@ -105,6 +105,9 @@ export function AvailabilityDesktopCalendar(props: Props) {
                     dateStyle: "full",
                     timeZone: "UTC"
                   }).format(dateFromKey(dateKey))}
+                  aria-current={
+                    props.selectedDate === dateKey ? "date" : undefined
+                  }
                 >
                   {day}
                 </Link>

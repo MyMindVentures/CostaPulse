@@ -5,6 +5,8 @@ import { useMemo, useState } from "react";
 import type { PublicAvailabilityEntry } from "@/lib/view-models/team-member-availability";
 import type { AvailabilityFilters } from "./availability-calendar.types";
 import {
+  availabilityBasePath,
+  availabilityDateUrl,
   availabilityUrl,
   filtersFromFormData,
   groupEntriesByDay
@@ -24,13 +26,21 @@ export function useAvailabilityCalendar({
   selectedDate
 }: Options) {
   const pathname = usePathname();
+  const basePath = availabilityBasePath(pathname);
   const router = useRouter();
-  const [activeEntry, setActiveEntry] =
-    useState<PublicAvailabilityEntry | null>(
-      selectedDate
-        ? (entries.find((entry) => entry.dateKey === selectedDate) ?? null)
-        : null
-    );
+  const [selection, setSelection] = useState<{
+    selectedDate?: string | null;
+    entryId: string | null;
+  }>({
+    selectedDate,
+    entryId: entries.find((entry) => entry.dateKey === selectedDate)?.id ?? null
+  });
+  const routeEntryId =
+    entries.find((entry) => entry.dateKey === selectedDate)?.id ?? null;
+  const activeEntryId =
+    selection.selectedDate === selectedDate ? selection.entryId : routeEntryId;
+  const activeEntry =
+    entries.find((entry) => entry.id === activeEntryId) ?? null;
   const entriesByDay = useMemo(() => groupEntriesByDay(entries), [entries]);
   const agendaDays = useMemo(
     () =>
@@ -39,13 +49,26 @@ export function useAvailabilityCalendar({
   );
 
   function monthHref(targetMonth: string) {
-    return availabilityUrl(pathname, targetMonth, initialFilters);
+    return availabilityUrl(basePath, targetMonth, initialFilters);
+  }
+
+  function dateHref(date: string) {
+    return availabilityDateUrl(basePath, date, initialFilters);
   }
 
   function applyFilters(formData: FormData) {
     router.push(
-      availabilityUrl(pathname, month, filtersFromFormData(formData))
+      availabilityUrl(
+        basePath,
+        month,
+        filtersFromFormData(formData),
+        selectedDate
+      )
     );
+  }
+
+  function setActiveEntry(entry: PublicAvailabilityEntry | null) {
+    setSelection({ selectedDate, entryId: entry?.id ?? null });
   }
 
   return {
@@ -53,6 +76,7 @@ export function useAvailabilityCalendar({
     agendaDays,
     applyFilters,
     entriesByDay,
+    dateHref,
     monthHref,
     setActiveEntry
   };

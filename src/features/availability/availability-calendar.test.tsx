@@ -56,7 +56,10 @@ const baseEntry: PublicAvailabilityEntry = {
   }
 };
 
-function renderCalendar(entries: PublicAvailabilityEntry[] = [baseEntry]) {
+function renderCalendar(
+  entries: PublicAvailabilityEntry[] = [baseEntry],
+  options: { selectedDate?: string; todayDateKey?: string } = {}
+) {
   return render(
     <NextIntlClientProvider locale="en" messages={messages}>
       <AvailabilityCalendar
@@ -69,6 +72,8 @@ function renderCalendar(entries: PublicAvailabilityEntry[] = [baseEntry]) {
           availableOnly: false,
           location: ""
         }}
+        selectedDate={options.selectedDate}
+        todayDateKey={options.todayDateKey ?? "2026-07-30"}
       />
     </NextIntlClientProvider>
   );
@@ -84,8 +89,78 @@ describe("AvailabilityCalendar", () => {
       "href",
       "/availability?month=2026-09"
     );
+    expect(screen.getByRole("link", { name: "Today" })).toHaveAttribute(
+      "href",
+      "/availability/2026-07-30?month=2026-07"
+    );
     expect(
       screen.getAllByRole("link", { name: "Monday, August 10, 2026" })
+    ).toHaveLength(2);
+  });
+
+  it("keeps Today selection and filters together in shareable URL state", () => {
+    render(
+      <NextIntlClientProvider locale="en" messages={messages}>
+        <AvailabilityCalendar
+          entries={[baseEntry]}
+          month="2026-08"
+          locale="en"
+          initialFilters={{
+            serviceCategory: "watersports",
+            status: "limited",
+            availableOnly: true,
+            location: "Alicante"
+          }}
+          todayDateKey="2026-07-30"
+        />
+      </NextIntlClientProvider>
+    );
+
+    expect(screen.getByRole("link", { name: "Today" })).toHaveAttribute(
+      "href",
+      "/availability/2026-07-30?month=2026-07&service_category=watersports&status=limited&location=Alicante&available_only=true"
+    );
+  });
+
+  it("synchronizes selected date and entry when navigation state changes", () => {
+    const secondEntry = {
+      ...baseEntry,
+      id: "00000000-0000-4000-8000-000000000002",
+      dateKey: "2026-08-11",
+      startsAt: "2026-08-11T08:00:00+02:00",
+      endsAt: "2026-08-11T12:00:00+02:00",
+      title: "Second date"
+    };
+    const view = renderCalendar([baseEntry, secondEntry], {
+      selectedDate: baseEntry.dateKey
+    });
+
+    expect(screen.getAllByRole("link", { current: "date" })).toHaveLength(2);
+    expect(
+      screen.getAllByRole("heading", { name: baseEntry.title })
+    ).toHaveLength(2);
+
+    view.rerender(
+      <NextIntlClientProvider locale="en" messages={messages}>
+        <AvailabilityCalendar
+          entries={[baseEntry, secondEntry]}
+          month="2026-08"
+          locale="en"
+          initialFilters={{
+            serviceCategory: "",
+            status: "",
+            availableOnly: false,
+            location: ""
+          }}
+          selectedDate={secondEntry.dateKey}
+          todayDateKey="2026-07-30"
+        />
+      </NextIntlClientProvider>
+    );
+
+    expect(screen.getAllByRole("link", { current: "date" })).toHaveLength(2);
+    expect(
+      screen.getAllByRole("heading", { name: secondEntry.title })
     ).toHaveLength(2);
   });
 
