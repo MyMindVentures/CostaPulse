@@ -22,9 +22,16 @@ vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: vi.fn()
 }));
 
+vi.mock("@/lib/supabase/admin", () => ({
+  createSupabaseAdminClient: vi.fn()
+}));
+
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   createProfessionalDocumentAction,
+  deleteCertificateFileAction,
+  uploadCertificateFileAction,
   setProfessionalDocumentVerificationAction
 } from "./actions";
 
@@ -222,6 +229,7 @@ describe("createProfessionalDocumentAction renew flow", () => {
   it("links replaces_document_id and marks previous document as replaced", async () => {
     const { client, ctx } = createRenewSupabaseMock();
     vi.mocked(createSupabaseServerClient).mockResolvedValue(client as never);
+    vi.mocked(createSupabaseAdminClient).mockReturnValue(client as never);
 
     const formData = createFormData({
       replacesDocumentId: "11111111-1111-4111-8111-111111111111"
@@ -269,6 +277,7 @@ describe("createProfessionalDocumentAction renew flow", () => {
   it("does not set replacement status when renew source is absent", async () => {
     const { client, ctx } = createRenewSupabaseMock();
     vi.mocked(createSupabaseServerClient).mockResolvedValue(client as never);
+    vi.mocked(createSupabaseAdminClient).mockReturnValue(client as never);
 
     await expect(
       createProfessionalDocumentAction(createFormData())
@@ -332,9 +341,316 @@ describe("createProfessionalDocumentAction renew flow", () => {
     };
 
     vi.mocked(createSupabaseServerClient).mockResolvedValue(client as never);
+    vi.mocked(createSupabaseAdminClient).mockReturnValue(client as never);
 
     await expect(
       setProfessionalDocumentVerificationAction(createVerificationFormData())
     ).rejects.toThrow("redirect:/admin?auth=forbidden");
+  });
+});
+
+describe("certificate file actions", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("uploads file for existing certificate and creates linked document when needed", async () => {
+    const insertedDocumentPayloads: Array<Record<string, unknown>> = [];
+    const insertedFilePayloads: Array<Record<string, unknown>> = [];
+    const uploadedPaths: string[] = [];
+
+    const client = {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: { id: "profile-1" } }
+        })
+      },
+      rpc: vi.fn().mockResolvedValue({
+        data: "certificate-file.pdf",
+        error: null
+      }),
+      storage: {
+        from: vi.fn().mockReturnValue({
+          upload: vi.fn((path: string) => {
+            uploadedPaths.push(path);
+            return Promise.resolve({ error: null });
+          }),
+          remove: vi.fn().mockResolvedValue({ error: null })
+        })
+      },
+      from: vi.fn((table: string) => {
+        if (table === "profiles") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: {
+                    id: "profile-1",
+                    display_name: "Admin User",
+                    email: "admin@example.com"
+                  },
+                  error: null
+                })
+              })
+            })
+          };
+        }
+
+        if (table === "user_roles") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({
+                data: [{ role: "administrator" }],
+                error: null
+              })
+            })
+          };
+        }
+
+        if (table === "team_member_certificates") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: {
+                    id: "8ce904db-ba62-41a7-ba90-e006a243e7ab",
+                    title: "Medical Certificate",
+                    certificate_type: "medical",
+                    issued_on: "2026-01-01",
+                    valid_from: "2026-01-01",
+                    expires_on: "2028-01-01",
+                    does_not_expire: false,
+                    verification_status: "pending"
+                  },
+                  error: null
+                })
+              })
+            })
+          };
+        }
+
+        if (table === "professional_documents") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                order: vi.fn().mockReturnValue({
+                  limit: vi.fn().mockReturnValue({
+                    maybeSingle: vi.fn().mockResolvedValue({
+                      data: null,
+                      error: null
+                    })
+                  })
+                })
+              })
+            }),
+            insert: vi.fn((payload: Record<string, unknown>) => {
+              insertedDocumentPayloads.push(payload);
+              return {
+                select: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
+                    data: {
+                      id: "d7f87f61-b2f3-495e-84b8-0fd36acbb4b1",
+                      profile_id: "profile-1",
+                      document_type: "other",
+                      document_number: null,
+                      issued_on: "2026-01-01",
+                      expires_on: "2028-01-01"
+                    },
+                    error: null
+                  })
+                })
+              };
+            })
+          };
+        }
+
+        if (table === "professional_document_files") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockReturnValue({
+                    maybeSingle: vi.fn().mockResolvedValue({
+                      data: null,
+                      error: null
+                    })
+                  })
+                })
+              })
+            }),
+            insert: vi.fn((payload: Record<string, unknown>) => {
+              insertedFilePayloads.push(payload);
+              return Promise.resolve({ error: null });
+            })
+          };
+        }
+
+        throw new Error(`Unexpected table: ${table}`);
+      })
+    };
+
+    vi.mocked(createSupabaseServerClient).mockResolvedValue(client as never);
+    vi.mocked(createSupabaseAdminClient).mockReturnValue(client as never);
+
+    const formData = new FormData();
+    formData.set("certificateId", "8ce904db-ba62-41a7-ba90-e006a243e7ab");
+    formData.set("fileRole", "primary");
+    formData.set(
+      "file",
+      new File(["pdf"], "medical.pdf", {
+        type: "application/pdf"
+      })
+    );
+
+    await expect(uploadCertificateFileAction(formData)).rejects.toThrow(
+      "redirect:/admin/documents/certificates/8ce904db-ba62-41a7-ba90-e006a243e7ab?status=file_uploaded"
+    );
+
+    expect(insertedDocumentPayloads).toHaveLength(1);
+    expect(insertedDocumentPayloads[0]).toMatchObject({
+      team_member_certificate_id: "8ce904db-ba62-41a7-ba90-e006a243e7ab",
+      document_type: "other",
+      category: "other"
+    });
+    expect(insertedFilePayloads).toHaveLength(1);
+    expect(uploadedPaths[0]).toContain(
+      "profile-1/d7f87f61-b2f3-495e-84b8-0fd36acbb4b1/"
+    );
+    expect(revalidatePath).toHaveBeenCalledWith(
+      "/admin/documents/certificates/8ce904db-ba62-41a7-ba90-e006a243e7ab"
+    );
+  });
+
+  it("deletes certificate file and removes flow-managed empty linked document", async () => {
+    const removedPaths: string[] = [];
+
+    const serverClient = {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: { id: "profile-1" } }
+        })
+      },
+      from: vi.fn((table: string) => {
+        if (table === "profiles") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: {
+                    id: "profile-1",
+                    display_name: "Admin User",
+                    email: "admin@example.com"
+                  },
+                  error: null
+                })
+              })
+            })
+          };
+        }
+
+        if (table === "user_roles") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({
+                data: [{ role: "administrator" }],
+                error: null
+              })
+            })
+          };
+        }
+
+        throw new Error(`Unexpected table: ${table}`);
+      })
+    };
+
+    const adminClient = {
+      storage: {
+        from: vi.fn().mockReturnValue({
+          remove: vi.fn((paths: string[]) => {
+            removedPaths.push(...paths);
+            return Promise.resolve({ error: null });
+          })
+        })
+      },
+      from: vi.fn((table: string) => {
+        if (table === "professional_document_files") {
+          return {
+            select: vi.fn((_: string, options?: { head?: boolean }) => {
+              if (options?.head) {
+                return {
+                  eq: vi.fn().mockResolvedValue({ count: 0, error: null })
+                };
+              }
+
+              return {
+                eq: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
+                    data: {
+                      id: "bbc2e9e2-a570-4d63-8f53-f3d5f498f649",
+                      document_id: "d7f87f61-b2f3-495e-84b8-0fd36acbb4b1",
+                      file_role: "primary",
+                      is_current: false,
+                      version_number: 1,
+                      storage_bucket: "professional-credentials",
+                      storage_path:
+                        "profile-1/d7f87f61-b2f3-495e-84b8-0fd36acbb4b1/medical.pdf"
+                    },
+                    error: null
+                  })
+                })
+              };
+            }),
+            delete: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ error: null })
+            })
+          };
+        }
+
+        if (table === "professional_documents") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  single: vi.fn().mockResolvedValue({
+                    data: {
+                      id: "d7f87f61-b2f3-495e-84b8-0fd36acbb4b1",
+                      metadata: { source: "certificate-file-flow" }
+                    },
+                    error: null
+                  })
+                })
+              })
+            }),
+            delete: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                eq: vi.fn().mockResolvedValue({ error: null })
+              })
+            })
+          };
+        }
+
+        throw new Error(`Unexpected table: ${table}`);
+      })
+    };
+
+    vi.mocked(createSupabaseServerClient).mockResolvedValue(
+      serverClient as never
+    );
+    vi.mocked(createSupabaseAdminClient).mockReturnValue(adminClient as never);
+
+    const formData = new FormData();
+    formData.set("certificateId", "8ce904db-ba62-41a7-ba90-e006a243e7ab");
+    formData.set("fileId", "bbc2e9e2-a570-4d63-8f53-f3d5f498f649");
+
+    await expect(deleteCertificateFileAction(formData)).rejects.toThrow(
+      "redirect:/admin/documents/certificates/8ce904db-ba62-41a7-ba90-e006a243e7ab?status=file_deleted"
+    );
+
+    expect(removedPaths).toContain(
+      "profile-1/d7f87f61-b2f3-495e-84b8-0fd36acbb4b1/medical.pdf"
+    );
+    expect(revalidatePath).toHaveBeenCalledWith(
+      "/admin/documents/certificates/8ce904db-ba62-41a7-ba90-e006a243e7ab"
+    );
   });
 });

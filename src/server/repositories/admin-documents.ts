@@ -129,6 +129,23 @@ const teamMemberCertificateDetailSchema = teamMemberCertificateSchema.extend({
   skills: z.array(z.string()).optional().default([])
 });
 
+const certificateLinkedDocumentSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().min(1),
+  updated_at: z.string().nullable().optional().default(null),
+  files: z
+    .preprocess((value) => {
+      if (value == null) return [];
+      return Array.isArray(value) ? value : [];
+    }, z.array(fileSummarySchema))
+    .default([])
+});
+
+const teamMemberCertificateDetailWithFilesSchema =
+  teamMemberCertificateDetailSchema.extend({
+    linked_documents: z.array(certificateLinkedDocumentSchema).default([])
+  });
+
 export type AdminProfessionalDocument = z.infer<
   typeof professionalDocumentAdminSchema
 >;
@@ -138,7 +155,7 @@ export type AdminTeamMemberCertificate = z.infer<
 >;
 
 export type AdminTeamMemberCertificateDetail = z.infer<
-  typeof teamMemberCertificateDetailSchema
+  typeof teamMemberCertificateDetailWithFilesSchema
 >;
 
 export type AdminDocumentsSummary = {
@@ -743,5 +760,32 @@ export async function fetchAdminTeamMemberCertificateDetail(
     throw new Error("Team member certificate detail payload is invalid.");
   }
 
-  return parsed.data;
+  const { data: linkedDocumentsData, error: linkedDocumentsError } = await admin
+    .from("professional_documents")
+    .select(
+      "id, title, updated_at, files:professional_document_files(id, file_role, is_current, version_number, original_filename, mime_type, file_size_bytes, created_at)"
+    )
+    .eq("team_member_certificate_id", certificateId)
+    .order("updated_at", { ascending: false });
+
+  if (linkedDocumentsError) {
+    throw new Error(linkedDocumentsError.message);
+  }
+
+  const linkedDocumentsParsed = z
+    .array(certificateLinkedDocumentSchema)
+    .safeParse(linkedDocumentsData ?? []);
+  if (!linkedDocumentsParsed.success) {
+    throw new Error("Linked certificate documents payload is invalid.");
+  }
+
+  const detailWithFiles = teamMemberCertificateDetailWithFilesSchema.safeParse({
+    ...parsed.data,
+    linked_documents: linkedDocumentsParsed.data
+  });
+  if (!detailWithFiles.success) {
+    throw new Error("Team member certificate detail payload is invalid.");
+  }
+
+  return detailWithFiles.data;
 }

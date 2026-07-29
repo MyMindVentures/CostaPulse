@@ -4,6 +4,7 @@ import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   canAccessAdminSection,
@@ -273,6 +274,107 @@ async function getDocumentForMutation(
   }
 
   return data;
+}
+
+async function getCertificateForMutation(certificateId: string) {
+  const admin = createSupabaseAdminClient();
+  if (!admin) {
+    throw new Error("Supabase admin access is not configured.");
+  }
+
+  const { data, error } = await admin
+    .from("team_member_certificates")
+    .select(
+      "id, title, certificate_type, issued_on, valid_from, expires_on, does_not_expire, verification_status"
+    )
+    .eq("id", certificateId)
+    .single();
+
+  if (error || !data) {
+    throw new Error("Certificate not found.");
+  }
+
+  return data;
+}
+
+async function getOrCreateDocumentForCertificate(input: {
+  supabase: {
+    from: SupabaseServerClient["from"];
+  };
+  profileId: string;
+  certificate: {
+    id: string;
+    title: string;
+    certificate_type: string;
+    issued_on: string | null;
+    valid_from: string | null;
+    expires_on: string | null;
+    does_not_expire: boolean;
+    verification_status: string;
+  };
+}) {
+  const { data: existingDocument, error: existingDocumentError } =
+    await input.supabase
+      .from("professional_documents")
+      .select(
+        "id, profile_id, document_type, document_number, issued_on, expires_on"
+      )
+      .eq("team_member_certificate_id", input.certificate.id)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+  if (existingDocumentError) {
+    throw new Error(existingDocumentError.message);
+  }
+
+  if (existingDocument) {
+    return existingDocument;
+  }
+
+  const normalizedVerification = z
+    .enum(VERIFICATION_VALUES)
+    .safeParse(input.certificate.verification_status);
+
+  const { data: createdDocument, error: createdDocumentError } =
+    await input.supabase
+      .from("professional_documents")
+      .insert({
+        profile_id: input.profileId,
+        team_member_certificate_id: input.certificate.id,
+        document_type: "other",
+        category: "other",
+        title: input.certificate.title,
+        issued_on: input.certificate.issued_on,
+        valid_from: input.certificate.valid_from,
+        expires_on: input.certificate.does_not_expire
+          ? null
+          : input.certificate.expires_on,
+        does_not_expire: input.certificate.does_not_expire,
+        confidentiality_level: "administrative",
+        verification_status: normalizedVerification.success
+          ? normalizedVerification.data
+          : "unverified",
+        uploaded_by_profile_id: input.profileId,
+        metadata: {
+          source: "certificate-file-flow",
+          certificate_id: input.certificate.id,
+          certificate_type: input.certificate.certificate_type
+        }
+      })
+      .select(
+        "id, profile_id, document_type, document_number, issued_on, expires_on"
+      )
+      .single();
+
+  if (createdDocumentError || !createdDocument) {
+    throw new Error(
+      createdDocumentError?.message ??
+        "Failed to create document record for certificate."
+    );
+  }
+
+  return createdDocument;
 }
 
 async function generateDocumentFilename(input: {
@@ -1038,6 +1140,349 @@ export async function replaceProfessionalDocumentFileAction(
 
     redirect(
       `/admin/documents/${documentId}/edit?status=error&message=` +
+        encodeURIComponent(toErrorMessage(error))
+    );
+  }
+}
+
+export async function uploadCertificateFileAction(formData: FormData) {
+  const certificateId = parseUuid(formData.get("certificateId"));
+  if (!certificateId) {
+    redirect(
+      "/admin/documents?status=error&message=" +
+        encodeURIComponent("Certificate identifier is invalid.")
+    );
+  }
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) {
+    redirect(
+      "/admin/documents?status=error&message=" +
+        encodeURIComponent("Supabase is not configured.")
+    );
+  }
+
+  const supabaseClient = supabase as SupabaseServerClient;
+  const fileRole = z
+    .enum(FILE_ROLE_VALUES)
+    .safeParse(String(formData.get("fileRole") ?? ""));
+  const uploadedFile = formData.get("file");
+
+  if (!fileRole.success) {
+    redirect(
+      `/admin/documents/certificates/${certificateId}?status=error&message=` +
+        encodeURIComponent("File role is invalid.")
+    );
+  }
+
+  if (!(uploadedFile instanceof File) || uploadedFile.size === 0) {
+    redirect(
+      `/admin/documents/certificates/${certificateId}?status=error&message=` +
+        encodeURIComponent("Selecteer een bestand om te uploaden.")
+    );
+  }
+
+  if (!ALLOWED_MIME_TYPES.has(uploadedFile.type)) {
+    redirect(
+      `/admin/documents/certificates/${certificateId}?status=error&message=` +
+        encodeURIComponent("Only PDF, JPEG, PNG, and WebP files are allowed.")
+    );
+  }
+
+  if (uploadedFile.size > MAX_FILE_BYTES) {
+    redirect(
+      `/admin/documents/certificates/${certificateId}?status=error&message=` +
+        encodeURIComponent("Maximum file size is 25 MB.")
+    );
+  }
+
+  const profile = await getAuthenticatedProfile(
+    supabaseClient,
+    `/admin/documents/certificates/${certificateId}`
+  );
+  const roles = await readUserRoles(supabaseClient, profile.id);
+  requireDocumentsAccess(roles);
+
+  const admin = createSupabaseAdminClient();
+  if (!admin) {
+    redirect(
+      `/admin/documents/certificates/${certificateId}?status=error&message=` +
+        encodeURIComponent("Supabase admin access is not configured.")
+    );
+  }
+
+  let storagePath: string | undefined;
+  let previousCurrentFileId: string | null = null;
+
+  try {
+    const certificate = await getCertificateForMutation(certificateId);
+
+    const document = await getOrCreateDocumentForCertificate({
+      supabase: admin,
+      profileId: profile.id,
+      certificate
+    });
+
+    const { data: currentFile, error: currentFileError } = await admin
+      .from("professional_document_files")
+      .select("id, version_number, sort_order")
+      .eq("document_id", document.id)
+      .eq("file_role", fileRole.data)
+      .eq("is_current", true)
+      .maybeSingle();
+
+    if (currentFileError) {
+      throw new Error(currentFileError.message);
+    }
+
+    previousCurrentFileId = currentFile?.id ?? null;
+    const nextVersion = (currentFile?.version_number ?? 0) + 1;
+    const nextSortOrder = currentFile?.sort_order ?? 0;
+
+    if (previousCurrentFileId) {
+      const { error: unsetCurrentError } = await admin
+        .from("professional_document_files")
+        .update({ is_current: false })
+        .eq("id", previousCurrentFileId);
+      if (unsetCurrentError) {
+        throw new Error(unsetCurrentError.message);
+      }
+    }
+
+    const generatedName = await generateDocumentFilename({
+      supabase: supabaseClient,
+      profileName: profile.display_name ?? profile.email ?? "profile",
+      documentType: document.document_type,
+      documentNumber: document.document_number,
+      issuedOn: document.issued_on,
+      expiresOn: document.expires_on,
+      originalFilename: uploadedFile.name,
+      mimeType: uploadedFile.type
+    });
+
+    storagePath = `${profile.id}/${document.id}/${generatedName}`;
+
+    const { error: uploadError } = await admin.storage
+      .from("professional-credentials")
+      .upload(storagePath, uploadedFile, {
+        contentType: uploadedFile.type,
+        upsert: false
+      });
+
+    if (uploadError) {
+      throw new Error(uploadError.message);
+    }
+
+    const { error: insertError } = await admin
+      .from("professional_document_files")
+      .insert({
+        document_id: document.id,
+        file_role: fileRole.data,
+        storage_bucket: "professional-credentials",
+        storage_path: storagePath,
+        original_filename: uploadedFile.name,
+        stored_filename: generatedName,
+        mime_type: uploadedFile.type,
+        file_size_bytes: uploadedFile.size,
+        version_number: nextVersion,
+        is_current: true,
+        sort_order: nextSortOrder,
+        uploaded_by_profile_id: profile.id
+      });
+
+    if (insertError) {
+      throw new Error(insertError.message);
+    }
+
+    revalidatePath("/admin/documents");
+    revalidatePath(`/admin/documents/certificates/${certificateId}`);
+
+    redirect(
+      `/admin/documents/certificates/${certificateId}?status=file_uploaded`
+    );
+  } catch (error) {
+    if (isRedirectControlFlowError(error)) {
+      throw error;
+    }
+
+    if (storagePath) {
+      const { error: cleanupFileError } = await admin.storage
+        .from("professional-credentials")
+        .remove([storagePath]);
+      if (cleanupFileError) {
+        console.error(
+          "Failed to remove uploaded certificate file after error",
+          {
+            message: cleanupFileError.message
+          }
+        );
+      }
+    }
+
+    if (previousCurrentFileId) {
+      const { error: restoreError } = await admin
+        .from("professional_document_files")
+        .update({ is_current: true })
+        .eq("id", previousCurrentFileId);
+      if (restoreError) {
+        console.error("Failed to restore previous current certificate file", {
+          message: restoreError.message
+        });
+      }
+    }
+
+    redirect(
+      `/admin/documents/certificates/${certificateId}?status=error&message=` +
+        encodeURIComponent(toErrorMessage(error))
+    );
+  }
+}
+
+export async function deleteCertificateFileAction(formData: FormData) {
+  const certificateId = parseUuid(formData.get("certificateId"));
+  const fileId = parseUuid(formData.get("fileId"));
+
+  if (!certificateId || !fileId) {
+    redirect(
+      "/admin/documents?status=error&message=" +
+        encodeURIComponent("Delete request is invalid.")
+    );
+  }
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) {
+    redirect(
+      "/admin/documents?status=error&message=" +
+        encodeURIComponent("Supabase is not configured.")
+    );
+  }
+
+  const supabaseClient = supabase as SupabaseServerClient;
+  const profile = await getAuthenticatedProfile(
+    supabaseClient,
+    `/admin/documents/certificates/${certificateId}`
+  );
+  const roles = await readUserRoles(supabaseClient, profile.id);
+  requireDocumentsAccess(roles);
+
+  const admin = createSupabaseAdminClient();
+  if (!admin) {
+    redirect(
+      `/admin/documents/certificates/${certificateId}?status=error&message=` +
+        encodeURIComponent("Supabase admin access is not configured.")
+    );
+  }
+
+  try {
+    const { data: fileRow, error: fileError } = await admin
+      .from("professional_document_files")
+      .select(
+        "id, document_id, file_role, is_current, version_number, storage_bucket, storage_path"
+      )
+      .eq("id", fileId)
+      .single();
+
+    if (fileError || !fileRow) {
+      throw new Error("File not found.");
+    }
+
+    const { data: documentRow, error: documentError } = await admin
+      .from("professional_documents")
+      .select("id, metadata")
+      .eq("id", fileRow.document_id)
+      .eq("team_member_certificate_id", certificateId)
+      .single();
+
+    if (documentError || !documentRow) {
+      throw new Error("File does not belong to this certificate.");
+    }
+
+    const { error: storageDeleteError } = await admin.storage
+      .from(fileRow.storage_bucket)
+      .remove([fileRow.storage_path]);
+    if (storageDeleteError) {
+      throw new Error(storageDeleteError.message);
+    }
+
+    const { error: fileDeleteError } = await admin
+      .from("professional_document_files")
+      .delete()
+      .eq("id", fileRow.id);
+    if (fileDeleteError) {
+      throw new Error(fileDeleteError.message);
+    }
+
+    if (fileRow.is_current) {
+      const {
+        data: replacementCurrentFile,
+        error: replacementCurrentFileError
+      } = await admin
+        .from("professional_document_files")
+        .select("id")
+        .eq("document_id", fileRow.document_id)
+        .eq("file_role", fileRow.file_role)
+        .order("version_number", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (replacementCurrentFileError) {
+        throw new Error(replacementCurrentFileError.message);
+      }
+
+      if (replacementCurrentFile) {
+        const { error: replacementUpdateError } = await admin
+          .from("professional_document_files")
+          .update({ is_current: true })
+          .eq("id", replacementCurrentFile.id);
+
+        if (replacementUpdateError) {
+          throw new Error(replacementUpdateError.message);
+        }
+      }
+    }
+
+    const { count: remainingFileCount, error: remainingFileCountError } =
+      await admin
+        .from("professional_document_files")
+        .select("id", { count: "exact", head: true })
+        .eq("document_id", fileRow.document_id);
+
+    if (remainingFileCountError) {
+      throw new Error(remainingFileCountError.message);
+    }
+
+    const metadata = documentRow.metadata;
+    const isFlowManagedDocument =
+      typeof metadata === "object" &&
+      metadata !== null &&
+      "source" in metadata &&
+      (metadata as { source?: unknown }).source === "certificate-file-flow";
+
+    if ((remainingFileCount ?? 0) === 0 && isFlowManagedDocument) {
+      const { error: deleteDocumentError } = await admin
+        .from("professional_documents")
+        .delete()
+        .eq("id", fileRow.document_id)
+        .eq("team_member_certificate_id", certificateId);
+
+      if (deleteDocumentError) {
+        throw new Error(deleteDocumentError.message);
+      }
+    }
+
+    revalidatePath("/admin/documents");
+    revalidatePath(`/admin/documents/certificates/${certificateId}`);
+
+    redirect(
+      `/admin/documents/certificates/${certificateId}?status=file_deleted`
+    );
+  } catch (error) {
+    if (isRedirectControlFlowError(error)) {
+      throw error;
+    }
+
+    redirect(
+      `/admin/documents/certificates/${certificateId}?status=error&message=` +
         encodeURIComponent(toErrorMessage(error))
     );
   }

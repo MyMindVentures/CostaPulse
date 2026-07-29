@@ -1,10 +1,16 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { requireAreaAccess } from "@/server/auth/protected-area";
 import { canAccessAdminSection } from "@/server/auth/role-access";
+import {
+  deleteCertificateFileAction,
+  uploadCertificateFileAction
+} from "@/server/documents/actions";
 import { fetchAdminTeamMemberCertificateDetail } from "@/server/repositories/admin-documents";
 
 export const metadata = {
@@ -16,6 +22,7 @@ export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ certificateId: string }>;
+  searchParams: Promise<{ status?: string; message?: string }>;
 };
 
 const detailPanelClass =
@@ -23,6 +30,19 @@ const detailPanelClass =
 
 const detailMetaTermClass = "text-navy/70 text-xs uppercase";
 const detailMetaValueClass = "text-ink mt-1 font-medium";
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  const kb = bytes / 1024;
+  if (kb < 1024) {
+    return `${Math.ceil(kb)} KB`;
+  }
+
+  return `${(kb / 1024).toFixed(1)} MB`;
+}
 
 function formatDate(value: string | null): string {
   if (!value) return "-";
@@ -58,20 +78,31 @@ function formatTeamMemberName(
   return fullName || "-";
 }
 
-export default async function AdminCertificateDetailPage({ params }: Props) {
+export default async function AdminCertificateDetailPage({
+  params,
+  searchParams
+}: Props) {
   const { roles } = await requireAreaAccess("admin");
   if (!canAccessAdminSection(roles, "documents")) {
     redirect("/admin?auth=forbidden");
   }
 
   const t = await getTranslations("Dashboards.admin");
-  const { certificateId } = await params;
+  const [{ certificateId }, query] = await Promise.all([params, searchParams]);
   const certificate =
     await fetchAdminTeamMemberCertificateDetail(certificateId);
 
   if (!certificate) {
     notFound();
   }
+
+  const linkedFiles = certificate.linked_documents.flatMap((document) =>
+    document.files.map((file) => ({
+      ...file,
+      source_document_id: document.id,
+      source_document_title: document.title
+    }))
+  );
 
   return (
     <section className="flex flex-col gap-6">
@@ -204,6 +235,172 @@ export default async function AdminCertificateDetailPage({ params }: Props) {
             </dd>
           </div>
         </dl>
+      </div>
+
+      {query.status === "file_uploaded" ? (
+        <p className="rounded-md border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+          Bestand is succesvol geupload.
+        </p>
+      ) : null}
+
+      {query.status === "file_deleted" ? (
+        <p className="rounded-md border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+          Bestand is verwijderd.
+        </p>
+      ) : null}
+
+      {query.status === "error" && query.message ? (
+        <p className="border-coral bg-coral/10 text-ink rounded-md border px-4 py-3 text-sm">
+          {query.message}
+        </p>
+      ) : null}
+
+      <div className={detailPanelClass}>
+        <h2 className="text-navy text-xl font-semibold">Document preview</h2>
+        <p className="text-navy/70 mt-1 text-sm">
+          Bekijk gekoppelde certificaatbestanden direct in de pagina.
+        </p>
+
+        <form
+          action={uploadCertificateFileAction}
+          className="border-navy/10 mt-4 grid gap-3 rounded-xl border bg-white p-4 md:grid-cols-[minmax(10rem,12rem)_minmax(0,1fr)_auto]"
+        >
+          <input type="hidden" name="certificateId" value={certificate.id} />
+
+          <label className="flex flex-col gap-1 text-sm">
+            File role
+            <select
+              name="fileRole"
+              className="border-navy/20 min-h-11 rounded-md border px-3"
+              defaultValue="primary"
+              required
+            >
+              <option value="primary">primary</option>
+              <option value="front">front</option>
+              <option value="back">back</option>
+              <option value="translation">translation</option>
+              <option value="attachment">attachment</option>
+              <option value="supporting_evidence">supporting evidence</option>
+            </select>
+          </label>
+
+          <label className="flex flex-col gap-1 text-sm">
+            Bestand
+            <input
+              type="file"
+              name="file"
+              className="border-navy/20 min-h-11 rounded-md border px-3 py-2"
+              accept="application/pdf,image/jpeg,image/png,image/webp"
+              required
+            />
+          </label>
+
+          <div className="flex items-end">
+            <Button type="submit" className="min-h-11">
+              Upload
+            </Button>
+          </div>
+        </form>
+
+        {linkedFiles.length === 0 ? (
+          <p className="text-ink/80 mt-4 text-sm">
+            Er zijn nog geen gekoppelde bestanden voor dit certificaat.
+          </p>
+        ) : (
+          <ul className="mt-4 grid gap-5">
+            {linkedFiles.map((file) => {
+              const fileLabel = file.original_filename ?? "file";
+              const viewHref = `/api/admin/documents/files/${file.id}?intent=view`;
+              const downloadHref = `/api/admin/documents/files/${file.id}?intent=download`;
+
+              return (
+                <li
+                  key={file.id}
+                  className="border-navy/10 rounded-xl border bg-white p-4"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-ink text-sm font-semibold break-all">
+                        {fileLabel}
+                      </p>
+                      <p className="text-navy/70 mt-1 text-xs">
+                        {file.file_role.replaceAll("_", " ")} · {file.mime_type}{" "}
+                        · {formatFileSize(file.file_size_bytes)} · v
+                        {file.version_number}
+                        {file.is_current ? " · current" : ""}
+                      </p>
+                      <p className="text-navy/70 mt-1 text-xs">
+                        Bron document: {file.source_document_title}
+                      </p>
+                    </div>
+                    <div className="flex min-h-11 items-center gap-4 text-sm">
+                      <a
+                        href={viewHref}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-navy hover:text-coral underline underline-offset-4 transition-colors"
+                      >
+                        Open
+                      </a>
+                      <a
+                        href={downloadHref}
+                        className="text-navy hover:text-coral underline underline-offset-4 transition-colors"
+                      >
+                        Download
+                      </a>
+                      <form action={deleteCertificateFileAction}>
+                        <input
+                          type="hidden"
+                          name="certificateId"
+                          value={certificate.id}
+                        />
+                        <input type="hidden" name="fileId" value={file.id} />
+                        <button
+                          type="submit"
+                          className="text-coral hover:text-navy underline underline-offset-4 transition-colors"
+                        >
+                          Verwijder
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+
+                  <div className="border-navy/10 bg-sand/20 mt-3 overflow-hidden rounded-lg border">
+                    {file.mime_type.startsWith("image/") ? (
+                      <Image
+                        src={viewHref}
+                        alt={fileLabel}
+                        width={1200}
+                        height={880}
+                        unoptimized
+                        loading="lazy"
+                        className="h-[22rem] w-full object-contain"
+                      />
+                    ) : file.mime_type === "application/pdf" ? (
+                      <iframe
+                        src={viewHref}
+                        title={`Preview ${fileLabel}`}
+                        loading="lazy"
+                        className="h-[22rem] w-full"
+                      />
+                    ) : (
+                      <object
+                        data={viewHref}
+                        type={file.mime_type}
+                        className="h-[22rem] w-full"
+                      >
+                        <div className="text-navy/70 flex h-full items-center justify-center p-4 text-sm">
+                          Inline preview is niet beschikbaar voor dit
+                          bestandstype.
+                        </div>
+                      </object>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
     </section>
   );
