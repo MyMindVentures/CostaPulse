@@ -6,11 +6,101 @@ This document defines what CostaPulse does from a product perspective. It descri
 
 ## Public platform
 
-Visitors can discover experiences and services, view experience and team profiles, check availability, choose variants, participants and add-ons, complete bookings and payments, and access confirmations, vouchers and relevant account information.
+Visitors can discover experiences and professional services, browse destinations, marinas, beaches and coastal areas, view experience and team profiles, check availability, choose variants, participants and add-ons, complete bookings and payments, and access confirmations, vouchers and relevant account information.
+
+## Geographic product model
+
+CostaPulse must support multiple curated regions without hardcoding the product to a single town or coastline.
+
+The initial consumer launch corridor is the Spanish coast between Málaga and Jávea. Within that corridor, CostaPulse should support distinct destination and operational location types, including:
+
+- regions and coastal corridors;
+- cities and coastal towns;
+- marinas and ports;
+- beaches, coves and launch points;
+- meeting points and operational service areas.
+
+The first launch priority is to identify and present the best locations for Kevin's own services:
+
+- premium private yacht charters departing from carefully selected marinas;
+- paddleboard mentoring at attractive, safe and operationally suitable beaches or bays;
+- kayak mentoring at scenic coastal locations with suitable access and conditions.
+
+Future consumer expansion may include the Balearic Islands and Canary Islands. Expansion must remain curated, brand-consistent and operationally credible. The platform must not assume that every region offers the same activities, seasons, logistics or visual context.
+
+Location, destination and region relationships should remain data-driven so the frontend can represent current and future areas without duplicating routes, components or business logic for each geography.
 
 ## Experience domain
 
 An experience can include public content and media, variants, locations, availability, capacity rules, pricing, add-ons, hosts, team members, requirements, policies, languages, itinerary and highlights.
+
+The principal founder-led consumer experience categories are:
+
+- private yacht charters;
+- paddleboard mentoring;
+- kayak mentoring;
+- related curated coastal and hospitality experiences that meet the CostaPulse quality standard.
+
+CostaPulse is curated rather than crowded. Product decisions should favour a smaller set of credible, high-quality experiences over anonymous marketplace volume.
+
+## Private yacht charter domain
+
+Private yacht charters are a core CostaPulse proposition and are initially founder-led by Kevin.
+
+The product should be capable of representing:
+
+- departure marina and embarkation point;
+- charter area, route and possible coastal highlights;
+- duration and charter variant;
+- yacht or vessel context where provided by the backend;
+- guest capacity;
+- skipper or host identity;
+- menus, add-ons and hospitality options;
+- operational requirements, weather policy and confirmation flow;
+- imagery that communicates the real marina, coastline and onboard experience.
+
+Charter pages should present premium personal service and maritime competence, not resemble anonymous boat-rental listings.
+
+## Paddleboard and kayak domain
+
+Paddleboard and kayak experiences are mentoring-led coastal experiences rather than equipment-only rentals.
+
+The product should be capable of representing:
+
+- beach, bay, cove or launch location;
+- meeting point and access information;
+- experience level and physical or swimming requirements;
+- duration, group size and mentoring format;
+- weather, sea-state and cancellation considerations;
+- included equipment and safety information;
+- host credibility and local knowledge.
+
+Location selection should reflect scenic value, safety, access and real operational suitability.
+
+## Professional maritime services domain
+
+CostaPulse includes professional B2B maritime services as a distinct product domain within the same brand.
+
+The first professional geographic focus is Western European harbour towage, especially:
+
+- Rotterdam;
+- Amsterdam;
+- the Scheldt region;
+- other selected Western European ports as the service expands.
+
+Professional services may include:
+
+- harbour tug captain assignments;
+- ASD tug operations;
+- training captain engagements;
+- ship-handling mentoring;
+- maritime consultancy;
+- professional credential presentation and controlled sharing;
+- assignment availability and inquiry flows.
+
+Professional service pages may use more technical terminology, operational evidence and credential detail than leisure experience pages. They must still use the CostaPulse design system and should feel like a premium maritime service within the wider brand, not a separate corporate website.
+
+Professional services are generally inquiry- or quote-led unless the verified backend explicitly supports direct booking.
 
 ## Partner discovery domain
 
@@ -49,7 +139,14 @@ Sign-on/sign-off information may include vessel, yacht or ship, role, joining pl
 
 ## Admin platform
 
-The admin environment manages application content and workflows, including experiences, media, bookings, availability, customers, partners, team members, reviews, finance views and system administration.
+The admin environment manages application content and workflows, including experiences, destinations, locations, media, bookings, availability, customers, partners, team members, professional services, reviews, finance views and system administration.
+
+The existing Founder Dashboard is an established application surface. New work must upgrade it incrementally, preserve working routes and functionality, and add only verified sections or capabilities. It must not be rebuilt as a generic dashboard.
+
+For the current dashboard phase, the primary workspaces are:
+
+- Founder, represented by the existing super-administrator access;
+- Partner, restricted to the authenticated partner's own profile, referrals, attributed results, vouchers, payouts, promotional material and permitted business or financial details.
 
 ## Role and capability model
 
