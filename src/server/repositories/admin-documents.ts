@@ -88,8 +88,57 @@ const professionalDocumentBaseSchema = z.object({
     .default([])
 });
 
+const teamMemberCertificateSchema = z.object({
+  id: z.string().uuid(),
+  team_member_id: z.string().uuid(),
+  title: z.string().min(1),
+  certificate_type: z.string().min(1),
+  certificate_number: z.string().nullable().optional().default(null),
+  issuing_organization: z.string().nullable().optional().default(null),
+  issued_on: z.string().nullable().optional().default(null),
+  expires_on: z.string().nullable().optional().default(null),
+  does_not_expire: z.boolean(),
+  status: z.string().min(1),
+  verification_status: z.string().min(1),
+  updated_at: z.string().min(1),
+  team_member: z
+    .preprocess(
+      (value) => {
+        if (Array.isArray(value)) {
+          return value[0] ?? null;
+        }
+        return value ?? null;
+      },
+      z
+        .object({
+          id: z.string().uuid(),
+          first_name: z.string().nullable().optional().default(null),
+          last_name: z.string().nullable().optional().default(null),
+          display_name: z.string().nullable().optional().default(null)
+        })
+        .nullable()
+    )
+    .default(null)
+});
+
+const teamMemberCertificateDetailSchema = teamMemberCertificateSchema.extend({
+  description: z.string().nullable().optional().default(null),
+  valid_from: z.string().nullable().optional().default(null),
+  credential_url: z.string().nullable().optional().default(null),
+  verification_url: z.string().nullable().optional().default(null),
+  skills: z.array(z.string()).optional().default([])
+});
+
 export type AdminProfessionalDocument = z.infer<
   typeof professionalDocumentAdminSchema
+>;
+
+export type AdminTeamMemberCertificate = z.infer<
+  typeof teamMemberCertificateSchema
+>;
+
+export type AdminTeamMemberCertificateDetail = z.infer<
+  typeof teamMemberCertificateDetailSchema
 >;
 
 export type AdminDocumentsSummary = {
@@ -636,4 +685,63 @@ export async function fetchAdminDocumentDetail(
     status: "ok",
     document: parsed.data
   };
+}
+
+export async function fetchAdminTeamMemberCertificates(): Promise<
+  AdminTeamMemberCertificate[]
+> {
+  const admin = createSupabaseAdminClient();
+  if (!admin) {
+    return [];
+  }
+
+  const { data, error } = await admin
+    .from("team_member_certificates")
+    .select(
+      "id, team_member_id, title, certificate_type, certificate_number, issuing_organization, issued_on, expires_on, does_not_expire, status, verification_status, updated_at, team_member:team_members(id, first_name, last_name, display_name)"
+    )
+    .order("updated_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const parsed = z.array(teamMemberCertificateSchema).safeParse(data ?? []);
+  if (!parsed.success) {
+    throw new Error("Team member certificates payload is invalid.");
+  }
+
+  return parsed.data;
+}
+
+export async function fetchAdminTeamMemberCertificateDetail(
+  certificateId: string
+): Promise<AdminTeamMemberCertificateDetail | null> {
+  const admin = createSupabaseAdminClient();
+  if (!admin) {
+    return null;
+  }
+
+  const { data, error } = await admin
+    .from("team_member_certificates")
+    .select(
+      "id, team_member_id, title, certificate_type, certificate_number, issuing_organization, issued_on, valid_from, expires_on, does_not_expire, status, verification_status, credential_url, verification_url, description, skills, updated_at, team_member:team_members(id, first_name, last_name, display_name)"
+    )
+    .eq("id", certificateId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  const parsed = teamMemberCertificateDetailSchema.safeParse(data);
+  if (!parsed.success) {
+    throw new Error("Team member certificate detail payload is invalid.");
+  }
+
+  return parsed.data;
 }

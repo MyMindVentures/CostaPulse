@@ -17,7 +17,8 @@ import {
   DOCUMENT_SORT_VALUES,
   DOCUMENT_TYPE_VALUES,
   DOCUMENT_VERIFICATION_VALUES,
-  fetchAdminDocumentsOverview
+  fetchAdminDocumentsOverview,
+  fetchAdminTeamMemberCertificates
 } from "@/server/repositories/admin-documents";
 
 export const metadata = {
@@ -66,6 +67,116 @@ function firstCurrentFile(
 ) {
   if (!files || files.length === 0) return null;
   return files.find((file) => file.is_current) ?? files[0] ?? null;
+}
+
+function formatTeamMemberName(
+  input: {
+    display_name: string | null;
+    first_name: string | null;
+    last_name: string | null;
+  } | null
+): string {
+  if (!input) {
+    return "-";
+  }
+
+  if (input.display_name && input.display_name.trim()) {
+    return input.display_name;
+  }
+
+  const fullName = `${input.first_name ?? ""} ${input.last_name ?? ""}`.trim();
+  return fullName || "-";
+}
+
+const previewCardClass =
+  "border-navy/10 bg-gradient-to-br from-white via-white to-sand/60 rounded-[var(--radius)] border p-4 shadow-[0_12px_30px_rgba(2,16,31,0.08)]";
+
+const previewMetaRowClass = "flex justify-between gap-3 text-sm";
+const previewMetaTermClass = "text-navy/70";
+const previewMetaValueClass = "text-ink text-right font-medium";
+
+const previewActionLinkClass =
+  "text-navy hover:bg-coral hover:text-white inline-flex items-center rounded-md bg-navy/5 px-2.5 py-1 text-sm font-semibold transition-colors";
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+function normalizeFilterValue(value: string): string {
+  return value.trim().toLowerCase().replace(/\s+/g, "_");
+}
+
+function toUtcMidnight(value: string): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return null;
+  }
+
+  const date = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date;
+}
+
+function deriveCertificateComputedStatus(input: {
+  status: string;
+  doesNotExpire: boolean;
+  expiresOn: string | null;
+  now: Date;
+}): string {
+  if (["draft", "replaced", "revoked", "archived"].includes(input.status)) {
+    return input.status;
+  }
+
+  if (input.status === "expired") {
+    return "expired";
+  }
+
+  if (input.doesNotExpire) {
+    return "valid";
+  }
+
+  if (!input.expiresOn) {
+    return "validity_unknown";
+  }
+
+  const expiryDate = toUtcMidnight(input.expiresOn);
+  if (!expiryDate) {
+    return "validity_unknown";
+  }
+
+  const nowUtc = new Date(
+    Date.UTC(
+      input.now.getUTCFullYear(),
+      input.now.getUTCMonth(),
+      input.now.getUTCDate()
+    )
+  );
+
+  const remainingDays = Math.floor(
+    (expiryDate.getTime() - nowUtc.getTime()) / MS_PER_DAY
+  );
+
+  if (remainingDays < 0) {
+    return "expired";
+  }
+
+  if (remainingDays <= 30) {
+    return "expires_within_30_days";
+  }
+
+  if (remainingDays <= 60) {
+    return "expires_within_60_days";
+  }
+
+  if (remainingDays <= 90) {
+    return "expires_within_90_days";
+  }
+
+  if (remainingDays <= 180) {
+    return "expires_within_180_days";
+  }
+
+  return "valid";
 }
 
 export default async function AdminDocumentsPage({
@@ -131,6 +242,175 @@ export default async function AdminDocumentsPage({
       : "updated_desc"
   });
 
+  const teamCertificates =
+    result.status === "ok" && result.documents.length === 0
+      ? await fetchAdminTeamMemberCertificates()
+      : [];
+
+  const isCertificateMode =
+    result.status === "ok" && result.documents.length === 0;
+
+  const certificateTypeValues = Array.from(
+    new Set(teamCertificates.map((certificate) => certificate.certificate_type))
+  ).sort((a, b) => a.localeCompare(b));
+
+  const teamCertificatesWithComputedStatus = teamCertificates.map(
+    (certificate) => ({
+      ...certificate,
+      computed_status: deriveCertificateComputedStatus({
+        status: certificate.status,
+        doesNotExpire: certificate.does_not_expire,
+        expiresOn: certificate.expires_on,
+        now: new Date()
+      })
+    })
+  );
+
+  const filteredTeamCertificates = teamCertificatesWithComputedStatus
+    .filter((certificate) => {
+      if (type) {
+        const normalizedType = normalizeFilterValue(type);
+        if (
+          normalizeFilterValue(certificate.certificate_type) !== normalizedType
+        ) {
+          return false;
+        }
+      }
+
+      if (verification && certificate.verification_status !== verification) {
+        return false;
+      }
+
+      if (computedStatus && certificate.computed_status !== computedStatus) {
+        return false;
+      }
+
+      if (expiry === "expired" && certificate.computed_status !== "expired") {
+        return false;
+      }
+
+      if (
+        expiry === "expiring" &&
+        ![
+          "expires_within_180_days",
+          "expires_within_90_days",
+          "expires_within_60_days",
+          "expires_within_30_days"
+        ].includes(certificate.computed_status)
+      ) {
+        return false;
+      }
+
+      if (expiry === "non_expiring" && !certificate.does_not_expire) {
+        return false;
+      }
+
+      if (!search) {
+        return true;
+      }
+
+      const lowerSearch = search.toLowerCase();
+      const searchableNumber =
+        certificate.certificate_number?.toLowerCase() ?? "";
+      const searchableMaskedNumber = searchableNumber
+        ? searchableNumber.length <= 4
+          ? "*".repeat(searchableNumber.length)
+          : `${"*".repeat(searchableNumber.length - 4)}${searchableNumber.slice(-4)}`
+        : "";
+
+      return (
+        certificate.title.toLowerCase().includes(lowerSearch) ||
+        (certificate.issuing_organization ?? "")
+          .toLowerCase()
+          .includes(lowerSearch) ||
+        searchableNumber.includes(lowerSearch) ||
+        searchableMaskedNumber.includes(lowerSearch) ||
+        formatTeamMemberName(certificate.team_member)
+          .toLowerCase()
+          .includes(lowerSearch)
+      );
+    })
+    .sort((a, b) => {
+      const expiryA = a.expires_on ?? "9999-12-31";
+      const expiryB = b.expires_on ?? "9999-12-31";
+
+      switch (sort) {
+        case "updated_asc":
+          return a.updated_at.localeCompare(b.updated_at);
+        case "expiry_asc":
+          return expiryA.localeCompare(expiryB);
+        case "expiry_desc":
+          return expiryB.localeCompare(expiryA);
+        case "updated_desc":
+        default:
+          return b.updated_at.localeCompare(a.updated_at);
+      }
+    });
+
+  const certificateSummary = filteredTeamCertificates.reduce(
+    (acc, certificate) => {
+      switch (certificate.computed_status) {
+        case "valid":
+          acc.valid += 1;
+          break;
+        case "expires_within_180_days":
+          acc.expiresWithin180Days += 1;
+          break;
+        case "expires_within_90_days":
+          acc.expiresWithin90Days += 1;
+          break;
+        case "expires_within_60_days":
+          acc.expiresWithin60Days += 1;
+          break;
+        case "expires_within_30_days":
+          acc.expiresWithin30Days += 1;
+          break;
+        case "expired":
+          acc.expired += 1;
+          break;
+        default:
+          break;
+      }
+
+      if (certificate.verification_status === "pending") {
+        acc.pendingVerification += 1;
+      }
+
+      return acc;
+    },
+    {
+      valid: 0,
+      expiresWithin180Days: 0,
+      expiresWithin90Days: 0,
+      expiresWithin60Days: 0,
+      expiresWithin30Days: 0,
+      expired: 0,
+      pendingVerification: 0
+    }
+  );
+
+  const displayedSummary =
+    result.status === "ok"
+      ? isCertificateMode
+        ? certificateSummary
+        : result.summary
+      : {
+          valid: 0,
+          expiresWithin180Days: 0,
+          expiresWithin90Days: 0,
+          expiresWithin60Days: 0,
+          expiresWithin30Days: 0,
+          expired: 0,
+          pendingVerification: 0
+        };
+
+  const displayedResultCount =
+    result.status === "ok"
+      ? isCertificateMode
+        ? filteredTeamCertificates.length
+        : result.filteredCount
+      : 0;
+
   if (result.status === "unauthenticated") {
     redirect("/login?auth=required");
   }
@@ -185,25 +465,30 @@ export default async function AdminDocumentsPage({
               aria-label={t("documentsTableType")}
             >
               <option value="">{t("documentsFilterAllTypes")}</option>
-              {DOCUMENT_TYPE_VALUES.map((value) => (
+              {(isCertificateMode
+                ? certificateTypeValues
+                : DOCUMENT_TYPE_VALUES
+              ).map((value) => (
                 <option key={value} value={value}>
                   {formatStatus(value)}
                 </option>
               ))}
             </select>
-            <select
-              name="category"
-              defaultValue={category ?? ""}
-              className="border-border min-h-11 rounded-md border px-3"
-              aria-label={t("documentsFilterCategory")}
-            >
-              <option value="">{t("documentsFilterAllCategories")}</option>
-              {DOCUMENT_CATEGORY_VALUES.map((value) => (
-                <option key={value} value={value}>
-                  {formatStatus(value)}
-                </option>
-              ))}
-            </select>
+            {isCertificateMode ? null : (
+              <select
+                name="category"
+                defaultValue={category ?? ""}
+                className="border-border min-h-11 rounded-md border px-3"
+                aria-label={t("documentsFilterCategory")}
+              >
+                <option value="">{t("documentsFilterAllCategories")}</option>
+                {DOCUMENT_CATEGORY_VALUES.map((value) => (
+                  <option key={value} value={value}>
+                    {formatStatus(value)}
+                  </option>
+                ))}
+              </select>
+            )}
             <select
               name="computed_status"
               defaultValue={computedStatus ?? ""}
@@ -232,19 +517,23 @@ export default async function AdminDocumentsPage({
                 </option>
               ))}
             </select>
-            <select
-              name="confidentiality"
-              defaultValue={confidentiality ?? ""}
-              className="border-border min-h-11 rounded-md border px-3"
-              aria-label={t("documentsFilterConfidentiality")}
-            >
-              <option value="">{t("documentsFilterAllConfidentiality")}</option>
-              {DOCUMENT_CONFIDENTIALITY_VALUES.map((value) => (
-                <option key={value} value={value}>
-                  {formatStatus(value)}
+            {isCertificateMode ? null : (
+              <select
+                name="confidentiality"
+                defaultValue={confidentiality ?? ""}
+                className="border-border min-h-11 rounded-md border px-3"
+                aria-label={t("documentsFilterConfidentiality")}
+              >
+                <option value="">
+                  {t("documentsFilterAllConfidentiality")}
                 </option>
-              ))}
-            </select>
+                {DOCUMENT_CONFIDENTIALITY_VALUES.map((value) => (
+                  <option key={value} value={value}>
+                    {formatStatus(value)}
+                  </option>
+                ))}
+              </select>
+            )}
             <select
               name="expiry"
               defaultValue={expiry ?? "all"}
@@ -283,294 +572,334 @@ export default async function AdminDocumentsPage({
                 {t("documentsFilterClear")}
               </Link>
               <p className="text-muted self-center text-sm">
-                {t("documentsFilterResults", { count: result.filteredCount })}
+                {t("documentsFilterResults", { count: displayedResultCount })}
               </p>
             </div>
           </form>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
-            <article className="border-border rounded-[var(--radius)] border bg-white p-4">
-              <p className="text-muted text-xs">{t("documentsSummaryValid")}</p>
-              <p className="text-ink mt-1 text-2xl font-semibold">
-                {result.summary.valid}
+            <article className="rounded-[var(--radius)] border border-emerald-200/70 bg-gradient-to-br from-white via-white to-emerald-50/70 p-4 shadow-[0_10px_26px_rgba(6,27,44,0.08)]">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex size-2 rounded-full bg-emerald-500" />
+                <p className="text-navy/70 text-[0.7rem] font-semibold tracking-[0.08em] uppercase">
+                  {t("documentsSummaryValid")}
+                </p>
+              </div>
+              <p className="text-navy mt-1 text-3xl leading-none font-semibold">
+                {displayedSummary.valid}
               </p>
             </article>
-            <article className="border-border rounded-[var(--radius)] border bg-white p-4">
-              <p className="text-muted text-xs">
-                {t("documentsSummaryExpiring180")}
-              </p>
-              <p className="text-ink mt-1 text-2xl font-semibold">
-                {result.summary.expiresWithin180Days}
-              </p>
-            </article>
-            <article className="border-border rounded-[var(--radius)] border bg-white p-4">
-              <p className="text-muted text-xs">
-                {t("documentsSummaryExpiring90")}
-              </p>
-              <p className="text-ink mt-1 text-2xl font-semibold">
-                {result.summary.expiresWithin90Days}
+            <article className="rounded-[var(--radius)] border border-teal-200/70 bg-gradient-to-br from-white via-white to-teal-50/70 p-4 shadow-[0_10px_26px_rgba(6,27,44,0.08)]">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex size-2 rounded-full bg-teal-500" />
+                <p className="text-navy/70 text-[0.7rem] font-semibold tracking-[0.08em] uppercase">
+                  {t("documentsSummaryExpiring180")}
+                </p>
+              </div>
+              <p className="text-navy mt-1 text-3xl leading-none font-semibold">
+                {displayedSummary.expiresWithin180Days}
               </p>
             </article>
-            <article className="border-border rounded-[var(--radius)] border bg-white p-4">
-              <p className="text-muted text-xs">
-                {t("documentsSummaryExpiring60")}
-              </p>
-              <p className="text-ink mt-1 text-2xl font-semibold">
-                {result.summary.expiresWithin60Days}
-              </p>
-            </article>
-            <article className="border-border rounded-[var(--radius)] border bg-white p-4">
-              <p className="text-muted text-xs">
-                {t("documentsSummaryExpiring30")}
-              </p>
-              <p className="text-ink mt-1 text-2xl font-semibold">
-                {result.summary.expiresWithin30Days}
+            <article className="rounded-[var(--radius)] border border-cyan-200/70 bg-gradient-to-br from-white via-white to-cyan-50/70 p-4 shadow-[0_10px_26px_rgba(6,27,44,0.08)]">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex size-2 rounded-full bg-cyan-500" />
+                <p className="text-navy/70 text-[0.7rem] font-semibold tracking-[0.08em] uppercase">
+                  {t("documentsSummaryExpiring90")}
+                </p>
+              </div>
+              <p className="text-navy mt-1 text-3xl leading-none font-semibold">
+                {displayedSummary.expiresWithin90Days}
               </p>
             </article>
-            <article className="border-border rounded-[var(--radius)] border bg-white p-4">
-              <p className="text-muted text-xs">
-                {t("documentsSummaryExpired")}
-              </p>
-              <p className="text-ink mt-1 text-2xl font-semibold">
-                {result.summary.expired}
+            <article className="rounded-[var(--radius)] border border-amber-200/70 bg-gradient-to-br from-white via-white to-amber-50/70 p-4 shadow-[0_10px_26px_rgba(6,27,44,0.08)]">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex size-2 rounded-full bg-amber-500" />
+                <p className="text-navy/70 text-[0.7rem] font-semibold tracking-[0.08em] uppercase">
+                  {t("documentsSummaryExpiring60")}
+                </p>
+              </div>
+              <p className="text-navy mt-1 text-3xl leading-none font-semibold">
+                {displayedSummary.expiresWithin60Days}
               </p>
             </article>
-            <article className="border-border rounded-[var(--radius)] border bg-white p-4">
-              <p className="text-muted text-xs">
-                {t("documentsSummaryPendingVerification")}
+            <article className="rounded-[var(--radius)] border border-orange-200/70 bg-gradient-to-br from-white via-white to-orange-50/70 p-4 shadow-[0_10px_26px_rgba(6,27,44,0.08)]">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex size-2 rounded-full bg-orange-500" />
+                <p className="text-navy/70 text-[0.7rem] font-semibold tracking-[0.08em] uppercase">
+                  {t("documentsSummaryExpiring30")}
+                </p>
+              </div>
+              <p className="text-navy mt-1 text-3xl leading-none font-semibold">
+                {displayedSummary.expiresWithin30Days}
               </p>
-              <p className="text-ink mt-1 text-2xl font-semibold">
-                {result.summary.pendingVerification}
+            </article>
+            <article className="rounded-[var(--radius)] border border-rose-200/70 bg-gradient-to-br from-white via-white to-rose-50/70 p-4 shadow-[0_10px_26px_rgba(6,27,44,0.08)]">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex size-2 rounded-full bg-rose-500" />
+                <p className="text-navy/70 text-[0.7rem] font-semibold tracking-[0.08em] uppercase">
+                  {t("documentsSummaryExpired")}
+                </p>
+              </div>
+              <p className="text-navy mt-1 text-3xl leading-none font-semibold">
+                {displayedSummary.expired}
+              </p>
+            </article>
+            <article className="rounded-[var(--radius)] border border-violet-200/70 bg-gradient-to-br from-white via-white to-violet-50/70 p-4 shadow-[0_10px_26px_rgba(6,27,44,0.08)]">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex size-2 rounded-full bg-violet-500" />
+                <p className="text-navy/70 text-[0.7rem] font-semibold tracking-[0.08em] uppercase">
+                  {t("documentsSummaryPendingVerification")}
+                </p>
+              </div>
+              <p className="text-navy mt-1 text-3xl leading-none font-semibold">
+                {displayedSummary.pendingVerification}
               </p>
             </article>
           </div>
 
-          {result.documents.length === 0 ? (
+          {result.documents.length === 0 && teamCertificates.length === 0 ? (
             <EmptyState
               title={t("documentsFirstRunTitle")}
               description={t("documentsFirstRunDescription")}
               actionLabel={t("documentsFirstRunCta")}
               actionHref="/admin/documents/new"
             />
-          ) : (
-            <>
-              <div className="hidden overflow-x-auto lg:block">
-                <table className="w-full min-w-[70rem] text-left text-sm">
-                  <thead className="text-muted border-border border-b">
-                    <tr>
-                      <th className="px-2 py-3">
-                        {t("documentsTableDocument")}
-                      </th>
-                      <th className="px-2 py-3">{t("documentsTableType")}</th>
-                      <th className="px-2 py-3">
-                        {t("documentsTableMaskedNumber")}
-                      </th>
-                      <th className="px-2 py-3">{t("documentsTableIssuer")}</th>
-                      <th className="px-2 py-3">{t("documentsTableIssued")}</th>
-                      <th className="px-2 py-3">{t("documentsTableExpiry")}</th>
-                      <th className="px-2 py-3">{t("documentsTableStatus")}</th>
-                      <th className="px-2 py-3">
-                        {t("documentsTableVerification")}
-                      </th>
-                      <th className="px-2 py-3">{t("documentsTableFiles")}</th>
-                      <th className="px-2 py-3">
-                        {t("documentsTableUpdated")}
-                      </th>
-                      <th className="px-2 py-3">
-                        {t("documentsTableActions")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {result.documents.map((document) => (
-                      <tr
-                        key={document.id}
-                        className="border-border border-b align-top"
+          ) : result.documents.length > 0 ? (
+            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {result.documents.map((document) => {
+                const currentFile = firstCurrentFile(document.files);
+
+                return (
+                  <li key={document.id} className={previewCardClass}>
+                    <p className="text-navy bg-navy/10 inline-flex rounded-full px-2 py-1 text-xs font-semibold uppercase">
+                      {formatStatus(document.document_type)}
+                    </p>
+                    <h2 className="mt-2 text-lg font-semibold">
+                      <Link
+                        href={`/admin/documents/${document.id}`}
+                        className="text-navy hover:text-coral underline-offset-4 transition-colors hover:underline"
                       >
-                        <td className="px-2 py-3 font-medium">
-                          {document.title}
-                        </td>
-                        <td className="px-2 py-3">
-                          {formatStatus(document.document_type)}
-                        </td>
-                        <td className="px-2 py-3">
+                        {document.title}
+                      </Link>
+                    </h2>
+
+                    <dl className="mt-3 space-y-2">
+                      <div className={previewMetaRowClass}>
+                        <dt className={previewMetaTermClass}>
+                          {t("documentsTableMaskedNumber")}
+                        </dt>
+                        <dd className={previewMetaValueClass}>
                           {maskDocumentNumber(document.document_number)}
-                        </td>
-                        <td className="px-2 py-3">
+                        </dd>
+                      </div>
+                      <div className={previewMetaRowClass}>
+                        <dt className={previewMetaTermClass}>
+                          {t("documentsTableIssuer")}
+                        </dt>
+                        <dd className={previewMetaValueClass}>
                           {document.issuing_authority ?? "-"}
-                        </td>
-                        <td className="px-2 py-3">
+                        </dd>
+                      </div>
+                      <div className={previewMetaRowClass}>
+                        <dt className={previewMetaTermClass}>
+                          {t("documentsTableIssued")}
+                        </dt>
+                        <dd className={previewMetaValueClass}>
                           {formatDate(document.issued_on)}
-                        </td>
-                        <td className="px-2 py-3">
+                        </dd>
+                      </div>
+                      <div className={previewMetaRowClass}>
+                        <dt className={previewMetaTermClass}>
+                          {t("documentsTableExpiry")}
+                        </dt>
+                        <dd className={previewMetaValueClass}>
                           {document.does_not_expire
                             ? "-"
                             : formatDate(document.expires_on)}
-                        </td>
-                        <td className="px-2 py-3">
-                          <Badge variant="outline">
-                            {formatStatus(document.computed_status)}
-                          </Badge>
-                        </td>
-                        <td className="px-2 py-3">
-                          <Badge variant="outline">
-                            {formatStatus(document.verification_status)}
-                          </Badge>
-                        </td>
-                        <td className="px-2 py-3">
+                        </dd>
+                      </div>
+                      <div className={previewMetaRowClass}>
+                        <dt className={previewMetaTermClass}>
+                          {t("documentsTableFiles")}
+                        </dt>
+                        <dd className={previewMetaValueClass}>
                           {Array.isArray(document.files)
                             ? document.files.length
                             : 0}
-                        </td>
-                        <td className="px-2 py-3">
+                        </dd>
+                      </div>
+                      <div className={previewMetaRowClass}>
+                        <dt className={previewMetaTermClass}>
+                          {t("documentsTableUpdated")}
+                        </dt>
+                        <dd className={previewMetaValueClass}>
                           {formatDate(document.updated_at)}
-                        </td>
-                        <td className="px-2 py-3">
-                          {(() => {
-                            const currentFile = firstCurrentFile(
-                              document.files
-                            );
-                            return (
-                              <div className="flex flex-wrap gap-2">
-                                <Link
-                                  href={`/admin/documents/${document.id}`}
-                                  className="text-sm font-medium underline-offset-4 hover:underline"
-                                >
-                                  {t("documentsActionView")}
-                                </Link>
-                                {currentFile ? (
-                                  <>
-                                    <Link
-                                      href={`/api/admin/documents/files/${currentFile.id}?intent=view`}
-                                      className="text-sm font-medium underline-offset-4 hover:underline"
-                                    >
-                                      {t("documentsActionPreview")}
-                                    </Link>
-                                    <Link
-                                      href={`/api/admin/documents/files/${currentFile.id}?intent=download`}
-                                      className="text-sm font-medium underline-offset-4 hover:underline"
-                                    >
-                                      {t("documentsActionDownload")}
-                                    </Link>
-                                  </>
-                                ) : null}
-                                <Link
-                                  href={`/admin/documents/${document.id}/edit`}
-                                  className="text-sm font-medium underline-offset-4 hover:underline"
-                                >
-                                  {t("documentsActionEdit")}
-                                </Link>
-                                <Link
-                                  href={`/admin/documents/new?renewFrom=${document.id}`}
-                                  className="text-sm font-medium underline-offset-4 hover:underline"
-                                >
-                                  {t("documentsActionRenew")}
-                                </Link>
-                                <Link
-                                  href={`/admin/documents/${document.id}/edit`}
-                                  className="text-sm font-medium underline-offset-4 hover:underline"
-                                >
-                                  {t("documentsActionReplaceFile")}
-                                </Link>
-                                <Link
-                                  href={`/admin/documents/${document.id}/edit`}
-                                  className="text-sm font-medium underline-offset-4 hover:underline"
-                                >
-                                  {t("documentsActionAddAttachment")}
-                                </Link>
-                              </div>
-                            );
-                          })()}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                        </dd>
+                      </div>
+                    </dl>
 
-              <ul className="grid gap-3 lg:hidden">
-                {result.documents.map((document) => (
-                  <li
-                    key={document.id}
-                    className="border-border rounded-[var(--radius)] border bg-white p-4"
-                  >
-                    <p className="text-muted text-xs font-semibold uppercase">
-                      {formatStatus(document.document_type)}
-                    </p>
-                    <h2 className="text-ink mt-1 text-lg font-semibold">
-                      {document.title}
-                    </h2>
-                    <p className="text-muted mt-1 text-sm">
-                      {t("documentsTableMaskedNumber")}:{" "}
-                      {maskDocumentNumber(document.document_number)}
-                    </p>
-                    <p className="text-muted text-sm">
-                      {t("documentsTableIssuer")}:{" "}
-                      {document.issuing_authority ?? "-"}
-                    </p>
-                    <p className="text-muted text-sm">
-                      {t("documentsTableIssued")}:{" "}
-                      {formatDate(document.issued_on)}
-                    </p>
-                    <p className="text-muted text-sm">
-                      {t("documentsTableExpiry")}:{" "}
-                      {document.does_not_expire
-                        ? "-"
-                        : formatDate(document.expires_on)}
-                    </p>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <Badge variant="outline">
+                      <Badge
+                        variant="outline"
+                        className="border-navy/20 text-navy bg-white"
+                      >
                         {formatStatus(document.computed_status)}
                       </Badge>
-                      <Badge variant="outline">
+                      <Badge
+                        variant="outline"
+                        className="border-turquoise/40 bg-turquoise/10 text-navy"
+                      >
                         {formatStatus(document.verification_status)}
                       </Badge>
                     </div>
-                    <div className="mt-4 flex flex-wrap gap-4">
+
+                    <div className="mt-4 flex flex-wrap gap-2">
                       <Link
                         href={`/admin/documents/${document.id}`}
-                        className="text-sm font-medium underline-offset-4 hover:underline"
+                        className={previewActionLinkClass}
                       >
                         {t("documentsActionView")}
                       </Link>
-                      {(() => {
-                        const currentFile = firstCurrentFile(document.files);
-                        if (!currentFile) return null;
-
-                        return (
-                          <>
-                            <Link
-                              href={`/api/admin/documents/files/${currentFile.id}?intent=view`}
-                              className="text-sm font-medium underline-offset-4 hover:underline"
-                            >
-                              {t("documentsActionPreview")}
-                            </Link>
-                            <Link
-                              href={`/api/admin/documents/files/${currentFile.id}?intent=download`}
-                              className="text-sm font-medium underline-offset-4 hover:underline"
-                            >
-                              {t("documentsActionDownload")}
-                            </Link>
-                          </>
-                        );
-                      })()}
+                      {currentFile ? (
+                        <>
+                          <Link
+                            href={`/api/admin/documents/files/${currentFile.id}?intent=view`}
+                            className={previewActionLinkClass}
+                          >
+                            {t("documentsActionPreview")}
+                          </Link>
+                          <Link
+                            href={`/api/admin/documents/files/${currentFile.id}?intent=download`}
+                            className={previewActionLinkClass}
+                          >
+                            {t("documentsActionDownload")}
+                          </Link>
+                        </>
+                      ) : null}
                       <Link
                         href={`/admin/documents/${document.id}/edit`}
-                        className="text-sm font-medium underline-offset-4 hover:underline"
+                        className={previewActionLinkClass}
                       >
                         {t("documentsActionEdit")}
                       </Link>
                       <Link
                         href={`/admin/documents/new?renewFrom=${document.id}`}
-                        className="text-sm font-medium underline-offset-4 hover:underline"
+                        className={previewActionLinkClass}
                       >
                         {t("documentsActionRenew")}
                       </Link>
+                      <Link
+                        href={`/admin/documents/${document.id}/edit`}
+                        className={previewActionLinkClass}
+                      >
+                        {t("documentsActionReplaceFile")}
+                      </Link>
+                      <Link
+                        href={`/admin/documents/${document.id}/edit`}
+                        className={previewActionLinkClass}
+                      >
+                        {t("documentsActionAddAttachment")}
+                      </Link>
                     </div>
                   </li>
-                ))}
-              </ul>
-            </>
+                );
+              })}
+            </ul>
+          ) : (
+            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {filteredTeamCertificates.map((certificate) => (
+                <li key={certificate.id} className={previewCardClass}>
+                  <p className="text-navy bg-navy/10 inline-flex rounded-full px-2 py-1 text-xs font-semibold uppercase">
+                    {formatStatus(certificate.certificate_type)}
+                  </p>
+                  <h2 className="mt-2 text-lg font-semibold">
+                    <Link
+                      href={`/admin/documents/certificates/${certificate.id}`}
+                      className="text-navy hover:text-coral underline-offset-4 transition-colors hover:underline"
+                    >
+                      {certificate.title}
+                    </Link>
+                  </h2>
+
+                  <dl className="mt-3 space-y-2">
+                    <div className={previewMetaRowClass}>
+                      <dt className={previewMetaTermClass}>
+                        {t("documentsTableMaskedNumber")}
+                      </dt>
+                      <dd className={previewMetaValueClass}>
+                        {maskDocumentNumber(certificate.certificate_number)}
+                      </dd>
+                    </div>
+                    <div className={previewMetaRowClass}>
+                      <dt className={previewMetaTermClass}>
+                        {t("documentsTableIssuer")}
+                      </dt>
+                      <dd className={previewMetaValueClass}>
+                        {certificate.issuing_organization ?? "-"}
+                      </dd>
+                    </div>
+                    <div className={previewMetaRowClass}>
+                      <dt className={previewMetaTermClass}>
+                        {t("documentsTableIssued")}
+                      </dt>
+                      <dd className={previewMetaValueClass}>
+                        {formatDate(certificate.issued_on)}
+                      </dd>
+                    </div>
+                    <div className={previewMetaRowClass}>
+                      <dt className={previewMetaTermClass}>
+                        {t("documentsTableExpiry")}
+                      </dt>
+                      <dd className={previewMetaValueClass}>
+                        {certificate.does_not_expire
+                          ? "-"
+                          : formatDate(certificate.expires_on)}
+                      </dd>
+                    </div>
+                    <div className={previewMetaRowClass}>
+                      <dt className={previewMetaTermClass}>
+                        {t("documentsTableUpdated")}
+                      </dt>
+                      <dd className={previewMetaValueClass}>
+                        {formatDate(certificate.updated_at)}
+                      </dd>
+                    </div>
+                    <div className={previewMetaRowClass}>
+                      <dt className={previewMetaTermClass}>
+                        {t("documentsTableDocument")}
+                      </dt>
+                      <dd className={previewMetaValueClass}>
+                        {formatTeamMemberName(certificate.team_member)}
+                      </dd>
+                    </div>
+                  </dl>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Badge
+                      variant="outline"
+                      className="border-navy/20 text-navy bg-white"
+                    >
+                      {formatStatus(certificate.status)}
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="border-turquoise/40 bg-turquoise/10 text-navy"
+                    >
+                      {formatStatus(certificate.verification_status)}
+                    </Badge>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Link
+                      href={`/admin/documents/certificates/${certificate.id}`}
+                      className={previewActionLinkClass}
+                    >
+                      {t("documentsActionView")}
+                    </Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
         </>
       ) : null}
