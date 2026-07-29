@@ -6,7 +6,12 @@ vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: vi.fn()
 }));
 
+vi.mock("@/lib/supabase/admin", () => ({
+  createSupabaseAdminClient: vi.fn()
+}));
+
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { fetchAdminDocumentsOverview } from "./admin-documents";
 
 function buildDocument(input: {
@@ -48,7 +53,10 @@ function buildDocument(input: {
   };
 }
 
-function createSupabaseMock(documents: unknown[]) {
+function createSupabaseMock(
+  documents: unknown[],
+  input?: { viewErrorMessage?: string }
+) {
   const profilesTable = {
     select: vi.fn().mockReturnValue({
       eq: vi.fn().mockReturnValue({
@@ -67,6 +75,17 @@ function createSupabaseMock(documents: unknown[]) {
     select: vi.fn().mockReturnValue({
       order: vi.fn().mockResolvedValue({
         data: documents,
+        error: input?.viewErrorMessage
+          ? { message: input.viewErrorMessage }
+          : null
+      })
+    })
+  };
+
+  const baseDocumentsTable = {
+    select: vi.fn().mockReturnValue({
+      order: vi.fn().mockResolvedValue({
+        data: documents,
         error: null
       })
     })
@@ -81,6 +100,25 @@ function createSupabaseMock(documents: unknown[]) {
     from: vi.fn((table: string) => {
       if (table === "profiles") return profilesTable;
       if (table === "professional_documents_admin") return documentsTable;
+      if (table === "professional_documents") return baseDocumentsTable;
+      throw new Error(`Unexpected table: ${table}`);
+    })
+  };
+}
+
+function createSupabaseAdminMock(documents: unknown[]) {
+  const baseDocumentsTable = {
+    select: vi.fn().mockReturnValue({
+      order: vi.fn().mockResolvedValue({
+        data: documents,
+        error: null
+      })
+    })
+  };
+
+  return {
+    from: vi.fn((table: string) => {
+      if (table === "professional_documents") return baseDocumentsTable;
       throw new Error(`Unexpected table: ${table}`);
     })
   };
@@ -197,5 +235,39 @@ describe("admin-documents repository", () => {
       status: "unauthenticated",
       message: "Authentication is required."
     });
+  });
+
+  it("falls back to base table query when admin view role function is denied", async () => {
+    const docs = [
+      buildDocument({
+        id: "ffffffff-ffff-4fff-8fff-ffffffffffff",
+        title: "Fallback Passport",
+        documentNumber: "FALL-1234",
+        issuingAuthority: "Authority",
+        computedStatus: "valid",
+        verificationStatus: "pending",
+        updatedAt: "2026-01-14T00:00:00.000Z",
+        expiresOn: "2030-01-01"
+      })
+    ];
+
+    vi.mocked(createSupabaseServerClient).mockResolvedValue(
+      createSupabaseMock(docs, {
+        viewErrorMessage: "permission denied for function has_any_role"
+      }) as never
+    );
+    vi.mocked(createSupabaseAdminClient).mockReturnValue(
+      createSupabaseAdminMock(docs) as never
+    );
+
+    const result = await fetchAdminDocumentsOverview();
+
+    expect(result.status).toBe("ok");
+    if (result.status !== "ok") return;
+
+    expect(result.documents).toHaveLength(1);
+    expect(result.documents[0]?.id).toBe(
+      "ffffffff-ffff-4fff-8fff-ffffffffffff"
+    );
   });
 });

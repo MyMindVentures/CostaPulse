@@ -681,6 +681,7 @@
       "documentsFilterAllCategories": "Alle Kategorien",
       "documentsFilterAllComputedStatuses": "Alle berechneten Status",
       "documentsFilterAllVerification": "Alle Verifizierungsstatus",
+      "documentsFilterConfidentiality": "Vertraulichkeit",
       "documentsFilterAllConfidentiality": "Alle Vertraulichkeitsstufen",
       "documentsFilterApply": "Filter anwenden",
       "documentsFilterClear": "Zurücksetzen",

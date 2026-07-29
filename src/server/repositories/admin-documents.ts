@@ -1,6 +1,7 @@
 import "server-only";
 
 import { z } from "zod";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const fileSummarySchema = z.object({
@@ -42,6 +43,42 @@ const professionalDocumentAdminSchema = z.object({
   status: z.string().min(1),
   verification_status: z.string().min(1),
   computed_status: z.string().min(1),
+  updated_at: z.string().min(1),
+  files: z
+    .preprocess((value) => {
+      if (value == null) return [];
+      return Array.isArray(value) ? value : [];
+    }, z.array(fileSummarySchema))
+    .default([])
+});
+
+const professionalDocumentBaseSchema = z.object({
+  id: z.string().uuid(),
+  profile_id: z.string().uuid(),
+  document_type: z.string().min(1),
+  category: z.string().min(1),
+  title: z.string().min(1),
+  document_number: z.string().nullable(),
+  issuing_authority: z.string().nullable(),
+  issuing_country_code: z.string().nullable().optional().default(null),
+  issued_on: z.string().nullable(),
+  valid_from: z.string().nullable(),
+  expires_on: z.string().nullable(),
+  does_not_expire: z.boolean(),
+  confidentiality_level: z.string().min(1),
+  qualification: z.string().nullable().optional().default(null),
+  stcw_code: z.string().nullable().optional().default(null),
+  restrictions: z.string().nullable().optional().default(null),
+  notes: z.string().nullable(),
+  team_member_certificate_id: z
+    .string()
+    .uuid()
+    .nullable()
+    .optional()
+    .default(null),
+  replaces_document_id: z.string().uuid().nullable().optional().default(null),
+  status: z.string().min(1),
+  verification_status: z.string().min(1),
   updated_at: z.string().min(1),
   files: z
     .preprocess((value) => {
@@ -178,6 +215,134 @@ const defaultSummary: AdminDocumentsSummary = {
   expired: 0,
   pendingVerification: 0
 };
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+function hasRoleFunctionPermissionError(message: string): boolean {
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("permission denied for function has_any_role") ||
+    (normalized.includes("permission denied") &&
+      normalized.includes("has_any_role"))
+  );
+}
+
+function toUtcMidnight(dateValue: string): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+    return null;
+  }
+
+  const utcDate = new Date(`${dateValue}T00:00:00.000Z`);
+  if (Number.isNaN(utcDate.getTime())) {
+    return null;
+  }
+
+  return utcDate;
+}
+
+function deriveComputedStatus(input: {
+  status: string;
+  doesNotExpire: boolean;
+  expiresOn: string | null;
+  now: Date;
+}): string {
+  if (["draft", "replaced", "revoked", "archived"].includes(input.status)) {
+    return input.status;
+  }
+
+  if (input.status === "expired") {
+    return "expired";
+  }
+
+  if (input.doesNotExpire) {
+    return "valid";
+  }
+
+  if (!input.expiresOn) {
+    return "validity_unknown";
+  }
+
+  const expiryDate = toUtcMidnight(input.expiresOn);
+  if (!expiryDate) {
+    return "validity_unknown";
+  }
+
+  const nowUtc = new Date(
+    Date.UTC(
+      input.now.getUTCFullYear(),
+      input.now.getUTCMonth(),
+      input.now.getUTCDate()
+    )
+  );
+
+  const remainingDays = Math.floor(
+    (expiryDate.getTime() - nowUtc.getTime()) / MS_PER_DAY
+  );
+
+  if (remainingDays < 0) {
+    return "expired";
+  }
+
+  if (remainingDays <= 30) {
+    return "expires_within_30_days";
+  }
+
+  if (remainingDays <= 60) {
+    return "expires_within_60_days";
+  }
+
+  if (remainingDays <= 90) {
+    return "expires_within_90_days";
+  }
+
+  if (remainingDays <= 180) {
+    return "expires_within_180_days";
+  }
+
+  return "valid";
+}
+
+async function fetchDocumentsFromBaseTablesWithAdmin() {
+  const admin = createSupabaseAdminClient();
+  if (!admin) {
+    return {
+      status: "missing_config" as const,
+      message: "Supabase admin access is not configured."
+    };
+  }
+
+  const { data, error } = await admin
+    .from("professional_documents")
+    .select(
+      "id, profile_id, document_type, category, title, document_number, issuing_authority, issuing_country_code, issued_on, valid_from, expires_on, does_not_expire, confidentiality_level, qualification, stcw_code, restrictions, notes, team_member_certificate_id, replaces_document_id, status, verification_status, updated_at, files:professional_document_files(id, file_role, is_current, version_number, original_filename, mime_type, file_size_bytes, created_at)"
+    )
+    .order("updated_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const parsed = z.array(professionalDocumentBaseSchema).safeParse(data ?? []);
+  if (!parsed.success) {
+    throw new Error("Professional documents payload is invalid.");
+  }
+
+  const now = new Date();
+  const documents = parsed.data.map((document) => ({
+    ...document,
+    computed_status: deriveComputedStatus({
+      status: document.status,
+      doesNotExpire: document.does_not_expire,
+      expiresOn: document.expires_on,
+      now
+    })
+  }));
+
+  return {
+    status: "ok" as const,
+    documents
+  };
+}
 
 function computeSummary(
   documents: readonly AdminProfessionalDocument[]
@@ -355,23 +520,38 @@ export async function fetchAdminDocumentsOverview(
     )
     .order("updated_at", { ascending: false });
 
+  let documents: AdminProfessionalDocument[];
+
   if (error) {
-    throw new Error(error.message);
+    if (!hasRoleFunctionPermissionError(error.message)) {
+      throw new Error(error.message);
+    }
+
+    const fallback = await fetchDocumentsFromBaseTablesWithAdmin();
+    if (fallback.status !== "ok") {
+      return fallback;
+    }
+
+    documents = fallback.documents;
+  } else {
+    const parsed = z
+      .array(professionalDocumentAdminSchema)
+      .safeParse(data ?? []);
+    if (!parsed.success) {
+      throw new Error("Professional documents payload is invalid.");
+    }
+
+    documents = parsed.data;
   }
 
-  const parsed = z.array(professionalDocumentAdminSchema).safeParse(data ?? []);
-  if (!parsed.success) {
-    throw new Error("Professional documents payload is invalid.");
-  }
-
-  const filteredDocuments = applyOverviewQuery(parsed.data, query);
+  const filteredDocuments = applyOverviewQuery(documents, query);
 
   return {
     status: "ok",
     profileId: profile.id,
     profileDisplayName: profile.display_name,
     documents: filteredDocuments,
-    summary: computeSummary(parsed.data),
+    summary: computeSummary(documents),
     filteredCount: filteredDocuments.length
   };
 }
@@ -420,7 +600,27 @@ export async function fetchAdminDocumentDetail(
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    if (!hasRoleFunctionPermissionError(error.message)) {
+      throw new Error(error.message);
+    }
+
+    const fallback = await fetchDocumentsFromBaseTablesWithAdmin();
+    if (fallback.status !== "ok") {
+      return fallback;
+    }
+
+    const fallbackDocument = fallback.documents.find(
+      (document) => document.id === documentId
+    );
+
+    if (!fallbackDocument) {
+      return { status: "not_found" };
+    }
+
+    return {
+      status: "ok",
+      document: fallbackDocument
+    };
   }
 
   if (!data) {
