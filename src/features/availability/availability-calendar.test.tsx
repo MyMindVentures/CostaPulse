@@ -91,7 +91,7 @@ describe("AvailabilityCalendar", () => {
     );
     expect(screen.getByRole("link", { name: "Today" })).toHaveAttribute(
       "href",
-      "/availability?month=2026-07&date=2026-07-30"
+      "/availability/2026-07-30?month=2026-07"
     );
     expect(
       screen.getAllByRole("link", { name: "Monday, August 10, 2026" })
@@ -118,7 +118,7 @@ describe("AvailabilityCalendar", () => {
 
     expect(screen.getByRole("link", { name: "Today" })).toHaveAttribute(
       "href",
-      "/availability?month=2026-07&date=2026-07-30&service_category=watersports&status=limited&location=Alicante&available_only=true"
+      "/availability/2026-07-30?month=2026-07&service_category=watersports&status=limited&location=Alicante&available_only=true"
     );
   });
 
