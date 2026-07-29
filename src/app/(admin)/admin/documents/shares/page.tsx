@@ -1,8 +1,15 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { Badge } from "@/components/ui/badge";
 import { SectionKicker } from "@/components/shared/section-kicker";
 import { Button } from "@/components/ui/button";
+import {
+  formatCredentialDocumentType,
+  formatCredentialFileRole,
+  formatCredentialRecordStatus,
+  formatCredentialVerificationStatus
+} from "@/features/credentials/labels";
 import {
   createCredentialGrantAndSendMagicLinkAction,
   createCredentialShareLinkAction,
@@ -53,6 +60,34 @@ function humanDate(value: string | null): string {
   });
 }
 
+function toIsoOrNull(value: string): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const parsed = new Date(trimmed);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  return parsed.toISOString();
+}
+
+function toPositiveIntegerOrNull(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const parsed = Number(trimmed);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    return null;
+  }
+
+  return parsed;
+}
+
 export default async function AdminDocumentSharesPage({
   searchParams
 }: {
@@ -92,7 +127,14 @@ export default async function AdminDocumentSharesPage({
     const accessExpiresAtRaw = String(
       formData.get("accessExpiresAt") ?? ""
     ).trim();
+    const accessExpiresAt = toIsoOrNull(accessExpiresAtRaw);
     const message = String(formData.get("message") ?? "").trim();
+
+    if (accessExpiresAtRaw && !accessExpiresAt) {
+      redirect(
+        `/admin/documents/shares?status=error&message=${encodeURIComponent("Access expiry must be a valid date and time.")}`
+      );
+    }
 
     const payload = {
       recipientEmail,
@@ -102,9 +144,7 @@ export default async function AdminDocumentSharesPage({
         selectedFileRoles.length > 0
           ? selectedFileRoles
           : (["primary"] as FileRole[]),
-      accessExpiresAt: accessExpiresAtRaw
-        ? new Date(accessExpiresAtRaw).toISOString()
-        : null,
+      accessExpiresAt,
       permissionViewFiles: formData.get("permissionViewFiles") === "on",
       permissionDownloadFiles: formData.get("permissionDownloadFiles") === "on",
       permissionIncludeHistory:
@@ -133,19 +173,40 @@ export default async function AdminDocumentSharesPage({
     const expiresAtRaw = String(formData.get("shareExpiresAt") ?? "").trim();
     const maxViewsRaw = String(formData.get("maxViews") ?? "").trim();
     const maxDownloadsRaw = String(formData.get("maxDownloads") ?? "").trim();
+    const shareExpiresAt = toIsoOrNull(expiresAtRaw);
+    const maxViews = toPositiveIntegerOrNull(maxViewsRaw);
+    const maxDownloads = toPositiveIntegerOrNull(maxDownloadsRaw);
+
+    if (expiresAtRaw && !shareExpiresAt) {
+      redirect(
+        `/admin/documents/shares?status=error&message=${encodeURIComponent("Share expiry must be a valid date and time.")}`
+      );
+    }
+
+    if (maxViewsRaw && maxViews === null) {
+      redirect(
+        `/admin/documents/shares?status=error&message=${encodeURIComponent("Max views must be a positive whole number.")}`
+      );
+    }
+
+    if (maxDownloadsRaw && maxDownloads === null) {
+      redirect(
+        `/admin/documents/shares?status=error&message=${encodeURIComponent("Max downloads must be a positive whole number.")}`
+      );
+    }
 
     const result: CreateCredentialShareLinkResult =
       await createCredentialShareLinkAction({
         grantId,
-        expiresAt: expiresAtRaw
-          ? new Date(expiresAtRaw).toISOString()
-          : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        expiresAt:
+          shareExpiresAt ??
+          new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         recipientEmail:
           String(formData.get("shareRecipientEmail") ?? "").trim() || null,
         recipientAgencyLabel:
           String(formData.get("shareRecipientAgency") ?? "").trim() || null,
-        maxViews: maxViewsRaw ? Number(maxViewsRaw) : null,
-        maxDownloads: maxDownloadsRaw ? Number(maxDownloadsRaw) : null
+        maxViews,
+        maxDownloads
       });
 
     if (!result.ok) {
@@ -316,7 +377,7 @@ export default async function AdminDocumentSharesPage({
                   value={role}
                   defaultChecked={role === "primary"}
                 />
-                {role.replaceAll("_", " ")}
+                {formatCredentialFileRole(t, role)}
               </label>
             ))}
           </div>
@@ -347,9 +408,12 @@ export default async function AdminDocumentSharesPage({
                       {document.title}
                     </strong>
                     <span className="text-muted text-xs">
-                      {document.document_type.replaceAll("_", " ")} ·{" "}
-                      {document.verification_status.replaceAll("_", " ")} ·{" "}
-                      {document.status.replaceAll("_", " ")}
+                      {formatCredentialDocumentType(document.document_type)} ·{" "}
+                      {formatCredentialVerificationStatus(
+                        t,
+                        document.verification_status
+                      )}{" "}
+                      · {formatCredentialRecordStatus(t, document.status)}
                     </span>
                   </span>
                 </label>
@@ -390,6 +454,9 @@ export default async function AdminDocumentSharesPage({
                   <th className="px-2 py-2">
                     {t("documentsSharesTableStatus")}
                   </th>
+                  <th className="px-2 py-2">
+                    {t("documentsSharesTablePermissions")}
+                  </th>
                   <th className="px-2 py-2">{t("documentsSharesTableSent")}</th>
                   <th className="px-2 py-2">
                     {t("documentsSharesTableActions")}
@@ -410,6 +477,36 @@ export default async function AdminDocumentSharesPage({
                       {grant.revoked_at
                         ? t("documentsSharesStatusRevoked")
                         : t("documentsSharesStatusActive")}
+                    </td>
+                    <td className="px-2 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {grant.permission_view_files ? (
+                          <Badge variant="outline" className="text-xs">
+                            {t("documentsSharesPermissionViewFiles")}
+                          </Badge>
+                        ) : null}
+                        {grant.permission_download_files ? (
+                          <Badge variant="outline" className="text-xs">
+                            {t("documentsSharesPermissionDownloadFiles")}
+                          </Badge>
+                        ) : null}
+                        {grant.permission_include_history ? (
+                          <Badge variant="outline" className="text-xs">
+                            {t("documentsSharesPermissionHistory")}
+                          </Badge>
+                        ) : null}
+                        {grant.permission_include_document_number ? (
+                          <Badge variant="outline" className="text-xs">
+                            {t("documentsSharesPermissionDocumentNumber")}
+                          </Badge>
+                        ) : null}
+                        {!grant.permission_view_files &&
+                        !grant.permission_download_files &&
+                        !grant.permission_include_history &&
+                        !grant.permission_include_document_number ? (
+                          <span className="text-muted text-xs">-</span>
+                        ) : null}
+                      </div>
                     </td>
                     <td className="px-2 py-3">
                       {humanDate(grant.last_magic_link_sent_at)}

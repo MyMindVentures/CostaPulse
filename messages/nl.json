@@ -88,9 +88,39 @@
       "description": "Concierge- en hosted services verschijnen hier zodra ze gepubliceerd zijn."
     },
     "about": {
+      "meta": {
+        "title": "Over CostaPulse | CostaPulse",
+        "description": "Ontdek het verhaal, de waarden en de belofte achter CostaPulse en onze zorgvuldig gekozen Costa Blanca-ervaringen."
+      },
       "kicker": "Over ons",
       "title": "Over CostaPulse",
-      "description": "Ons verhaal en aanpak verschijnen hier zodra redactionele content wordt gepubliceerd."
+      "description": "Ons verhaal en aanpak verschijnen hier zodra redactionele content wordt gepubliceerd.",
+      "intro": "CostaPulse is ontstaan uit een eenvoudige overtuiging: de meest memorabele ervaringen vind je nooit toevallig. Ze worden gecreeerd door gepassioneerde mensen, met zorg gedeeld en beleefd op buitengewone plekken.",
+      "discoverTitle": "Ontdek de echte pulse van de Costa Blanca",
+      "discoverP1": "Onze missie is om bezoekers te verbinden met het allerbeste dat de Costa Blanca te bieden heeft. Van onvergetelijke dagen op het water en outdoor-avonturen tot zorgvuldig geselecteerde lokale ervaringen: elke activiteit op CostaPulse wordt gekozen op kwaliteit, authenticiteit en persoonlijke aandacht.",
+      "discoverP2": "Wij geloven dat luxe niet wordt bepaald door overdaad, maar door uitzonderlijke momenten, oprechte gastvrijheid en ervaringen die blijvende herinneringen achterlaten.",
+      "curatedTitle": "Gecureerd, niet overvol",
+      "curatedP1": "De Costa Blanca is een van Europa's mooiste bestemmingen, maar veel bezoekers ontdekken slechts een klein deel van wat deze regio echt bijzonder maakt. CostaPulse verandert dat.",
+      "curatedP2": "In plaats van honderden anonieme listings bieden we zorgvuldig gecureerde ervaringen die voldoen aan onze standaarden voor professionaliteit, veiligheid en gastbeleving. Of je nu zoekt naar een privejachtcharter, een paddleboardavontuur, een begeleide kustexcursie of een unieke outdoor ervaring: je boekt met vertrouwen omdat elke ervaring met zorg is geselecteerd.",
+      "moreTitle": "Meer dan een boekingsplatform",
+      "moreP1": "CostaPulse is ontworpen als veel meer dan een marktplaats. Achter elke boeking staat een groeiend netwerk van lokale professionals, ervaren crewleden, betrouwbare partners en gepassioneerde ondernemers die samen onvergetelijke momenten creeren.",
+      "moreP2": "Ons platform brengt deze mensen samen in een premium ecosysteem waar gasten ervaringen ontdekken, aanbieders hun expertise tonen en partners samenwerken om uitzonderlijke service te leveren. Technologie ondersteunt de reis, maar mensen maken de herinneringen.",
+      "builtTitle": "Gebouwd op ervaring",
+      "builtP1": "CostaPulse werd opgericht door Kevin De Vlieger, wiens achtergrond tientallen jaren professionele maritieme ervaring combineert met een passie voor avontuur, watersport, gastvrijheid en de mediterrane levensstijl.",
+      "builtP2": "Die unieke combinatie vormt alles wat we bouwen. Elk detail, van de manier waarop ervaringen worden gepresenteerd tot het boekingsproces en de operationele kwaliteit, is ontworpen met praktijkervaring, professionaliteit en oprechte zorg voor de gastbeleving.",
+      "promiseTitle": "Onze belofte",
+      "promiseItem1": "Zorgvuldig geselecteerde premium ervaringen.",
+      "promiseItem2": "Betrouwbare lokale professionals en partners.",
+      "promiseItem3": "Veilige, betrouwbare en transparante boekingen.",
+      "promiseItem4": "Authentieke momenten in plaats van massatoerisme.",
+      "promiseItem5": "Persoonlijke service met aandacht voor elk detail.",
+      "promiseItem6": "Een groeiende community gebouwd op kwaliteit, vertrouwen en avontuur.",
+      "aheadTitle": "Vooruitkijken",
+      "aheadP1": "CostaPulse blijft zich ontwikkelen tot het premium digitale thuis voor het ontdekken, boeken en beleven van de Costa Blanca.",
+      "aheadP2": "Naarmate onze community groeit, groeit ook onze verzameling zorgvuldig geselecteerde ervaringen, vertrouwde partners en gepassioneerde professionals.",
+      "aheadP3": "Of je nu een dag op bezoek bent, een onvergetelijke vakantie plant of jaar na jaar terugkomt: ons doel blijft hetzelfde.",
+      "aheadClosing": "Jou de echte pulse van de Costa Blanca laten beleven.",
+      "outro": "CostaPulse weerspiegelt niet alleen een zakelijke visie, maar ook een persoonlijke toewijding om het allerbeste van het leven aan de Costa Blanca te delen."
     },
     "partners": {
       "kicker": "Partners",
@@ -824,6 +854,7 @@
       "documentsSharesTableAgency": "Agency",
       "documentsSharesTableExpires": "Expires",
       "documentsSharesTableStatus": "Status",
+      "documentsSharesTablePermissions": "Permissions",
       "documentsSharesTableSent": "Last invitation",
       "documentsSharesStatusActive": "Active",
       "documentsSharesStatusRevoked": "Revoked",
@@ -907,7 +938,23 @@
       "email": "E-mail",
       "password": "Wachtwoord",
       "submit": "Inloggen",
-      "errorTitle": "Inloggen mislukt"
+      "errorTitle": "Inloggen mislukt",
+      "magicLinkTitle": "Request a new magic link",
+      "magicLinkDescription": "For agency credential access, request a fresh magic link to your email.",
+      "magicLinkEmail": "Agency contact email",
+      "magicLinkSubmit": "Send magic link",
+      "magicLinkErrorTitle": "Magic-link request failed",
+      "magicLinkSentTitle": "Check your inbox",
+      "authNoticeRequiredTitle": "Sign in required",
+      "authNoticeRequiredDescription": "Please sign in to continue.",
+      "authNoticeForbiddenTitle": "Access not permitted",
+      "authNoticeForbiddenDescription": "Your account is signed in but does not have permission for that area.",
+      "authNoticeInvalidMagicLinkTitle": "Magic link invalid",
+      "authNoticeInvalidMagicLinkDescription": "That sign-in link is invalid. Request a new one below.",
+      "authNoticeMagicLinkExpiredTitle": "Magic link expired",
+      "authNoticeMagicLinkExpiredDescription": "This sign-in link has expired. Request a fresh magic link below.",
+      "authNoticeGrantRequiredTitle": "Credential grant required",
+      "authNoticeGrantRequiredDescription": "Your session is valid, but no active credential-access grant is available for this account."
     }
   },
   "PartnerInvitation": {
@@ -1032,6 +1079,94 @@
       "customer": "Klant",
       "experienceProvider": "Ervaringsaanbieder",
       "teamMember": "Teamlid"
+    }
+  },
+  "CredentialPortal": {
+    "headerKicker": "Agency credential access",
+    "sharedKicker": "Secure shared credentials",
+    "headerTitle": "Professional credentials",
+    "accessRecipient": "Access recipient:",
+    "accessExpires": "Access expires:",
+    "sharedWith": "Shared with:",
+    "grantExpires": "Grant expires:",
+    "shareExpires": "Share expires:",
+    "filters": {
+      "search": "Search by title or issuer",
+      "documentType": "Document type",
+      "category": "Category",
+      "validity": "Validity status",
+      "verification": "Verification status",
+      "recordState": "Record state",
+      "current": "Current",
+      "historical": "Historical",
+      "all": "All",
+      "apply": "Apply filters"
+    },
+    "empty": {
+      "title": "No credentials granted",
+      "description": "There are currently no credentials assigned to this access grant.",
+      "filteredTitle": "No credentials match these filters",
+      "filteredDescription": "Adjust your filters to view additional credentials."
+    },
+    "emptyShared": {
+      "title": "No credentials available",
+      "description": "This share currently has no available credentials."
+    },
+    "sharedUnavailable": {
+      "kicker": "Secure link",
+      "title": "This credential share is unavailable",
+      "description": "The link may be expired, revoked or invalid. Request a fresh invitation from Kevin or an authorized administrator."
+    },
+    "card": {
+      "issuer": "Issuer",
+      "expires": "Expires",
+      "verification": "Verification",
+      "validity": "Validity",
+      "noExpiry": "Does not expire"
+    },
+    "detail": {
+      "backToCredentials": "Back to credentials",
+      "backToSharedCredentials": "Back to shared credentials",
+      "issuingAuthority": "Issuing authority",
+      "country": "Country",
+      "issued": "Issued",
+      "expires": "Expires",
+      "status": "Status",
+      "verification": "Verification",
+      "documentNumber": "Document number",
+      "files": "Files",
+      "noFiles": "No files are available for this credential.",
+      "openFile": "Open file",
+      "downloadFile": "Download file"
+    },
+    "labels": {
+      "verificationStatus": {
+        "verified": "Verified",
+        "pending": "Pending",
+        "rejected": "Rejected",
+        "unverified": "Unverified"
+      },
+      "computedStatus": {
+        "valid": "Valid",
+        "validityUnknown": "Validity unknown",
+        "expiresWithin180Days": "Expires within 180 days",
+        "expiresWithin90Days": "Expires within 90 days",
+        "expiresWithin60Days": "Expires within 60 days",
+        "expiresWithin30Days": "Expires within 30 days",
+        "expired": "Expired"
+      },
+      "recordStatus": {
+        "active": "Active",
+        "replaced": "Replaced"
+      },
+      "fileRole": {
+        "primary": "Primary",
+        "front": "Front",
+        "back": "Back",
+        "translation": "Translation",
+        "attachment": "Attachment",
+        "supportingEvidence": "Supporting evidence"
+      }
     }
   }
 }

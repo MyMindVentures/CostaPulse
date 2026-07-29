@@ -74,6 +74,7 @@ Credential-sharing surfaces are split between authenticated and tokenized routes
 Rules for these surfaces:
 
 - Route guards and repository contracts must enforce access before rendering sensitive data.
+- Credential enums and tokenized values (document type, verification, computed status, record status and file roles) must be rendered through the shared formatter module (`src/features/credentials/labels.ts`) with translation keys under `CredentialPortal.labels`, never as raw snake_case tokens in UI copy.
 - File links in the UI must resolve through secure API handlers that issue short-lived signed URLs only after backend permission checks.
 - Shared token pages are non-indexable and are not added to sitemap output.
 - Admin grant/share management is exposed in the role-aware admin area under `/admin/documents/shares` and uses server actions backed by validated RPC contracts.

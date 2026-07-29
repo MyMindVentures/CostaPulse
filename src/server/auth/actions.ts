@@ -8,6 +8,31 @@ export type SignInResult =
   | { ok: true; redirectTo: string }
   | { ok: false; message: string };
 
+export type RequestPortalMagicLinkResult =
+  | { ok: true; message: string }
+  | { ok: false; message: string };
+
+const PORTAL_MAGIC_LINK_REDIRECT_PATH =
+  "/auth/callback?next=/portal/credentials";
+
+function buildPortalMagicLinkRedirectUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (configured) {
+    try {
+      const origin = new URL(configured).origin;
+      return `${origin}${PORTAL_MAGIC_LINK_REDIRECT_PATH}`;
+    } catch {
+      // Fall through to localhost fallback.
+    }
+  }
+
+  return `http://localhost:3000${PORTAL_MAGIC_LINK_REDIRECT_PATH}`;
+}
+
+function isPlausibleEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 export async function signInWithPasswordAction(input: {
   email: string;
   password: string;
@@ -48,4 +73,40 @@ export async function signOutAction(): Promise<void> {
     await supabase.auth.signOut();
   }
   redirect("/");
+}
+
+export async function requestPortalMagicLinkAction(input: {
+  email: string;
+}): Promise<RequestPortalMagicLinkResult> {
+  const email = input.email.trim().toLowerCase();
+  if (!isPlausibleEmail(email)) {
+    return { ok: false, message: "Enter a valid email address." };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) {
+    return { ok: false, message: "Authentication is not configured." };
+  }
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      shouldCreateUser: true,
+      emailRedirectTo: buildPortalMagicLinkRedirectUrl()
+    }
+  });
+
+  if (error) {
+    return {
+      ok: true,
+      message:
+        "If this address is eligible for access, a fresh magic link has been sent."
+    };
+  }
+
+  return {
+    ok: true,
+    message:
+      "If this address is eligible for access, a fresh magic link has been sent."
+  };
 }
