@@ -21,6 +21,7 @@ describe("dashboard navigation", () => {
       "/admin",
       "/admin/experiences",
       "/admin/media",
+      "/admin/documents",
       "/admin/documents/shares",
       "/admin/partners",
       "/admin/locations",
@@ -97,9 +98,9 @@ describe("account nav", () => {
 describe("getAdminDashboardNavItems", () => {
   it("filters admin nav by allowed sections", () => {
     expect(
-      getAdminDashboardNavItems(["overview", "calendar"]).map(
+      getAdminDashboardNavItems(["overview", "documents", "calendar"]).map(
         (item) => item.href
       )
-    ).toEqual(["/admin", "/admin/calendar"]);
+    ).toEqual(["/admin", "/admin/documents", "/admin/calendar"]);
   });
 });

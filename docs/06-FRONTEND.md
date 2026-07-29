@@ -68,6 +68,8 @@ Credential-sharing surfaces are split between authenticated and tokenized routes
 - Authenticated portal routes: `/portal/credentials` and `/portal/credentials/[documentId]`
 - Shared token routes: `/shared/credentials/[token]` and `/shared/credentials/[token]/[documentId]`
 - Secure file-link handlers: `/api/credentials/files/[fileId]` and `/api/shared/credentials/[token]/files/[fileId]`
+- Admin owner-management routes: `/admin/documents`, `/admin/documents/new`, `/admin/documents/[documentId]`, and `/admin/documents/[documentId]/edit`
+- Admin secure file-link handler: `/api/admin/documents/files/[fileId]`
 
 Rules for these surfaces:
 
@@ -75,6 +77,11 @@ Rules for these surfaces:
 - File links in the UI must resolve through secure API handlers that issue short-lived signed URLs only after backend permission checks.
 - Shared token pages are non-indexable and are not added to sitemap output.
 - Admin grant/share management is exposed in the role-aware admin area under `/admin/documents/shares` and uses server actions backed by validated RPC contracts.
+- Admin document editing, verification-state updates and file replacement must execute through server actions that revalidate both overview and detail routes after mutation.
+- Renewal uses the existing `/admin/documents/new` route with a source document context; the server action links the new document through `replaces_document_id` and marks the previous document status as `replaced` after a successful replacement upload flow.
+- Admin document overview supports URL-driven search, filtering and sorting (search by title, issuing authority and masked number; filters for type, category, computed status, verification, confidentiality and expiry; sort by expiry or updated date).
+- Admin document create/edit forms capture extended metadata (`issuing_country_code`, `qualification`, `stcw_code`, `restrictions`, `notes`, and optional `team_member_certificate_id`) through validated server actions.
+- Verification state mutation controls are shown only to roles allowed to mutate operational content, and server actions enforce the same authorization before applying status changes.
 
 ### Admin platform
 

@@ -1174,6 +1174,302 @@ export type Database = {
           }
         ];
       };
+      credential_access_events: {
+        Row: {
+          actor_profile_id: string | null;
+          created_at: string;
+          document_file_id: string | null;
+          document_id: string | null;
+          event_type: string;
+          grant_id: string | null;
+          id: string;
+          metadata: Json;
+          share_link_id: string | null;
+        };
+        Insert: {
+          actor_profile_id?: string | null;
+          created_at?: string;
+          document_file_id?: string | null;
+          document_id?: string | null;
+          event_type: string;
+          grant_id?: string | null;
+          id?: string;
+          metadata?: Json;
+          share_link_id?: string | null;
+        };
+        Update: {
+          actor_profile_id?: string | null;
+          created_at?: string;
+          document_file_id?: string | null;
+          document_id?: string | null;
+          event_type?: string;
+          grant_id?: string | null;
+          id?: string;
+          metadata?: Json;
+          share_link_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "credential_access_events_actor_profile_id_fkey";
+            columns: ["actor_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "credential_access_events_document_file_id_fkey";
+            columns: ["document_file_id"];
+            isOneToOne: false;
+            referencedRelation: "professional_document_files";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "credential_access_events_document_id_fkey";
+            columns: ["document_id"];
+            isOneToOne: false;
+            referencedRelation: "professional_documents";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "credential_access_events_document_id_fkey";
+            columns: ["document_id"];
+            isOneToOne: false;
+            referencedRelation: "professional_documents_admin";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "credential_access_events_grant_id_fkey";
+            columns: ["grant_id"];
+            isOneToOne: false;
+            referencedRelation: "credential_access_grants";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "credential_access_events_share_link_id_fkey";
+            columns: ["share_link_id"];
+            isOneToOne: false;
+            referencedRelation: "credential_share_links";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      credential_access_grant_documents: {
+        Row: {
+          created_at: string;
+          document_id: string;
+          file_roles: string[];
+          grant_id: string;
+          include_document_number: boolean;
+          include_history: boolean;
+        };
+        Insert: {
+          created_at?: string;
+          document_id: string;
+          file_roles?: string[];
+          grant_id: string;
+          include_document_number?: boolean;
+          include_history?: boolean;
+        };
+        Update: {
+          created_at?: string;
+          document_id?: string;
+          file_roles?: string[];
+          grant_id?: string;
+          include_document_number?: boolean;
+          include_history?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "credential_access_grant_documents_document_id_fkey";
+            columns: ["document_id"];
+            isOneToOne: false;
+            referencedRelation: "professional_documents";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "credential_access_grant_documents_document_id_fkey";
+            columns: ["document_id"];
+            isOneToOne: false;
+            referencedRelation: "professional_documents_admin";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "credential_access_grant_documents_grant_id_fkey";
+            columns: ["grant_id"];
+            isOneToOne: false;
+            referencedRelation: "credential_access_grants";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      credential_access_grants: {
+        Row: {
+          access_expires_at: string | null;
+          created_at: string;
+          created_by_profile_id: string;
+          id: string;
+          last_login_at: string | null;
+          last_magic_link_sent_at: string | null;
+          message: string | null;
+          owner_profile_id: string;
+          permission_download_files: boolean;
+          permission_include_document_number: boolean;
+          permission_include_history: boolean;
+          permission_view_files: boolean;
+          recipient_agency_label: string | null;
+          recipient_email: string;
+          recipient_profile_id: string | null;
+          revoked_at: string | null;
+          revoked_by_profile_id: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          access_expires_at?: string | null;
+          created_at?: string;
+          created_by_profile_id?: string;
+          id?: string;
+          last_login_at?: string | null;
+          last_magic_link_sent_at?: string | null;
+          message?: string | null;
+          owner_profile_id: string;
+          permission_download_files?: boolean;
+          permission_include_document_number?: boolean;
+          permission_include_history?: boolean;
+          permission_view_files?: boolean;
+          recipient_agency_label?: string | null;
+          recipient_email: string;
+          recipient_profile_id?: string | null;
+          revoked_at?: string | null;
+          revoked_by_profile_id?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          access_expires_at?: string | null;
+          created_at?: string;
+          created_by_profile_id?: string;
+          id?: string;
+          last_login_at?: string | null;
+          last_magic_link_sent_at?: string | null;
+          message?: string | null;
+          owner_profile_id?: string;
+          permission_download_files?: boolean;
+          permission_include_document_number?: boolean;
+          permission_include_history?: boolean;
+          permission_view_files?: boolean;
+          recipient_agency_label?: string | null;
+          recipient_email?: string;
+          recipient_profile_id?: string | null;
+          revoked_at?: string | null;
+          revoked_by_profile_id?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "credential_access_grants_created_by_profile_id_fkey";
+            columns: ["created_by_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "credential_access_grants_owner_profile_id_fkey";
+            columns: ["owner_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "credential_access_grants_recipient_profile_id_fkey";
+            columns: ["recipient_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "credential_access_grants_revoked_by_profile_id_fkey";
+            columns: ["revoked_by_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      credential_share_links: {
+        Row: {
+          created_at: string;
+          created_by_profile_id: string;
+          download_count: number;
+          expires_at: string;
+          grant_id: string;
+          id: string;
+          max_downloads: number | null;
+          max_views: number | null;
+          recipient_agency_label: string | null;
+          recipient_email: string | null;
+          revoked_at: string | null;
+          revoked_by_profile_id: string | null;
+          token_hash: string;
+          updated_at: string;
+          view_count: number;
+        };
+        Insert: {
+          created_at?: string;
+          created_by_profile_id?: string;
+          download_count?: number;
+          expires_at: string;
+          grant_id: string;
+          id?: string;
+          max_downloads?: number | null;
+          max_views?: number | null;
+          recipient_agency_label?: string | null;
+          recipient_email?: string | null;
+          revoked_at?: string | null;
+          revoked_by_profile_id?: string | null;
+          token_hash: string;
+          updated_at?: string;
+          view_count?: number;
+        };
+        Update: {
+          created_at?: string;
+          created_by_profile_id?: string;
+          download_count?: number;
+          expires_at?: string;
+          grant_id?: string;
+          id?: string;
+          max_downloads?: number | null;
+          max_views?: number | null;
+          recipient_agency_label?: string | null;
+          recipient_email?: string | null;
+          revoked_at?: string | null;
+          revoked_by_profile_id?: string | null;
+          token_hash?: string;
+          updated_at?: string;
+          view_count?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "credential_share_links_created_by_profile_id_fkey";
+            columns: ["created_by_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "credential_share_links_grant_id_fkey";
+            columns: ["grant_id"];
+            isOneToOne: false;
+            referencedRelation: "credential_access_grants";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "credential_share_links_revoked_by_profile_id_fkey";
+            columns: ["revoked_by_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       customer_referral_sessions: {
         Row: {
           created_at: string;
@@ -2531,6 +2827,533 @@ export type Database = {
           }
         ];
       };
+      mission_statement_translations: {
+        Row: {
+          created_at: string;
+          id: string;
+          locale: string;
+          mission_statement_id: string;
+          principles: Json;
+          statement: string;
+          supporting_statement: string | null;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          locale: string;
+          mission_statement_id: string;
+          principles?: Json;
+          statement: string;
+          supporting_statement?: string | null;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          locale?: string;
+          mission_statement_id?: string;
+          principles?: Json;
+          statement?: string;
+          supporting_statement?: string | null;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "mission_statement_translations_mission_statement_id_fkey";
+            columns: ["mission_statement_id"];
+            isOneToOne: false;
+            referencedRelation: "mission_statements";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      mission_statements: {
+        Row: {
+          created_at: string;
+          id: string;
+          is_primary: boolean;
+          principles: Json;
+          slug: string;
+          statement: string;
+          status: string;
+          supporting_statement: string | null;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          is_primary?: boolean;
+          principles?: Json;
+          slug: string;
+          statement: string;
+          status?: string;
+          supporting_statement?: string | null;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          is_primary?: boolean;
+          principles?: Json;
+          slug?: string;
+          statement?: string;
+          status?: string;
+          supporting_statement?: string | null;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      partner_financial_profiles: {
+        Row: {
+          account_holder: string;
+          bank_name: string | null;
+          bic_swift: string | null;
+          billing_address_line_1: string | null;
+          billing_address_line_2: string | null;
+          billing_city: string | null;
+          billing_country_code: string | null;
+          billing_email: string | null;
+          billing_phone: string | null;
+          billing_postal_code: string | null;
+          billing_province: string | null;
+          created_at: string;
+          iban: string;
+          is_verified: boolean;
+          legal_company_name: string;
+          notes: string | null;
+          partner_id: string;
+          payment_reference_prefix: string | null;
+          payment_terms_days: number;
+          preferred_currency: string;
+          tax_id: string | null;
+          updated_at: string;
+          vat_number: string | null;
+          verified_at: string | null;
+          verified_by: string | null;
+        };
+        Insert: {
+          account_holder: string;
+          bank_name?: string | null;
+          bic_swift?: string | null;
+          billing_address_line_1?: string | null;
+          billing_address_line_2?: string | null;
+          billing_city?: string | null;
+          billing_country_code?: string | null;
+          billing_email?: string | null;
+          billing_phone?: string | null;
+          billing_postal_code?: string | null;
+          billing_province?: string | null;
+          created_at?: string;
+          iban: string;
+          is_verified?: boolean;
+          legal_company_name: string;
+          notes?: string | null;
+          partner_id: string;
+          payment_reference_prefix?: string | null;
+          payment_terms_days?: number;
+          preferred_currency?: string;
+          tax_id?: string | null;
+          updated_at?: string;
+          vat_number?: string | null;
+          verified_at?: string | null;
+          verified_by?: string | null;
+        };
+        Update: {
+          account_holder?: string;
+          bank_name?: string | null;
+          bic_swift?: string | null;
+          billing_address_line_1?: string | null;
+          billing_address_line_2?: string | null;
+          billing_city?: string | null;
+          billing_country_code?: string | null;
+          billing_email?: string | null;
+          billing_phone?: string | null;
+          billing_postal_code?: string | null;
+          billing_province?: string | null;
+          created_at?: string;
+          iban?: string;
+          is_verified?: boolean;
+          legal_company_name?: string;
+          notes?: string | null;
+          partner_id?: string;
+          payment_reference_prefix?: string | null;
+          payment_terms_days?: number;
+          preferred_currency?: string;
+          tax_id?: string | null;
+          updated_at?: string;
+          vat_number?: string | null;
+          verified_at?: string | null;
+          verified_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "partner_financial_profiles_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: true;
+            referencedRelation: "admin_partner_performance";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_financial_profiles_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: true;
+            referencedRelation: "partners";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_financial_profiles_verified_by_fkey";
+            columns: ["verified_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      partner_outreach: {
+        Row: {
+          assigned_to: string | null;
+          channel: Database["public"]["Enums"]["partner_outreach_channel"];
+          contact_email: string | null;
+          contact_name: string | null;
+          contact_phone: string | null;
+          contact_role: string | null;
+          contacted_at: string | null;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          is_public_presentation: boolean;
+          message_summary: string | null;
+          next_follow_up_at: string | null;
+          notes: string | null;
+          outcome: string | null;
+          partner_id: string;
+          status: Database["public"]["Enums"]["partner_outreach_status"];
+          subject: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          assigned_to?: string | null;
+          channel?: Database["public"]["Enums"]["partner_outreach_channel"];
+          contact_email?: string | null;
+          contact_name?: string | null;
+          contact_phone?: string | null;
+          contact_role?: string | null;
+          contacted_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          is_public_presentation?: boolean;
+          message_summary?: string | null;
+          next_follow_up_at?: string | null;
+          notes?: string | null;
+          outcome?: string | null;
+          partner_id: string;
+          status?: Database["public"]["Enums"]["partner_outreach_status"];
+          subject?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          assigned_to?: string | null;
+          channel?: Database["public"]["Enums"]["partner_outreach_channel"];
+          contact_email?: string | null;
+          contact_name?: string | null;
+          contact_phone?: string | null;
+          contact_role?: string | null;
+          contacted_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          is_public_presentation?: boolean;
+          message_summary?: string | null;
+          next_follow_up_at?: string | null;
+          notes?: string | null;
+          outcome?: string | null;
+          partner_id?: string;
+          status?: Database["public"]["Enums"]["partner_outreach_status"];
+          subject?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "partner_outreach_assigned_to_fkey";
+            columns: ["assigned_to"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_outreach_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_outreach_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_partner_performance";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_outreach_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: false;
+            referencedRelation: "partners";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      partner_outreach_translations: {
+        Row: {
+          created_at: string;
+          id: string;
+          invitation_body: string;
+          locale: string;
+          outreach_id: string;
+          subject: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          invitation_body: string;
+          locale: string;
+          outreach_id: string;
+          subject: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          invitation_body?: string;
+          locale?: string;
+          outreach_id?: string;
+          subject?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "partner_outreach_translations_outreach_id_fkey";
+            columns: ["outreach_id"];
+            isOneToOne: false;
+            referencedRelation: "partner_outreach";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      partner_payout_items: {
+        Row: {
+          approved_at: string | null;
+          booking_id: string;
+          created_at: string;
+          currency: string;
+          id: string;
+          paid_at: string | null;
+          partner_id: string;
+          payout_id: string | null;
+          qualifying_amount_minor: number;
+          status: Database["public"]["Enums"]["partner_payout_item_status"];
+          updated_at: string;
+          voucher_amount_minor: number;
+          voucher_id: string;
+        };
+        Insert: {
+          approved_at?: string | null;
+          booking_id: string;
+          created_at?: string;
+          currency: string;
+          id?: string;
+          paid_at?: string | null;
+          partner_id: string;
+          payout_id?: string | null;
+          qualifying_amount_minor: number;
+          status?: Database["public"]["Enums"]["partner_payout_item_status"];
+          updated_at?: string;
+          voucher_amount_minor: number;
+          voucher_id: string;
+        };
+        Update: {
+          approved_at?: string | null;
+          booking_id?: string;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          paid_at?: string | null;
+          partner_id?: string;
+          payout_id?: string | null;
+          qualifying_amount_minor?: number;
+          status?: Database["public"]["Enums"]["partner_payout_item_status"];
+          updated_at?: string;
+          voucher_amount_minor?: number;
+          voucher_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "partner_payout_items_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_booking_queue";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_payout_items_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: false;
+            referencedRelation: "booking_detail";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_payout_items_booking_id_fkey";
+            columns: ["booking_id"];
+            isOneToOne: false;
+            referencedRelation: "bookings";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_payout_items_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_partner_performance";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_payout_items_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: false;
+            referencedRelation: "partners";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_payout_items_payout_id_fkey";
+            columns: ["payout_id"];
+            isOneToOne: false;
+            referencedRelation: "partner_payouts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_payout_items_voucher_id_fkey";
+            columns: ["voucher_id"];
+            isOneToOne: true;
+            referencedRelation: "vouchers";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      partner_payouts: {
+        Row: {
+          account_holder_snapshot: string;
+          adjustment_amount_minor: number;
+          approved_at: string | null;
+          approved_by: string | null;
+          bank_name_snapshot: string | null;
+          bic_swift_snapshot: string | null;
+          created_at: string;
+          currency: string;
+          external_payment_id: string | null;
+          gross_voucher_amount_minor: number;
+          iban_snapshot: string;
+          id: string;
+          net_amount_minor: number | null;
+          notes: string | null;
+          paid_at: string | null;
+          paid_by: string | null;
+          partner_id: string;
+          payment_method: string;
+          payment_reference: string | null;
+          period_end: string;
+          period_start: string;
+          status: Database["public"]["Enums"]["partner_payout_status"];
+          updated_at: string;
+        };
+        Insert: {
+          account_holder_snapshot: string;
+          adjustment_amount_minor?: number;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          bank_name_snapshot?: string | null;
+          bic_swift_snapshot?: string | null;
+          created_at?: string;
+          currency?: string;
+          external_payment_id?: string | null;
+          gross_voucher_amount_minor?: number;
+          iban_snapshot: string;
+          id?: string;
+          net_amount_minor?: number | null;
+          notes?: string | null;
+          paid_at?: string | null;
+          paid_by?: string | null;
+          partner_id: string;
+          payment_method?: string;
+          payment_reference?: string | null;
+          period_end: string;
+          period_start: string;
+          status?: Database["public"]["Enums"]["partner_payout_status"];
+          updated_at?: string;
+        };
+        Update: {
+          account_holder_snapshot?: string;
+          adjustment_amount_minor?: number;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          bank_name_snapshot?: string | null;
+          bic_swift_snapshot?: string | null;
+          created_at?: string;
+          currency?: string;
+          external_payment_id?: string | null;
+          gross_voucher_amount_minor?: number;
+          iban_snapshot?: string;
+          id?: string;
+          net_amount_minor?: number | null;
+          notes?: string | null;
+          paid_at?: string | null;
+          paid_by?: string | null;
+          partner_id?: string;
+          payment_method?: string;
+          payment_reference?: string | null;
+          period_end?: string;
+          period_start?: string;
+          status?: Database["public"]["Enums"]["partner_payout_status"];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "partner_payouts_approved_by_fkey";
+            columns: ["approved_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_payouts_paid_by_fkey";
+            columns: ["paid_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_payouts_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_partner_performance";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_payouts_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: false;
+            referencedRelation: "partners";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       partner_promo_content: {
         Row: {
           content: Json;
@@ -2707,16 +3530,58 @@ export type Database = {
           }
         ];
       };
+      partner_translations: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          id: string;
+          locale: string;
+          name: string | null;
+          partner_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          locale: string;
+          name?: string | null;
+          partner_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          locale?: string;
+          name?: string | null;
+          partner_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "partner_translations_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_partner_performance";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "partner_translations_partner_id_fkey";
+            columns: ["partner_id"];
+            isOneToOne: false;
+            referencedRelation: "partners";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       partners: {
         Row: {
-          address_line_1: string | null;
-          address_line_2: string | null;
           attribution_window_hours: number;
           business_type: string | null;
-          city: string | null;
           contact_name: string | null;
-          country_code: string | null;
           created_at: string;
+          description: string | null;
           email: string | null;
           id: string;
           is_featured: boolean;
@@ -2724,8 +3589,6 @@ export type Database = {
           name: string;
           owner_profile_id: string | null;
           phone: string | null;
-          postal_code: string | null;
-          province: string | null;
           published_at: string;
           referral_code: string;
           slug: string;
@@ -2735,14 +3598,11 @@ export type Database = {
           website_url: string | null;
         };
         Insert: {
-          address_line_1?: string | null;
-          address_line_2?: string | null;
           attribution_window_hours?: number;
           business_type?: string | null;
-          city?: string | null;
           contact_name?: string | null;
-          country_code?: string | null;
           created_at?: string;
+          description?: string | null;
           email?: string | null;
           id?: string;
           is_featured?: boolean;
@@ -2750,8 +3610,6 @@ export type Database = {
           name: string;
           owner_profile_id?: string | null;
           phone?: string | null;
-          postal_code?: string | null;
-          province?: string | null;
           published_at?: string;
           referral_code?: string;
           slug: string;
@@ -2761,14 +3619,11 @@ export type Database = {
           website_url?: string | null;
         };
         Update: {
-          address_line_1?: string | null;
-          address_line_2?: string | null;
           attribution_window_hours?: number;
           business_type?: string | null;
-          city?: string | null;
           contact_name?: string | null;
-          country_code?: string | null;
           created_at?: string;
+          description?: string | null;
           email?: string | null;
           id?: string;
           is_featured?: boolean;
@@ -2776,8 +3631,6 @@ export type Database = {
           name?: string;
           owner_profile_id?: string | null;
           phone?: string | null;
-          postal_code?: string | null;
-          province?: string | null;
           published_at?: string;
           referral_code?: string;
           slug?: string;
@@ -2787,6 +3640,13 @@ export type Database = {
           website_url?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "partners_location_id_fkey";
+            columns: ["location_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_map_catalog";
+            referencedColumns: ["location_id"];
+          },
           {
             foreignKeyName: "partners_location_id_fkey";
             columns: ["location_id"];
@@ -2851,6 +3711,365 @@ export type Database = {
             columns: ["booking_id"];
             isOneToOne: false;
             referencedRelation: "bookings";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      professional_document_files: {
+        Row: {
+          checksum_sha256: string | null;
+          created_at: string;
+          document_id: string;
+          file_role: string;
+          file_size_bytes: number;
+          id: string;
+          is_current: boolean;
+          mime_type: string;
+          original_filename: string;
+          sort_order: number;
+          storage_bucket: string;
+          storage_path: string;
+          stored_filename: string;
+          updated_at: string;
+          uploaded_by_profile_id: string;
+          version_number: number;
+        };
+        Insert: {
+          checksum_sha256?: string | null;
+          created_at?: string;
+          document_id: string;
+          file_role?: string;
+          file_size_bytes: number;
+          id?: string;
+          is_current?: boolean;
+          mime_type: string;
+          original_filename: string;
+          sort_order?: number;
+          storage_bucket?: string;
+          storage_path: string;
+          stored_filename: string;
+          updated_at?: string;
+          uploaded_by_profile_id?: string;
+          version_number?: number;
+        };
+        Update: {
+          checksum_sha256?: string | null;
+          created_at?: string;
+          document_id?: string;
+          file_role?: string;
+          file_size_bytes?: number;
+          id?: string;
+          is_current?: boolean;
+          mime_type?: string;
+          original_filename?: string;
+          sort_order?: number;
+          storage_bucket?: string;
+          storage_path?: string;
+          stored_filename?: string;
+          updated_at?: string;
+          uploaded_by_profile_id?: string;
+          version_number?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "professional_document_files_document_id_fkey";
+            columns: ["document_id"];
+            isOneToOne: false;
+            referencedRelation: "professional_documents";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "professional_document_files_document_id_fkey";
+            columns: ["document_id"];
+            isOneToOne: false;
+            referencedRelation: "professional_documents_admin";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "professional_document_files_uploaded_by_profile_id_fkey";
+            columns: ["uploaded_by_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      professional_documents: {
+        Row: {
+          category: string;
+          confidentiality_level: string;
+          created_at: string;
+          document_number: string | null;
+          document_type: string;
+          does_not_expire: boolean;
+          expires_on: string | null;
+          id: string;
+          issued_on: string | null;
+          issuing_authority: string | null;
+          issuing_country_code: string | null;
+          metadata: Json;
+          notes: string | null;
+          profile_id: string;
+          qualification: string | null;
+          replaces_document_id: string | null;
+          restrictions: string | null;
+          status: string;
+          stcw_code: string | null;
+          team_member_certificate_id: string | null;
+          title: string;
+          updated_at: string;
+          uploaded_by_profile_id: string;
+          valid_from: string | null;
+          verification_status: string;
+          verified_at: string | null;
+          verified_by_profile_id: string | null;
+        };
+        Insert: {
+          category: string;
+          confidentiality_level?: string;
+          created_at?: string;
+          document_number?: string | null;
+          document_type: string;
+          does_not_expire?: boolean;
+          expires_on?: string | null;
+          id?: string;
+          issued_on?: string | null;
+          issuing_authority?: string | null;
+          issuing_country_code?: string | null;
+          metadata?: Json;
+          notes?: string | null;
+          profile_id: string;
+          qualification?: string | null;
+          replaces_document_id?: string | null;
+          restrictions?: string | null;
+          status?: string;
+          stcw_code?: string | null;
+          team_member_certificate_id?: string | null;
+          title: string;
+          updated_at?: string;
+          uploaded_by_profile_id?: string;
+          valid_from?: string | null;
+          verification_status?: string;
+          verified_at?: string | null;
+          verified_by_profile_id?: string | null;
+        };
+        Update: {
+          category?: string;
+          confidentiality_level?: string;
+          created_at?: string;
+          document_number?: string | null;
+          document_type?: string;
+          does_not_expire?: boolean;
+          expires_on?: string | null;
+          id?: string;
+          issued_on?: string | null;
+          issuing_authority?: string | null;
+          issuing_country_code?: string | null;
+          metadata?: Json;
+          notes?: string | null;
+          profile_id?: string;
+          qualification?: string | null;
+          replaces_document_id?: string | null;
+          restrictions?: string | null;
+          status?: string;
+          stcw_code?: string | null;
+          team_member_certificate_id?: string | null;
+          title?: string;
+          updated_at?: string;
+          uploaded_by_profile_id?: string;
+          valid_from?: string | null;
+          verification_status?: string;
+          verified_at?: string | null;
+          verified_by_profile_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "professional_documents_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "professional_documents_replaces_document_id_fkey";
+            columns: ["replaces_document_id"];
+            isOneToOne: false;
+            referencedRelation: "professional_documents";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "professional_documents_replaces_document_id_fkey";
+            columns: ["replaces_document_id"];
+            isOneToOne: false;
+            referencedRelation: "professional_documents_admin";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "professional_documents_team_member_certificate_id_fkey";
+            columns: ["team_member_certificate_id"];
+            isOneToOne: false;
+            referencedRelation: "team_member_certificates";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "professional_documents_uploaded_by_profile_id_fkey";
+            columns: ["uploaded_by_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "professional_documents_verified_by_profile_id_fkey";
+            columns: ["verified_by_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      professional_services: {
+        Row: {
+          accommodation_required: boolean;
+          audience: string[];
+          created_at: string;
+          currency_code: string;
+          day_rate_from_minor: number | null;
+          deliverables: Json;
+          description: string | null;
+          direct_booking_enabled: boolean;
+          engagement_units: string[];
+          geographic_scope: string;
+          id: string;
+          inquiry_required: boolean;
+          languages: string[];
+          lead_time_days: number;
+          metadata: Json;
+          minimum_engagement_unit: string | null;
+          minimum_engagement_value: number | null;
+          owner_profile_id: string | null;
+          price_from_minor: number | null;
+          pricing_model: string;
+          provider_profile_id: string | null;
+          published_at: string | null;
+          qualifications: string[];
+          regions: string[];
+          requirements: Json;
+          seo_description: string | null;
+          seo_title: string | null;
+          service_category: string;
+          service_features: Json;
+          service_key: string;
+          short_title: string | null;
+          slug: string;
+          sort_order: number;
+          status: Database["public"]["Enums"]["publication_status"];
+          summary: string;
+          title: string;
+          travel_costs_included: boolean;
+          travel_required: boolean;
+          updated_at: string;
+          vessel_types: string[];
+          week_rate_from_minor: number | null;
+        };
+        Insert: {
+          accommodation_required?: boolean;
+          audience?: string[];
+          created_at?: string;
+          currency_code?: string;
+          day_rate_from_minor?: number | null;
+          deliverables?: Json;
+          description?: string | null;
+          direct_booking_enabled?: boolean;
+          engagement_units?: string[];
+          geographic_scope?: string;
+          id?: string;
+          inquiry_required?: boolean;
+          languages?: string[];
+          lead_time_days?: number;
+          metadata?: Json;
+          minimum_engagement_unit?: string | null;
+          minimum_engagement_value?: number | null;
+          owner_profile_id?: string | null;
+          price_from_minor?: number | null;
+          pricing_model?: string;
+          provider_profile_id?: string | null;
+          published_at?: string | null;
+          qualifications?: string[];
+          regions?: string[];
+          requirements?: Json;
+          seo_description?: string | null;
+          seo_title?: string | null;
+          service_category: string;
+          service_features?: Json;
+          service_key: string;
+          short_title?: string | null;
+          slug: string;
+          sort_order?: number;
+          status?: Database["public"]["Enums"]["publication_status"];
+          summary: string;
+          title: string;
+          travel_costs_included?: boolean;
+          travel_required?: boolean;
+          updated_at?: string;
+          vessel_types?: string[];
+          week_rate_from_minor?: number | null;
+        };
+        Update: {
+          accommodation_required?: boolean;
+          audience?: string[];
+          created_at?: string;
+          currency_code?: string;
+          day_rate_from_minor?: number | null;
+          deliverables?: Json;
+          description?: string | null;
+          direct_booking_enabled?: boolean;
+          engagement_units?: string[];
+          geographic_scope?: string;
+          id?: string;
+          inquiry_required?: boolean;
+          languages?: string[];
+          lead_time_days?: number;
+          metadata?: Json;
+          minimum_engagement_unit?: string | null;
+          minimum_engagement_value?: number | null;
+          owner_profile_id?: string | null;
+          price_from_minor?: number | null;
+          pricing_model?: string;
+          provider_profile_id?: string | null;
+          published_at?: string | null;
+          qualifications?: string[];
+          regions?: string[];
+          requirements?: Json;
+          seo_description?: string | null;
+          seo_title?: string | null;
+          service_category?: string;
+          service_features?: Json;
+          service_key?: string;
+          short_title?: string | null;
+          slug?: string;
+          sort_order?: number;
+          status?: Database["public"]["Enums"]["publication_status"];
+          summary?: string;
+          title?: string;
+          travel_costs_included?: boolean;
+          travel_required?: boolean;
+          updated_at?: string;
+          vessel_types?: string[];
+          week_rate_from_minor?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "professional_services_owner_profile_id_fkey";
+            columns: ["owner_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "professional_services_provider_profile_id_fkey";
+            columns: ["provider_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           }
         ];
@@ -3140,80 +4359,197 @@ export type Database = {
           }
         ];
       };
-      mission_statement_translations: {
+      seo_pages: {
         Row: {
+          body_sections: Json;
+          canonical_path: string | null;
           created_at: string;
+          created_by: string | null;
+          cta_label: string | null;
+          cta_path: string | null;
+          excerpt: string | null;
+          experience_id: string | null;
+          faq_items: Json;
+          h1: string;
+          hero_media_asset_id: string | null;
+          id: string;
+          introduction: string | null;
+          is_featured: boolean;
           locale: string;
-          mission_statement_id: string;
-          principles: Json | null;
-          rationale: string | null;
-          statement: string;
-          supporting_statement: string | null;
+          location_id: string | null;
+          meta_description: string;
+          meta_title: string;
+          metadata: Json;
+          page_type: string;
+          parent_page_id: string | null;
+          primary_keyword: string | null;
+          published_at: string | null;
+          robots_follow: boolean;
+          robots_index: boolean;
+          search_intent: string | null;
+          secondary_keywords: string[];
+          slug: string;
+          sort_order: number;
+          status: string;
+          structured_data: Json;
+          target_audience: string[];
           title: string;
           updated_at: string;
+          updated_by: string | null;
         };
         Insert: {
+          body_sections?: Json;
+          canonical_path?: string | null;
           created_at?: string;
-          locale: string;
-          mission_statement_id: string;
-          principles?: Json | null;
-          rationale?: string | null;
-          statement: string;
-          supporting_statement?: string | null;
+          created_by?: string | null;
+          cta_label?: string | null;
+          cta_path?: string | null;
+          excerpt?: string | null;
+          experience_id?: string | null;
+          faq_items?: Json;
+          h1: string;
+          hero_media_asset_id?: string | null;
+          id?: string;
+          introduction?: string | null;
+          is_featured?: boolean;
+          locale?: string;
+          location_id?: string | null;
+          meta_description: string;
+          meta_title: string;
+          metadata?: Json;
+          page_type: string;
+          parent_page_id?: string | null;
+          primary_keyword?: string | null;
+          published_at?: string | null;
+          robots_follow?: boolean;
+          robots_index?: boolean;
+          search_intent?: string | null;
+          secondary_keywords?: string[];
+          slug: string;
+          sort_order?: number;
+          status?: string;
+          structured_data?: Json;
+          target_audience?: string[];
           title: string;
           updated_at?: string;
+          updated_by?: string | null;
         };
         Update: {
+          body_sections?: Json;
+          canonical_path?: string | null;
           created_at?: string;
+          created_by?: string | null;
+          cta_label?: string | null;
+          cta_path?: string | null;
+          excerpt?: string | null;
+          experience_id?: string | null;
+          faq_items?: Json;
+          h1?: string;
+          hero_media_asset_id?: string | null;
+          id?: string;
+          introduction?: string | null;
+          is_featured?: boolean;
           locale?: string;
-          mission_statement_id?: string;
-          principles?: Json | null;
-          rationale?: string | null;
-          statement?: string;
-          supporting_statement?: string | null;
+          location_id?: string | null;
+          meta_description?: string;
+          meta_title?: string;
+          metadata?: Json;
+          page_type?: string;
+          parent_page_id?: string | null;
+          primary_keyword?: string | null;
+          published_at?: string | null;
+          robots_follow?: boolean;
+          robots_index?: boolean;
+          search_intent?: string | null;
+          secondary_keywords?: string[];
+          slug?: string;
+          sort_order?: number;
+          status?: string;
+          structured_data?: Json;
+          target_audience?: string[];
           title?: string;
           updated_at?: string;
+          updated_by?: string | null;
         };
-        Relationships: [];
-      };
-      strategy_translations: {
-        Row: {
-          created_at: string;
-          description: string | null;
-          locale: string;
-          objective: string;
-          simple_workflow_steps: Json;
-          strategy_id: string;
-          summary: string;
-          title: string;
-          updated_at: string;
-          win_win: Json;
-        };
-        Insert: {
-          created_at?: string;
-          description?: string | null;
-          locale: string;
-          objective: string;
-          simple_workflow_steps?: Json;
-          strategy_id: string;
-          summary: string;
-          title: string;
-          updated_at?: string;
-          win_win?: Json;
-        };
-        Update: {
-          created_at?: string;
-          description?: string | null;
-          locale?: string;
-          objective?: string;
-          simple_workflow_steps?: Json;
-          strategy_id?: string;
-          summary?: string;
-          title?: string;
-          updated_at?: string;
-          win_win?: Json;
-        };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "seo_pages_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "seo_pages_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_experience_health";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "seo_pages_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_map_catalog";
+            referencedColumns: ["experience_id"];
+          },
+          {
+            foreignKeyName: "seo_pages_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_review_summaries";
+            referencedColumns: ["experience_id"];
+          },
+          {
+            foreignKeyName: "seo_pages_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experiences";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "seo_pages_hero_media_asset_id_fkey";
+            columns: ["hero_media_asset_id"];
+            isOneToOne: false;
+            referencedRelation: "media_assets";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "seo_pages_hero_media_asset_id_fkey";
+            columns: ["hero_media_asset_id"];
+            isOneToOne: false;
+            referencedRelation: "published_media_assets";
+            referencedColumns: ["media_asset_id"];
+          },
+          {
+            foreignKeyName: "seo_pages_location_id_fkey";
+            columns: ["location_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_map_catalog";
+            referencedColumns: ["location_id"];
+          },
+          {
+            foreignKeyName: "seo_pages_location_id_fkey";
+            columns: ["location_id"];
+            isOneToOne: false;
+            referencedRelation: "locations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "seo_pages_parent_page_id_fkey";
+            columns: ["parent_page_id"];
+            isOneToOne: false;
+            referencedRelation: "seo_pages";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "seo_pages_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       site_content_sections: {
         Row: {
@@ -3314,6 +4650,319 @@ export type Database = {
             columns: ["parent_id"];
             isOneToOne: false;
             referencedRelation: "site_navigation_items";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      strategies: {
+        Row: {
+          action_plan: Json;
+          channels: string[];
+          created_at: string;
+          description: string | null;
+          ends_at: string | null;
+          id: string;
+          metadata: Json;
+          objective: string | null;
+          owner_profile_id: string | null;
+          priority: number;
+          slug: string;
+          sort_order: number;
+          stakeholder_key: string | null;
+          starts_at: string | null;
+          status: string;
+          strategy_type: string;
+          success_metrics: Json;
+          summary: string | null;
+          target_audience: string[];
+          title: string;
+          updated_at: string;
+          user_role: Database["public"]["Enums"]["app_role"] | null;
+          win_win: Json;
+        };
+        Insert: {
+          action_plan?: Json;
+          channels?: string[];
+          created_at?: string;
+          description?: string | null;
+          ends_at?: string | null;
+          id?: string;
+          metadata?: Json;
+          objective?: string | null;
+          owner_profile_id?: string | null;
+          priority?: number;
+          slug: string;
+          sort_order?: number;
+          stakeholder_key?: string | null;
+          starts_at?: string | null;
+          status?: string;
+          strategy_type?: string;
+          success_metrics?: Json;
+          summary?: string | null;
+          target_audience?: string[];
+          title: string;
+          updated_at?: string;
+          user_role?: Database["public"]["Enums"]["app_role"] | null;
+          win_win?: Json;
+        };
+        Update: {
+          action_plan?: Json;
+          channels?: string[];
+          created_at?: string;
+          description?: string | null;
+          ends_at?: string | null;
+          id?: string;
+          metadata?: Json;
+          objective?: string | null;
+          owner_profile_id?: string | null;
+          priority?: number;
+          slug?: string;
+          sort_order?: number;
+          stakeholder_key?: string | null;
+          starts_at?: string | null;
+          status?: string;
+          strategy_type?: string;
+          success_metrics?: Json;
+          summary?: string | null;
+          target_audience?: string[];
+          title?: string;
+          updated_at?: string;
+          user_role?: Database["public"]["Enums"]["app_role"] | null;
+          win_win?: Json;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "strategies_owner_profile_id_fkey";
+            columns: ["owner_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      strategy_mission_statements: {
+        Row: {
+          created_at: string;
+          display_order: number;
+          mission_statement_id: string;
+          rationale: string | null;
+          relationship_type: string;
+          strategy_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          display_order?: number;
+          mission_statement_id: string;
+          rationale?: string | null;
+          relationship_type?: string;
+          strategy_id: string;
+        };
+        Update: {
+          created_at?: string;
+          display_order?: number;
+          mission_statement_id?: string;
+          rationale?: string | null;
+          relationship_type?: string;
+          strategy_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "strategy_mission_statements_mission_statement_id_fkey";
+            columns: ["mission_statement_id"];
+            isOneToOne: false;
+            referencedRelation: "mission_statements";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "strategy_mission_statements_strategy_id_fkey";
+            columns: ["strategy_id"];
+            isOneToOne: false;
+            referencedRelation: "strategies";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      strategy_translations: {
+        Row: {
+          action_plan: Json;
+          channels: Json;
+          created_at: string;
+          description: string | null;
+          id: string;
+          locale: string;
+          objective: string | null;
+          simple_workflow_steps: Json;
+          strategy_id: string;
+          success_metrics: Json;
+          summary: string | null;
+          target_audience: Json;
+          title: string;
+          updated_at: string;
+          win_win: Json;
+        };
+        Insert: {
+          action_plan?: Json;
+          channels?: Json;
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          locale: string;
+          objective?: string | null;
+          simple_workflow_steps?: Json;
+          strategy_id: string;
+          success_metrics?: Json;
+          summary?: string | null;
+          target_audience?: Json;
+          title: string;
+          updated_at?: string;
+          win_win?: Json;
+        };
+        Update: {
+          action_plan?: Json;
+          channels?: Json;
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          locale?: string;
+          objective?: string | null;
+          simple_workflow_steps?: Json;
+          strategy_id?: string;
+          success_metrics?: Json;
+          summary?: string | null;
+          target_audience?: Json;
+          title?: string;
+          updated_at?: string;
+          win_win?: Json;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "strategy_translations_strategy_id_fkey";
+            columns: ["strategy_id"];
+            isOneToOne: false;
+            referencedRelation: "strategies";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      team_member_certificates: {
+        Row: {
+          certificate_number: string | null;
+          certificate_type: string;
+          created_at: string;
+          credential_url: string | null;
+          description: string | null;
+          display_order: number;
+          document_media_asset_id: string | null;
+          does_not_expire: boolean;
+          expires_on: string | null;
+          id: string;
+          is_featured: boolean;
+          is_public: boolean;
+          issued_on: string | null;
+          issuing_organization: string | null;
+          metadata: Json;
+          short_title: string | null;
+          skills: string[];
+          status: string;
+          team_member_id: string;
+          title: string;
+          updated_at: string;
+          valid_from: string | null;
+          verification_status: string;
+          verification_url: string | null;
+          verified_at: string | null;
+          verified_by: string | null;
+        };
+        Insert: {
+          certificate_number?: string | null;
+          certificate_type?: string;
+          created_at?: string;
+          credential_url?: string | null;
+          description?: string | null;
+          display_order?: number;
+          document_media_asset_id?: string | null;
+          does_not_expire?: boolean;
+          expires_on?: string | null;
+          id?: string;
+          is_featured?: boolean;
+          is_public?: boolean;
+          issued_on?: string | null;
+          issuing_organization?: string | null;
+          metadata?: Json;
+          short_title?: string | null;
+          skills?: string[];
+          status?: string;
+          team_member_id: string;
+          title: string;
+          updated_at?: string;
+          valid_from?: string | null;
+          verification_status?: string;
+          verification_url?: string | null;
+          verified_at?: string | null;
+          verified_by?: string | null;
+        };
+        Update: {
+          certificate_number?: string | null;
+          certificate_type?: string;
+          created_at?: string;
+          credential_url?: string | null;
+          description?: string | null;
+          display_order?: number;
+          document_media_asset_id?: string | null;
+          does_not_expire?: boolean;
+          expires_on?: string | null;
+          id?: string;
+          is_featured?: boolean;
+          is_public?: boolean;
+          issued_on?: string | null;
+          issuing_organization?: string | null;
+          metadata?: Json;
+          short_title?: string | null;
+          skills?: string[];
+          status?: string;
+          team_member_id?: string;
+          title?: string;
+          updated_at?: string;
+          valid_from?: string | null;
+          verification_status?: string;
+          verification_url?: string | null;
+          verified_at?: string | null;
+          verified_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "team_member_certificates_document_media_asset_id_fkey";
+            columns: ["document_media_asset_id"];
+            isOneToOne: false;
+            referencedRelation: "media_assets";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "team_member_certificates_document_media_asset_id_fkey";
+            columns: ["document_media_asset_id"];
+            isOneToOne: false;
+            referencedRelation: "published_media_assets";
+            referencedColumns: ["media_asset_id"];
+          },
+          {
+            foreignKeyName: "team_member_certificates_team_member_id_fkey";
+            columns: ["team_member_id"];
+            isOneToOne: false;
+            referencedRelation: "team_member_profile_detail";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "team_member_certificates_team_member_id_fkey";
+            columns: ["team_member_id"];
+            isOneToOne: false;
+            referencedRelation: "team_members";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "team_member_certificates_verified_by_fkey";
+            columns: ["verified_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           }
         ];
@@ -3811,6 +5460,240 @@ export type Database = {
             columns: ["participant_id"];
             isOneToOne: false;
             referencedRelation: "booking_participants";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      yacht_menu_ingredients: {
+        Row: {
+          created_at: string;
+          display_order: number;
+          id: string;
+          ingredient_name: string;
+          is_optional: boolean;
+          menu_id: string;
+          metadata: Json;
+          preparation_notes: string | null;
+          quantity_text: string | null;
+          quantity_value: number | null;
+          section: string | null;
+          storage_method: string | null;
+          unit: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          display_order?: number;
+          id?: string;
+          ingredient_name: string;
+          is_optional?: boolean;
+          menu_id: string;
+          metadata?: Json;
+          preparation_notes?: string | null;
+          quantity_text?: string | null;
+          quantity_value?: number | null;
+          section?: string | null;
+          storage_method?: string | null;
+          unit?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          display_order?: number;
+          id?: string;
+          ingredient_name?: string;
+          is_optional?: boolean;
+          menu_id?: string;
+          metadata?: Json;
+          preparation_notes?: string | null;
+          quantity_text?: string | null;
+          quantity_value?: number | null;
+          section?: string | null;
+          storage_method?: string | null;
+          unit?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "yacht_menu_ingredients_menu_id_fkey";
+            columns: ["menu_id"];
+            isOneToOne: false;
+            referencedRelation: "yacht_menus";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      yacht_menus: {
+        Row: {
+          created_at: string;
+          currency: string;
+          description: string | null;
+          dietary_tags: string[];
+          display_order: number;
+          experience_id: string;
+          id: string;
+          is_featured: boolean;
+          menu_items: Json;
+          metadata: Json;
+          price_amount_minor: number | null;
+          serves_people: number;
+          slug: string;
+          status: Database["public"]["Enums"]["publication_status"];
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          currency?: string;
+          description?: string | null;
+          dietary_tags?: string[];
+          display_order?: number;
+          experience_id: string;
+          id?: string;
+          is_featured?: boolean;
+          menu_items?: Json;
+          metadata?: Json;
+          price_amount_minor?: number | null;
+          serves_people?: number;
+          slug: string;
+          status?: Database["public"]["Enums"]["publication_status"];
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          currency?: string;
+          description?: string | null;
+          dietary_tags?: string[];
+          display_order?: number;
+          experience_id?: string;
+          id?: string;
+          is_featured?: boolean;
+          menu_items?: Json;
+          metadata?: Json;
+          price_amount_minor?: number | null;
+          serves_people?: number;
+          slug?: string;
+          status?: Database["public"]["Enums"]["publication_status"];
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "yacht_menus_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_experience_health";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "yacht_menus_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_map_catalog";
+            referencedColumns: ["experience_id"];
+          },
+          {
+            foreignKeyName: "yacht_menus_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_review_summaries";
+            referencedColumns: ["experience_id"];
+          },
+          {
+            foreignKeyName: "yacht_menus_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experiences";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      yacht_sub_experiences: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          display_order: number;
+          duration_minutes: number | null;
+          experience_id: string;
+          highlights: Json;
+          id: string;
+          ideal_for: string[];
+          is_featured: boolean;
+          metadata: Json;
+          operational_notes: string | null;
+          route_summary: string | null;
+          short_description: string | null;
+          slug: string;
+          status: Database["public"]["Enums"]["publication_status"];
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          display_order?: number;
+          duration_minutes?: number | null;
+          experience_id: string;
+          highlights?: Json;
+          id?: string;
+          ideal_for?: string[];
+          is_featured?: boolean;
+          metadata?: Json;
+          operational_notes?: string | null;
+          route_summary?: string | null;
+          short_description?: string | null;
+          slug: string;
+          status?: Database["public"]["Enums"]["publication_status"];
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          display_order?: number;
+          duration_minutes?: number | null;
+          experience_id?: string;
+          highlights?: Json;
+          id?: string;
+          ideal_for?: string[];
+          is_featured?: boolean;
+          metadata?: Json;
+          operational_notes?: string | null;
+          route_summary?: string | null;
+          short_description?: string | null;
+          slug?: string;
+          status?: Database["public"]["Enums"]["publication_status"];
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "yacht_sub_experiences_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_experience_health";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "yacht_sub_experiences_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_map_catalog";
+            referencedColumns: ["experience_id"];
+          },
+          {
+            foreignKeyName: "yacht_sub_experiences_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_review_summaries";
+            referencedColumns: ["experience_id"];
+          },
+          {
+            foreignKeyName: "yacht_sub_experiences_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experiences";
             referencedColumns: ["id"];
           }
         ];
@@ -4421,6 +6304,256 @@ export type Database = {
         };
         Relationships: [];
       };
+      professional_documents_admin: {
+        Row: {
+          category: string | null;
+          computed_status: string | null;
+          confidentiality_level: string | null;
+          created_at: string | null;
+          document_number: string | null;
+          document_type: string | null;
+          does_not_expire: boolean | null;
+          expires_on: string | null;
+          files: Json | null;
+          id: string | null;
+          issued_on: string | null;
+          issuing_authority: string | null;
+          issuing_country_code: string | null;
+          metadata: Json | null;
+          notes: string | null;
+          profile_id: string | null;
+          qualification: string | null;
+          replaces_document_id: string | null;
+          restrictions: string | null;
+          status: string | null;
+          stcw_code: string | null;
+          team_member_certificate_id: string | null;
+          title: string | null;
+          updated_at: string | null;
+          uploaded_by_profile_id: string | null;
+          valid_from: string | null;
+          verification_status: string | null;
+          verified_at: string | null;
+          verified_by_profile_id: string | null;
+        };
+        Insert: {
+          category?: string | null;
+          computed_status?: never;
+          confidentiality_level?: string | null;
+          created_at?: string | null;
+          document_number?: string | null;
+          document_type?: string | null;
+          does_not_expire?: boolean | null;
+          expires_on?: string | null;
+          files?: never;
+          id?: string | null;
+          issued_on?: string | null;
+          issuing_authority?: string | null;
+          issuing_country_code?: string | null;
+          metadata?: Json | null;
+          notes?: string | null;
+          profile_id?: string | null;
+          qualification?: string | null;
+          replaces_document_id?: string | null;
+          restrictions?: string | null;
+          status?: string | null;
+          stcw_code?: string | null;
+          team_member_certificate_id?: string | null;
+          title?: string | null;
+          updated_at?: string | null;
+          uploaded_by_profile_id?: string | null;
+          valid_from?: string | null;
+          verification_status?: string | null;
+          verified_at?: string | null;
+          verified_by_profile_id?: string | null;
+        };
+        Update: {
+          category?: string | null;
+          computed_status?: never;
+          confidentiality_level?: string | null;
+          created_at?: string | null;
+          document_number?: string | null;
+          document_type?: string | null;
+          does_not_expire?: boolean | null;
+          expires_on?: string | null;
+          files?: never;
+          id?: string | null;
+          issued_on?: string | null;
+          issuing_authority?: string | null;
+          issuing_country_code?: string | null;
+          metadata?: Json | null;
+          notes?: string | null;
+          profile_id?: string | null;
+          qualification?: string | null;
+          replaces_document_id?: string | null;
+          restrictions?: string | null;
+          status?: string | null;
+          stcw_code?: string | null;
+          team_member_certificate_id?: string | null;
+          title?: string | null;
+          updated_at?: string | null;
+          uploaded_by_profile_id?: string | null;
+          valid_from?: string | null;
+          verification_status?: string | null;
+          verified_at?: string | null;
+          verified_by_profile_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "professional_documents_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "professional_documents_replaces_document_id_fkey";
+            columns: ["replaces_document_id"];
+            isOneToOne: false;
+            referencedRelation: "professional_documents";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "professional_documents_replaces_document_id_fkey";
+            columns: ["replaces_document_id"];
+            isOneToOne: false;
+            referencedRelation: "professional_documents_admin";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "professional_documents_team_member_certificate_id_fkey";
+            columns: ["team_member_certificate_id"];
+            isOneToOne: false;
+            referencedRelation: "team_member_certificates";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "professional_documents_uploaded_by_profile_id_fkey";
+            columns: ["uploaded_by_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "professional_documents_verified_by_profile_id_fkey";
+            columns: ["verified_by_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      professional_services_public: {
+        Row: {
+          accommodation_required: boolean | null;
+          audience: string[] | null;
+          currency_code: string | null;
+          day_rate_from_minor: number | null;
+          deliverables: Json | null;
+          description: string | null;
+          direct_booking_enabled: boolean | null;
+          engagement_units: string[] | null;
+          geographic_scope: string | null;
+          inquiry_required: boolean | null;
+          languages: string[] | null;
+          lead_time_days: number | null;
+          metadata: Json | null;
+          minimum_engagement_unit: string | null;
+          minimum_engagement_value: number | null;
+          price_from_minor: number | null;
+          pricing_model: string | null;
+          qualifications: string[] | null;
+          regions: string[] | null;
+          requirements: Json | null;
+          seo_description: string | null;
+          seo_title: string | null;
+          service_category: string | null;
+          service_features: Json | null;
+          service_key: string | null;
+          short_title: string | null;
+          slug: string | null;
+          sort_order: number | null;
+          summary: string | null;
+          title: string | null;
+          travel_costs_included: boolean | null;
+          travel_required: boolean | null;
+          vessel_types: string[] | null;
+          week_rate_from_minor: number | null;
+        };
+        Insert: {
+          accommodation_required?: boolean | null;
+          audience?: string[] | null;
+          currency_code?: string | null;
+          day_rate_from_minor?: number | null;
+          deliverables?: Json | null;
+          description?: string | null;
+          direct_booking_enabled?: boolean | null;
+          engagement_units?: string[] | null;
+          geographic_scope?: string | null;
+          inquiry_required?: boolean | null;
+          languages?: string[] | null;
+          lead_time_days?: number | null;
+          metadata?: Json | null;
+          minimum_engagement_unit?: string | null;
+          minimum_engagement_value?: number | null;
+          price_from_minor?: number | null;
+          pricing_model?: string | null;
+          qualifications?: string[] | null;
+          regions?: string[] | null;
+          requirements?: Json | null;
+          seo_description?: string | null;
+          seo_title?: string | null;
+          service_category?: string | null;
+          service_features?: Json | null;
+          service_key?: string | null;
+          short_title?: string | null;
+          slug?: string | null;
+          sort_order?: number | null;
+          summary?: string | null;
+          title?: string | null;
+          travel_costs_included?: boolean | null;
+          travel_required?: boolean | null;
+          vessel_types?: string[] | null;
+          week_rate_from_minor?: number | null;
+        };
+        Update: {
+          accommodation_required?: boolean | null;
+          audience?: string[] | null;
+          currency_code?: string | null;
+          day_rate_from_minor?: number | null;
+          deliverables?: Json | null;
+          description?: string | null;
+          direct_booking_enabled?: boolean | null;
+          engagement_units?: string[] | null;
+          geographic_scope?: string | null;
+          inquiry_required?: boolean | null;
+          languages?: string[] | null;
+          lead_time_days?: number | null;
+          metadata?: Json | null;
+          minimum_engagement_unit?: string | null;
+          minimum_engagement_value?: number | null;
+          price_from_minor?: number | null;
+          pricing_model?: string | null;
+          qualifications?: string[] | null;
+          regions?: string[] | null;
+          requirements?: Json | null;
+          seo_description?: string | null;
+          seo_title?: string | null;
+          service_category?: string | null;
+          service_features?: Json | null;
+          service_key?: string | null;
+          short_title?: string | null;
+          slug?: string | null;
+          sort_order?: number | null;
+          summary?: string | null;
+          title?: string | null;
+          travel_costs_included?: boolean | null;
+          travel_required?: boolean | null;
+          vessel_types?: string[] | null;
+          week_rate_from_minor?: number | null;
+        };
+        Relationships: [];
+      };
       published_media_assets: {
         Row: {
           alt_text: string | null;
@@ -4461,6 +6594,72 @@ export type Database = {
           variant: string | null;
           visibility: Database["public"]["Enums"]["media_visibility"] | null;
           width: number | null;
+        };
+        Relationships: [];
+      };
+      strategy_cards_public: {
+        Row: {
+          action_plan: Json | null;
+          audience_key: string | null;
+          channels: string[] | null;
+          description: string | null;
+          metadata: Json | null;
+          mission_statements: Json | null;
+          objective: string | null;
+          priority: number | null;
+          slug: string | null;
+          sort_order: number | null;
+          stakeholder_key: string | null;
+          status: string | null;
+          strategy_type: string | null;
+          success_metrics: Json | null;
+          summary: string | null;
+          target_audience: string[] | null;
+          title: string | null;
+          user_role: Database["public"]["Enums"]["app_role"] | null;
+          win_win: Json | null;
+        };
+        Insert: {
+          action_plan?: Json | null;
+          audience_key?: never;
+          channels?: string[] | null;
+          description?: string | null;
+          metadata?: Json | null;
+          mission_statements?: never;
+          objective?: string | null;
+          priority?: number | null;
+          slug?: string | null;
+          sort_order?: number | null;
+          stakeholder_key?: string | null;
+          status?: string | null;
+          strategy_type?: string | null;
+          success_metrics?: Json | null;
+          summary?: string | null;
+          target_audience?: string[] | null;
+          title?: string | null;
+          user_role?: Database["public"]["Enums"]["app_role"] | null;
+          win_win?: Json | null;
+        };
+        Update: {
+          action_plan?: Json | null;
+          audience_key?: never;
+          channels?: string[] | null;
+          description?: string | null;
+          metadata?: Json | null;
+          mission_statements?: never;
+          objective?: string | null;
+          priority?: number | null;
+          slug?: string | null;
+          sort_order?: number | null;
+          stakeholder_key?: string | null;
+          status?: string | null;
+          strategy_type?: string | null;
+          success_metrics?: Json | null;
+          summary?: string | null;
+          target_audience?: string[] | null;
+          title?: string | null;
+          user_role?: Database["public"]["Enums"]["app_role"] | null;
+          win_win?: Json | null;
         };
         Relationships: [];
       };
@@ -4688,6 +6887,46 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      admin_create_partner_payout: {
+        Args: {
+          p_adjustment_amount_minor?: number;
+          p_notes?: string;
+          p_partner_id: string;
+          p_period_end: string;
+          p_period_start: string;
+        };
+        Returns: {
+          account_holder_snapshot: string;
+          adjustment_amount_minor: number;
+          approved_at: string | null;
+          approved_by: string | null;
+          bank_name_snapshot: string | null;
+          bic_swift_snapshot: string | null;
+          created_at: string;
+          currency: string;
+          external_payment_id: string | null;
+          gross_voucher_amount_minor: number;
+          iban_snapshot: string;
+          id: string;
+          net_amount_minor: number | null;
+          notes: string | null;
+          paid_at: string | null;
+          paid_by: string | null;
+          partner_id: string;
+          payment_method: string;
+          payment_reference: string | null;
+          period_end: string;
+          period_start: string;
+          status: Database["public"]["Enums"]["partner_payout_status"];
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "partner_payouts";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       admin_customer_detail: { Args: { p_customer_id: string }; Returns: Json };
       admin_dashboard_overview: {
         Args: { p_from?: string; p_to?: string };
@@ -4776,6 +7015,44 @@ export type Database = {
           p_usage?: string;
         };
         Returns: Json;
+      };
+      admin_mark_partner_payout_paid: {
+        Args: {
+          p_external_payment_id?: string;
+          p_notes?: string;
+          p_payout_id: string;
+        };
+        Returns: {
+          account_holder_snapshot: string;
+          adjustment_amount_minor: number;
+          approved_at: string | null;
+          approved_by: string | null;
+          bank_name_snapshot: string | null;
+          bic_swift_snapshot: string | null;
+          created_at: string;
+          currency: string;
+          external_payment_id: string | null;
+          gross_voucher_amount_minor: number;
+          iban_snapshot: string;
+          id: string;
+          net_amount_minor: number | null;
+          notes: string | null;
+          paid_at: string | null;
+          paid_by: string | null;
+          partner_id: string;
+          payment_method: string;
+          payment_reference: string | null;
+          period_end: string;
+          period_start: string;
+          status: Database["public"]["Enums"]["partner_payout_status"];
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "partner_payouts";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
       admin_moderate_review: {
         Args: { p_reason?: string; p_review_id: string; p_status: string };
@@ -5111,6 +7388,9 @@ export type Database = {
           country_code: string;
           created_at: string;
           description: string | null;
+          google_maps_url: string | null;
+          google_place_id: string | null;
+          google_plus_code: string | null;
           id: string;
           is_active: boolean;
           latitude: number;
@@ -5124,6 +7404,7 @@ export type Database = {
           short_name: string | null;
           slug: string;
           updated_at: string;
+          what3words: string | null;
         };
         SetofOptions: {
           from: "*";
@@ -5201,21 +7482,19 @@ export type Database = {
       admin_upsert_partner: {
         Args: { p_id?: string; p_payload?: Json };
         Returns: {
-          address_line_1: string | null;
-          address_line_2: string | null;
           attribution_window_hours: number;
           business_type: string | null;
-          city: string | null;
           contact_name: string | null;
-          country_code: string | null;
           created_at: string;
+          description: string | null;
           email: string | null;
           id: string;
+          is_featured: boolean;
+          location_id: string | null;
           name: string;
           owner_profile_id: string | null;
           phone: string | null;
-          postal_code: string | null;
-          province: string | null;
+          published_at: string;
           referral_code: string;
           slug: string;
           status: Database["public"]["Enums"]["partner_status"];
@@ -5226,6 +7505,42 @@ export type Database = {
         SetofOptions: {
           from: "*";
           to: "partners";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      admin_upsert_partner_financial_profile: {
+        Args: { p_partner_id: string; p_payload: Json };
+        Returns: {
+          account_holder: string;
+          bank_name: string | null;
+          bic_swift: string | null;
+          billing_address_line_1: string | null;
+          billing_address_line_2: string | null;
+          billing_city: string | null;
+          billing_country_code: string | null;
+          billing_email: string | null;
+          billing_phone: string | null;
+          billing_postal_code: string | null;
+          billing_province: string | null;
+          created_at: string;
+          iban: string;
+          is_verified: boolean;
+          legal_company_name: string;
+          notes: string | null;
+          partner_id: string;
+          payment_reference_prefix: string | null;
+          payment_terms_days: number;
+          preferred_currency: string;
+          tax_id: string | null;
+          updated_at: string;
+          vat_number: string | null;
+          verified_at: string | null;
+          verified_by: string | null;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "partner_financial_profiles";
           isOneToOne: true;
           isSetofReturn: false;
         };
@@ -5329,6 +7644,18 @@ export type Database = {
         Args: { p_slot_id: string };
         Returns: number;
       };
+      build_professional_document_filename: {
+        Args: {
+          p_document_number: string;
+          p_document_type: string;
+          p_expires_on: string;
+          p_extension: string;
+          p_issued_on: string;
+          p_profile_name: string;
+          p_unique_suffix?: string;
+        };
+        Returns: string;
+      };
       cancel_booking_voucher: {
         Args: { p_booking_id: string; p_reason?: string };
         Returns: Json;
@@ -5336,6 +7663,33 @@ export type Database = {
       confirm_paid_booking: {
         Args: { p_booking_id: string; p_provider_payment_id?: string };
         Returns: Json;
+      };
+      create_credential_access_grant: {
+        Args: {
+          p_access_expires_at?: string;
+          p_document_ids: string[];
+          p_message?: string;
+          p_permission_download_files?: boolean;
+          p_permission_include_document_number?: boolean;
+          p_permission_include_history?: boolean;
+          p_permission_view_files?: boolean;
+          p_recipient_agency_label: string;
+          p_recipient_email: string;
+          p_selected_file_roles?: string[];
+        };
+        Returns: string;
+      };
+      create_credential_share_link: {
+        Args: {
+          p_expires_at: string;
+          p_grant_id: string;
+          p_max_downloads?: number;
+          p_max_views?: number;
+          p_recipient_agency_label?: string;
+          p_recipient_email?: string;
+          p_token_hash: string;
+        };
+        Returns: string;
       };
       create_experience_booking: {
         Args: {
@@ -5356,6 +7710,11 @@ export type Database = {
         Returns: Json;
       };
       generate_public_code: { Args: { prefix?: string }; Returns: string };
+      get_authenticated_credential_file_access: {
+        Args: { p_document_file_id: string; p_intent?: string };
+        Returns: Json;
+      };
+      get_authenticated_credential_portfolio: { Args: never; Returns: Json };
       get_experience_calendar: {
         Args: {
           p_experience_id: string;
@@ -5455,10 +7814,6 @@ export type Database = {
               title: string;
             }[];
           };
-      get_public_strategy_cards: {
-        Args: { requested_locale: string };
-        Returns: Json;
-      };
       get_public_experience_booking_stories: {
         Args: {
           p_experience_slug: string;
@@ -5470,68 +7825,105 @@ export type Database = {
       get_public_partner_directory: {
         Args: { p_locale?: string };
         Returns: {
-          address_line_1: string | null;
+          address_line_1: string;
           attributed_booking_count: number;
-          category: string | null;
+          category: string;
           city: string;
           conversion_rate: number;
           country_code: string;
-          directions_url: string | null;
-          image_alt_text: string | null;
-          image_bucket_id: string | null;
-          image_storage_path: string | null;
+          directions_url: string;
+          image_alt_text: string;
+          image_bucket_id: string;
+          image_storage_path: string;
           is_featured: boolean;
           latitude: number;
           location_id: string;
           location_name: string;
           location_slug: string;
-          logo_alt_text: string | null;
-          logo_bucket_id: string | null;
-          logo_storage_path: string | null;
+          logo_alt_text: string;
+          logo_bucket_id: string;
+          logo_storage_path: string;
           longitude: number;
           map_zoom: number;
-          most_booked_experience_name: string | null;
-          most_booked_experience_slug: string | null;
+          most_booked_experience_name: string;
+          most_booked_experience_slug: string;
           name: string;
           partner_id: string;
-          phone: string | null;
-          postal_code: string | null;
-          province: string | null;
+          phone: string;
+          postal_code: string;
+          province: string;
           published_at: string;
           qr_scan_count: number;
-          short_description: string | null;
+          short_description: string;
           slug: string;
           total_booking_count: number;
           total_partner_count: number;
           total_qr_scan_count: number;
-          website_url: string | null;
+          website_url: string;
         }[];
       };
       get_public_partner_invitation: {
         Args: { p_locale?: string; p_partner_slug: string };
         Returns: {
-          business_type: string | null;
-          image_alt_text: string | null;
-          image_bucket_id: string | null;
-          image_storage_path: string | null;
+          business_type: string;
+          image_alt_text: string;
+          image_bucket_id: string;
+          image_storage_path: string;
           invitation_body: string;
-          location_city: string | null;
-          location_country_code: string | null;
-          location_name: string | null;
-          location_province: string | null;
-          logo_alt_text: string | null;
-          logo_bucket_id: string | null;
-          logo_storage_path: string | null;
+          location_city: string;
+          location_country_code: string;
+          location_name: string;
+          location_province: string;
+          logo_alt_text: string;
+          logo_bucket_id: string;
+          logo_storage_path: string;
           outreach_subject: string;
-          partner_description: string | null;
+          partner_description: string;
           partner_id: string;
           partner_name: string;
           partner_slug: string;
-          website_url: string | null;
+          website_url: string;
         }[];
       };
       get_public_referral_landing: {
         Args: { p_locale?: string; p_visit_token: string };
+        Returns: Json;
+      };
+      get_public_strategy_cards: {
+        Args: { requested_locale?: string };
+        Returns: {
+          action_plan: Json;
+          audience_key: string;
+          channels: string[];
+          description: string;
+          metadata: Json;
+          mission_statements: Json;
+          objective: string;
+          priority: number;
+          simple_workflow_steps: Json;
+          slug: string;
+          sort_order: number;
+          stakeholder_key: string;
+          status: string;
+          strategy_type: string;
+          success_metrics: Json;
+          summary: string;
+          target_audience: string[];
+          title: string;
+          user_role: Database["public"]["Enums"]["app_role"];
+          win_win: Json;
+        }[];
+      };
+      get_shared_credential_file_access: {
+        Args: {
+          p_document_file_id: string;
+          p_intent?: string;
+          p_token: string;
+        };
+        Returns: Json;
+      };
+      get_shared_credential_portfolio: {
+        Args: { p_token: string };
         Returns: Json;
       };
       get_verified_referral_context: {
@@ -5545,10 +7937,50 @@ export type Database = {
         };
         Returns: boolean;
       };
-      is_nonempty_text_array: { Args: { value: Json }; Returns: boolean };
+      list_owner_credential_access_grants: {
+        Args: never;
+        Returns: {
+          access_expires_at: string | null;
+          created_at: string;
+          created_by_profile_id: string;
+          id: string;
+          last_login_at: string | null;
+          last_magic_link_sent_at: string | null;
+          message: string | null;
+          owner_profile_id: string;
+          permission_download_files: boolean;
+          permission_include_document_number: boolean;
+          permission_include_history: boolean;
+          permission_view_files: boolean;
+          recipient_agency_label: string | null;
+          recipient_email: string;
+          recipient_profile_id: string | null;
+          revoked_at: string | null;
+          revoked_by_profile_id: string | null;
+          updated_at: string;
+        }[];
+        SetofOptions: {
+          from: "*";
+          to: "credential_access_grants";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
+      localized_role_benefit: {
+        Args: { p_locale: string; p_role: string };
+        Returns: string;
+      };
+      localized_role_motivation: {
+        Args: { p_locale: string; p_role: string };
+        Returns: string;
+      };
       mark_booking_payment_processing: {
         Args: { p_booking_id: string; p_provider_payment_id?: string };
         Returns: Json;
+      };
+      mark_credential_magic_link_sent: {
+        Args: { p_grant_id: string };
+        Returns: undefined;
       };
       media_assets_is_keep_object: {
         Args: { object_name: string };
@@ -5575,9 +8007,17 @@ export type Database = {
         Returns: boolean;
       };
       release_expired_booking_holds: { Args: never; Returns: number };
+      revoke_credential_access_grant: {
+        Args: { p_grant_id: string; p_reason?: string };
+        Returns: undefined;
+      };
       set_booking_participants: {
         Args: { p_booking_id: string; p_participants: Json };
         Returns: Json;
+      };
+      slugify_document_filename_part: {
+        Args: { value: string };
+        Returns: string;
       };
       submit_referral_contact: {
         Args: {
@@ -5642,6 +8082,35 @@ export type Database = {
       media_asset_status: "draft" | "published" | "archived";
       media_focal_unit: "percent";
       media_visibility: "public" | "authenticated" | "private";
+      partner_outreach_channel:
+        | "in_person"
+        | "phone"
+        | "email"
+        | "whatsapp"
+        | "instagram"
+        | "facebook"
+        | "linkedin"
+        | "website_form"
+        | "other";
+      partner_outreach_status:
+        | "planned"
+        | "contacted"
+        | "follow_up_due"
+        | "interested"
+        | "meeting_scheduled"
+        | "proposal_sent"
+        | "onboarding"
+        | "won"
+        | "not_interested"
+        | "no_response"
+        | "paused";
+      partner_payout_item_status: "pending" | "approved" | "paid" | "cancelled";
+      partner_payout_status:
+        | "draft"
+        | "ready"
+        | "processing"
+        | "paid"
+        | "cancelled";
       partner_status: "draft" | "active" | "disabled";
       payment_status:
         | "unpaid"
@@ -5828,6 +8297,38 @@ export const Constants = {
       media_asset_status: ["draft", "published", "archived"],
       media_focal_unit: ["percent"],
       media_visibility: ["public", "authenticated", "private"],
+      partner_outreach_channel: [
+        "in_person",
+        "phone",
+        "email",
+        "whatsapp",
+        "instagram",
+        "facebook",
+        "linkedin",
+        "website_form",
+        "other"
+      ],
+      partner_outreach_status: [
+        "planned",
+        "contacted",
+        "follow_up_due",
+        "interested",
+        "meeting_scheduled",
+        "proposal_sent",
+        "onboarding",
+        "won",
+        "not_interested",
+        "no_response",
+        "paused"
+      ],
+      partner_payout_item_status: ["pending", "approved", "paid", "cancelled"],
+      partner_payout_status: [
+        "draft",
+        "ready",
+        "processing",
+        "paid",
+        "cancelled"
+      ],
       partner_status: ["draft", "active", "disabled"],
       payment_status: [
         "unpaid",
