@@ -70,8 +70,6 @@ describe("availabilityDateUrl", () => {
         "2026-07-30",
         emptyFilters
       )
-    ).toBe(
-      "/team/kevin/availability?month=2026-07&date=2026-07-30"
-    );
+    ).toBe("/team/kevin/availability?month=2026-07&date=2026-07-30");
   });
 });
