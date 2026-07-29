@@ -21,6 +21,7 @@ describe("dashboard navigation", () => {
       "/admin",
       "/admin/experiences",
       "/admin/media",
+      "/admin/documents/shares",
       "/admin/partners",
       "/admin/locations",
       "/admin/team",

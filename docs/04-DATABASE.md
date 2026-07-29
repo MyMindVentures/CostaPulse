@@ -56,6 +56,34 @@ Attribution windows, voucher percentages and redemption rules must be explicit a
 
 Authentication identities, profiles, public team profiles and authorization roles remain distinct concerns. Internal permissions are governed by profiles, roles and RLS rather than public team-member content.
 
+### Credential sharing and secure document access
+
+Credential sharing for professional documents is modeled with dedicated grant, share-link and event tables:
+
+`profiles/professional_documents → credential_access_grants → credential_access_grant_documents → credential_share_links`
+
+Sensitive access activity is captured in `credential_access_events`.
+
+Key invariants:
+
+- Browser access to credential grant and share tables is denied by restrictive RLS; trusted access is mediated by reviewed security-definer RPCs.
+- Recipient emails are normalized and grants/shares are time-bounded with explicit revoke fields.
+- Share links store only token hashes, never plaintext tokens.
+- File access is constrained by grant-level permissions and per-document file-role allow lists.
+- Open/download attempts and denials emit audit events.
+
+Current credential access RPC contracts include:
+
+- `get_authenticated_credential_portfolio`
+- `get_shared_credential_portfolio`
+- `get_authenticated_credential_file_access`
+- `get_shared_credential_file_access`
+- `create_credential_access_grant`
+- `mark_credential_magic_link_sent`
+- `create_credential_share_link`
+- `revoke_credential_access_grant`
+- `list_owner_credential_access_grants`
+
 ## Canonical data path
 
 ```text
