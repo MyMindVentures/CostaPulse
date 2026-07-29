@@ -6,6 +6,7 @@ import type { PublicAvailabilityEntry } from "@/lib/view-models/team-member-avai
 import type { AvailabilityFilters } from "./availability-calendar.types";
 import {
   availabilityBasePath,
+  availabilityDateUrl,
   availabilityUrl,
   filtersFromFormData,
   groupEntriesByDay
@@ -52,7 +53,7 @@ export function useAvailabilityCalendar({
   }
 
   function dateHref(date: string) {
-    return availabilityUrl(basePath, date.slice(0, 7), initialFilters, date);
+    return availabilityDateUrl(basePath, date, initialFilters);
   }
 
   function applyFilters(formData: FormData) {
