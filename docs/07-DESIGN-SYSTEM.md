@@ -6,7 +6,7 @@ This document defines the binding visual and interaction principles for CostaPul
 
 ## Brand character
 
-CostaPulse must feel like an international premium Mediterranean lifestyle and experiences brand rooted in the Costa Blanca: sun, sea, white coastal architecture, warm stone, sand, teak, bamboo, linen, rope, salt air and relaxed southern hospitality.
+CostaPulse must feel like an international premium Mediterranean lifestyle, experiences and maritime brand rooted in the Costa Blanca: sun, sea, white coastal architecture, warm stone, sand, teak, bamboo, linen, rope, salt air and relaxed southern hospitality.
 
 The visual language is:
 
@@ -14,9 +14,33 @@ The visual language is:
 - warm, natural and sun-soaked;
 - coastal, refined and adventurous;
 - subtly bohemian, never rustic or improvised;
+- maritime and credible without becoming visually literal;
 - international, timeless and suitable for expansion beyond Spain.
 
 Never generic SaaS, corporate blue, neon, cartoonish, tropical-tiki, cheap beach-club, overly nautical, glassmorphism-heavy or default shadcn.
+
+## One identity across every region and domain
+
+CostaPulse has one visual identity. New destinations and professional service areas must adapt the subject matter, photography and information density without creating separate palettes, logos, component systems or disconnected microsite styles.
+
+The CostaPulse look and feel remains binding for:
+
+- the Costa Blanca launch area and the wider coast between Málaga and Jávea;
+- future Balearic Islands destinations;
+- future Canary Islands destinations;
+- private yacht charters;
+- paddleboard and kayak experiences;
+- Western European professional maritime services;
+- Founder, Partner, crew and other authenticated platforms.
+
+Regional expression should come from authentic imagery and editorial context:
+
+- Costa Blanca and the Málaga–Jávea corridor: clear Mediterranean water, marinas, rocky coves, beaches, white architecture, warm sun and relaxed hospitality;
+- Balearic Islands: refined island character, premium escape, limestone coasts and crystalline water;
+- Canary Islands: volcanic texture, Atlantic light, rugged coastlines and adventure;
+- Rotterdam, Amsterdam and the Scheldt professional domain: harbour scale, steel, working vessels, weather, precision manoeuvring and maritime competence.
+
+The professional maritime domain may be darker, more restrained and more information-dense, but must still use CostaPulse typography, tokens, spacing, components and editorial restraint. Do not turn it into a generic shipping-company website.
 
 ## Token source of truth
 
@@ -64,7 +88,31 @@ Express the Mediterranean feeling through photography, spacing, tone and subtle 
 
 Preferred cues include sun-faded linen, bamboo, teak, natural rope, pale stone, whitewashed walls, warm terraces, coastal cliffs, clear blue water, sunset light, natural shadows and authentic human moments.
 
-Do not add fake wood textures, obvious bamboo patterns, shells, anchors, waves, palm icons or decorative beach illustrations.
+Professional maritime surfaces may use restrained references to painted steel, bridge instrumentation, harbour lighting, towlines, working decks and weathered infrastructure. These cues must come primarily through real photography and composition, not decorative textures or themed icons.
+
+Do not add fake wood textures, obvious bamboo patterns, shells, anchors, waves, palm icons, tugboat clip-art or decorative beach illustrations.
+
+## Photography direction
+
+Photography must feel authentic, location-specific and operationally credible.
+
+For yacht charters:
+
+- show real marinas, vessels, coastline, onboard hospitality and human scale;
+- favour cinematic natural light and believable private-charter moments;
+- avoid anonymous luxury stock imagery, oversized superyachts unrelated to the offer or staged party clichés.
+
+For paddleboard and kayak experiences:
+
+- show the actual character of beaches, bays, coves and launch locations;
+- communicate mentoring, safety, movement and connection to the coastline;
+- avoid generic equipment-rental imagery or misleading extreme-sport scenes.
+
+For professional maritime services:
+
+- show real harbour towage, ASD tugs, bridge work, ship handling, ports and operational environments;
+- communicate competence, judgement, strength and precision;
+- avoid generic cargo-ship stock photos that do not support the service being described.
 
 ## Component principles
 
@@ -91,15 +139,35 @@ Do not add fake wood textures, obvious bamboo patterns, shells, anchors, waves, 
 
 Prioritize immersive, authentic imagery, clear value, transparent pricing, host credibility, availability and a confident booking call to action. Avoid generic stock-tourism clichés and low-quality placeholders.
 
-## Admin UI
+Destination and location pages should help users understand the real relationship between region, marina, beach, bay, meeting point and available experience. They must remain editorial and inspiring while using real database-backed records rather than hardcoded destination collections.
 
-The admin interface should feel like a premium Mediterranean operations platform:
+## Professional maritime UI
+
+Professional maritime pages should prioritize:
+
+- Kevin's actual qualifications and experience;
+- service scope and engagement format;
+- vessel and operation relevance;
+- geographic availability;
+- credentials and controlled evidence;
+- a clear inquiry or contact action.
+
+The presentation may use more navy, steel-toned imagery and compact evidence blocks than leisure pages. It must remain calm, premium and recognizably CostaPulse.
+
+## Admin and authenticated UI
+
+Authenticated interfaces should feel like a premium Mediterranean operations platform:
 
 - compact but readable data presentation;
 - meaningful metrics rather than decorative cards;
 - clear status systems;
 - fast filtering and quick actions;
-- desktop-first operational density with strong tablet support.
+- desktop-first operational density with strong tablet support;
+- role-relevant navigation rather than exposing every module to every user.
+
+The existing Founder Dashboard is an established surface. Its shell, routes, components and visual language must be preserved and upgraded incrementally. Do not replace it with a generic admin template.
+
+The Partner Dashboard should feel related to the Founder Dashboard but focused on partner tasks such as QR referrals, attributed bookings, vouchers, payouts and business details. It must not expose founder-only complexity or another partner's information.
 
 ## Motion
 
@@ -112,12 +180,13 @@ Meet WCAG 2.2 AA for contrast, keyboard use, focus visibility and screen-reader 
 ## Non-negotiable implementation rules
 
 1. No arbitrary Tailwind colors, radii, shadows or one-off CSS when a token or established pattern exists.
-2. No page-specific visual language; every surface must feel native to CostaPulse.
+2. No page-specific or region-specific visual language; every surface must feel native to CostaPulse.
 3. Do not copy components to create visual variants.
 4. No new palette, font, icon style, gradient language or visual trend without explicit approval.
-5. Compare every completed frontend change against this document, `src/app/globals.css`, existing shared components and relevant Storybook stories.
-6. When uncertain, choose the more refined, natural, calm and timeless option.
-7. CostaPulse must never look like a local hobby website or generic booking template.
+5. Do not create a separate corporate design system for professional maritime services.
+6. Compare every completed frontend change against this document, `src/app/globals.css`, existing shared components and relevant Storybook stories.
+7. When uncertain, choose the more refined, natural, calm and timeless option.
+8. CostaPulse must never look like a local hobby website, generic booking template or generic shipping-company site.
 
 ## Change discipline
 
