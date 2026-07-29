@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import type { Dispatch, SetStateAction } from "react";
 import type { PublicAvailabilityEntry } from "@/lib/view-models/team-member-availability";
 import { AvailabilityEntryDetails } from "./availability-entry-details";
 import { dateFromKey } from "./availability-calendar.utils";
@@ -12,13 +11,15 @@ type Props = {
   activeEntry: PublicAvailabilityEntry | null;
   agendaDays: [string, PublicAvailabilityEntry[]][];
   locale: string;
-  setActiveEntry: Dispatch<SetStateAction<PublicAvailabilityEntry | null>>;
+  selectedDate?: string | null;
+  setActiveEntry: (entry: PublicAvailabilityEntry | null) => void;
 };
 
 export function AvailabilityMobileAgenda({
   activeEntry,
   agendaDays,
   locale,
+  selectedDate,
   setActiveEntry
 }: Props) {
   const t = useTranslations("Availability");
@@ -31,6 +32,7 @@ export function AvailabilityMobileAgenda({
             <Link
               href={`/availability/${dateKey}`}
               className="text-ink min-h-11 text-lg font-semibold"
+              aria-current={selectedDate === dateKey ? "date" : undefined}
             >
               {new Intl.DateTimeFormat(locale, {
                 dateStyle: "full",

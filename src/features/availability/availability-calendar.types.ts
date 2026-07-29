@@ -13,4 +13,5 @@ export type AvailabilityCalendarProps = {
   locale: string;
   initialFilters: AvailabilityFilters;
   selectedDate?: string | null;
+  todayDateKey: string;
 };

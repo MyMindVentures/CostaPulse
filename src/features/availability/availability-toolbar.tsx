@@ -10,13 +10,14 @@ import {
   getAvailabilityStatusSemantic
 } from "@/lib/view-models/team-member-availability";
 import type { AvailabilityFilters } from "./availability-calendar.types";
-import { monthKey, shiftMonth } from "./availability-calendar.utils";
+import { shiftMonth } from "./availability-calendar.utils";
 
 type Props = {
   applyFilters: (formData: FormData) => void;
   initialFilters: AvailabilityFilters;
   month: string;
   monthHref: (month: string) => string;
+  todayHref: string;
   monthLabel: string;
 };
 
@@ -25,7 +26,8 @@ export function AvailabilityToolbar({
   initialFilters,
   month,
   monthHref,
-  monthLabel
+  monthLabel,
+  todayHref
 }: Props) {
   const t = useTranslations("Availability");
 
@@ -42,7 +44,7 @@ export function AvailabilityToolbar({
             </Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href={monthHref(monthKey(new Date()))}>{t("today")}</Link>
+            <Link href={todayHref}>{t("today")}</Link>
           </Button>
           <Button asChild variant="outline" aria-label={t("nextMonth")}>
             <Link href={monthHref(shiftMonth(month, 1))}>
