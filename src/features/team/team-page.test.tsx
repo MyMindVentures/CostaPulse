@@ -15,7 +15,8 @@ const labels = {
   experience: "Experience",
   experienceYears: (years: number) => `${years}+ years`,
   specialties: "Specialties",
-  certifications: "Certifications"
+  certifications: "Certifications",
+  availability: "View availability"
 };
 
 const baseMember: TeamMemberViewModel = {

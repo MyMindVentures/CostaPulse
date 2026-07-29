@@ -37,6 +37,7 @@ export type AdminNavSection =
   | "bookings"
   | "bookingStories"
   | "calendar"
+  | "availability"
   | "customers"
   | "experiences"
   | "media"
@@ -60,6 +61,13 @@ const adminNavRoles: Record<AdminNavSection, ReadonlySet<AppRole>> = {
     "operations_staff",
     "customer_support",
     "content_manager",
+    "administrator",
+    "super_administrator"
+  ]),
+  availability: new Set<AppRole>([
+    "experience_provider",
+    "team_member",
+    "operations_staff",
     "administrator",
     "super_administrator"
   ]),

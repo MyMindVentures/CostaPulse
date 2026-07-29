@@ -56,6 +56,14 @@ Attribution windows, voucher percentages and redemption rules must be explicit a
 
 Authentication identities, profiles, public team profiles and authorization roles remain distinct concerns. Internal permissions are governed by profiles, roles and RLS rather than public team-member content.
 
+### Team-member availability
+
+`team_member_availability` is the integrated source for professional-service availability, manual availability and blocks, travel, confirmed assignments, and optional links to experience slots. `availability_slots` remains the canonical experience-booking inventory and `availability_slot_team_members` remains the assignment link for concrete slots.
+
+The table constrains source consistency, time ranges, capacity, visibility, CTA paths, and JSON metadata. Raw rows are unavailable to anonymous clients. Owners may manage rows linked to their `team_members.profile_id`; operations staff and administrators may manage all rows. Public reads use `get_public_team_member_availability`, which returns only the safe calendar contract and derives capacity from confirmed booking state and active, non-expired holds.
+
+Professional service categories remain a constrained text field on `professional_services`; the constraint now includes the full captain, mate, delivery, ship-handling, consultancy, and other category set rather than introducing a duplicate service model.
+
 ### Credential sharing and secure document access
 
 Credential sharing for professional documents is modeled with dedicated grant, share-link and event tables:

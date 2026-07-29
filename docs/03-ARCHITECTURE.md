@@ -50,12 +50,16 @@ Agents must never guess a table, field, route, role or backend contract.
 | `/experiences`                          | Published experience catalog                            |
 | `/experiences/map`                      | MapLibre discovery using `get_experience_map`           |
 | `/experiences/[slug]`                   | Experience detail and booking widget                    |
+| `/availability`                         | Public range-based team-member availability calendar    |
+| `/availability/[date]`                  | Non-indexed public day detail                           |
+| `/team/[slug]/availability`             | Team-member-specific availability calendar              |
 | `/destinations`, `/about`, `/partners`  | Marketing pages, currently i18n-backed until CMS-backed |
 | `/book`, `/book/[slug]`, success/cancel | Booking wizard and payment outcomes                     |
 | `/r/[partnerCode]`                      | Partner QR entry and visit registration                 |
 | `/referral/[visitToken]`                | Tokenized contact verification, `noindex`               |
 | `/partner/qr/[partnerId]`               | Owner-only printable partner material, `noindex`        |
 | `/admin`                                | Role-protected admin dashboard                          |
+| `/admin/availability`                   | Owner/staff availability management                     |
 
 Operational endpoints such as `/api/health`, `/api/ready`, booking, availability and Stripe webhook routes are not marketing pages.
 

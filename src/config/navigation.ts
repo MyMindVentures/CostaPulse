@@ -36,6 +36,7 @@ export const DASHBOARD_NAVIGATION = {
     { labelKey: "bookings", href: "/admin/bookings" },
     { labelKey: "bookingStories", href: "/admin/booking-stories" },
     { labelKey: "calendar", href: "/admin/calendar" },
+    { labelKey: "availability", href: "/admin/availability" },
     { labelKey: "customers", href: "/admin/customers" }
   ]
 } as const satisfies Record<string, readonly NavigationItem[]>;
@@ -66,6 +67,7 @@ const adminNavHrefBySection = {
   bookings: "/admin/bookings",
   bookingStories: "/admin/booking-stories",
   calendar: "/admin/calendar",
+  availability: "/admin/availability",
   customers: "/admin/customers"
 } as const;
 

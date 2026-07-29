@@ -93,6 +93,14 @@ Current credential workflow entry points:
 - Never trust payment success reported only by the client.
 - Refunds require authorization, reason capture and audit logging.
 
+## Team-member availability workflow
+
+- Public calendars call `get_public_team_member_availability` once per bounded visible range. The RPC filters active team members, public visibility, and published linked services or experiences before returning the stable safe projection.
+- Effective status is server-authoritative with this precedence: cancelled, confirmed assignment, unavailable, fully booked, partially booked, limited, on request, travelling, available.
+- Experience capacity uses `booking_reserved_capacity`, which includes current booking states and active non-expired holds without exposing booking or hold identifiers.
+- Admin and owner writes use validated server actions against RLS-protected `team_member_availability`. Conflict checks use the security-invoker `check_team_member_availability_conflicts` RPC.
+- Mutations revalidate the public calendar, team-member calendar, affected day route, and admin availability route.
+
 ## Error handling
 
 - Return stable machine-readable error codes.

@@ -2295,6 +2295,36 @@ em {
     outline-offset: 3px;
   }
 }
+
+.availability-status--available {
+  border: 1px solid color-mix(in srgb, var(--turquoise) 55%, var(--border));
+  background: color-mix(in srgb, var(--turquoise) 14%, var(--white));
+  color: var(--turquoise-deep);
+}
+.availability-status--limited,
+.availability-status--partially-booked {
+  border: 1px solid color-mix(in srgb, var(--gold) 55%, var(--border));
+  background: color-mix(in srgb, var(--gold) 16%, var(--white));
+  color: var(--navy);
+}
+.availability-status--on-request,
+.availability-status--travelling {
+  border: 1px dashed color-mix(in srgb, var(--navy-soft) 55%, var(--border));
+  background: color-mix(in srgb, var(--navy-soft) 9%, var(--white));
+  color: var(--navy);
+}
+.availability-status--fully-booked,
+.availability-status--unavailable,
+.availability-status--cancelled {
+  border: 1px solid color-mix(in srgb, var(--coral) 45%, var(--border));
+  background: color-mix(in srgb, var(--coral) 10%, var(--white));
+  color: var(--coral-dark);
+}
+.availability-status--confirmed-assignment {
+  border: 1px solid color-mix(in srgb, var(--navy) 55%, var(--border));
+  background: var(--navy);
+  color: var(--white);
+}
 .mobile-nav__close {
   border: 1px solid var(--border);
   border-radius: 999px;

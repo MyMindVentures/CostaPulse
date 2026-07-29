@@ -29,6 +29,7 @@ describe("dashboard navigation", () => {
       "/admin/bookings",
       "/admin/booking-stories",
       "/admin/calendar",
+      "/admin/availability",
       "/admin/customers"
     ]);
   });

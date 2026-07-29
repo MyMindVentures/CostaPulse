@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import {
   Award,
   Languages,
@@ -7,6 +8,7 @@ import {
   ShieldCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import type { TeamMemberViewModel } from "@/lib/view-models/team-member";
 
 type TeamMemberCardLabels = {
@@ -17,6 +19,7 @@ type TeamMemberCardLabels = {
   experienceYears: (years: number) => string;
   specialties: string;
   certifications: string;
+  availability: string;
 };
 
 type TeamMemberCardProps = {
@@ -249,6 +252,11 @@ export function TeamMemberCard({
             </ul>
           </section>
         ) : null}
+        <Button asChild className="mt-7 self-start">
+          <Link href={`/team/${member.slug}/availability`}>
+            {labels.availability}
+          </Link>
+        </Button>
       </div>
     </article>
   );

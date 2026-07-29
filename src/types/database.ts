@@ -4844,30 +4844,242 @@ export type Database = {
           }
         ];
       };
+      team_member_availability: {
+        Row: {
+          availability_slot_id: string | null;
+          capacity_reserved: number;
+          capacity_total: number | null;
+          created_at: string;
+          created_by: string | null;
+          cta_path: string | null;
+          cta_type: string | null;
+          ends_at: string;
+          entry_type: string;
+          experience_id: string | null;
+          experience_variant_id: string | null;
+          geographic_scope: string | null;
+          id: string;
+          internal_notes: string | null;
+          is_all_day: boolean;
+          location_id: string | null;
+          metadata: Json;
+          professional_service_id: string | null;
+          public_location_label: string | null;
+          public_summary: string | null;
+          public_title: string | null;
+          starts_at: string;
+          status: string;
+          team_member_id: string;
+          timezone: string;
+          travel_available: boolean;
+          updated_at: string;
+          visibility: string;
+        };
+        Insert: {
+          availability_slot_id?: string | null;
+          capacity_reserved?: number;
+          capacity_total?: number | null;
+          created_at?: string;
+          created_by?: string | null;
+          cta_path?: string | null;
+          cta_type?: string | null;
+          ends_at: string;
+          entry_type: string;
+          experience_id?: string | null;
+          experience_variant_id?: string | null;
+          geographic_scope?: string | null;
+          id?: string;
+          internal_notes?: string | null;
+          is_all_day?: boolean;
+          location_id?: string | null;
+          metadata?: Json;
+          professional_service_id?: string | null;
+          public_location_label?: string | null;
+          public_summary?: string | null;
+          public_title?: string | null;
+          starts_at: string;
+          status: string;
+          team_member_id: string;
+          timezone?: string;
+          travel_available?: boolean;
+          updated_at?: string;
+          visibility?: string;
+        };
+        Update: {
+          availability_slot_id?: string | null;
+          capacity_reserved?: number;
+          capacity_total?: number | null;
+          created_at?: string;
+          created_by?: string | null;
+          cta_path?: string | null;
+          cta_type?: string | null;
+          ends_at?: string;
+          entry_type?: string;
+          experience_id?: string | null;
+          experience_variant_id?: string | null;
+          geographic_scope?: string | null;
+          id?: string;
+          internal_notes?: string | null;
+          is_all_day?: boolean;
+          location_id?: string | null;
+          metadata?: Json;
+          professional_service_id?: string | null;
+          public_location_label?: string | null;
+          public_summary?: string | null;
+          public_title?: string | null;
+          starts_at?: string;
+          status?: string;
+          team_member_id?: string;
+          timezone?: string;
+          travel_available?: boolean;
+          updated_at?: string;
+          visibility?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "team_member_availability_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "team_member_availability_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_experience_health";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "team_member_availability_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_map_catalog";
+            referencedColumns: ["experience_id"];
+          },
+          {
+            foreignKeyName: "team_member_availability_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_review_summaries";
+            referencedColumns: ["experience_id"];
+          },
+          {
+            foreignKeyName: "team_member_availability_experience_id_fkey";
+            columns: ["experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experiences";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "team_member_availability_experience_variant_fk";
+            columns: ["experience_variant_id", "experience_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_variants";
+            referencedColumns: ["id", "experience_id"];
+          },
+          {
+            foreignKeyName: "team_member_availability_location_id_fkey";
+            columns: ["location_id"];
+            isOneToOne: false;
+            referencedRelation: "experience_map_catalog";
+            referencedColumns: ["location_id"];
+          },
+          {
+            foreignKeyName: "team_member_availability_location_id_fkey";
+            columns: ["location_id"];
+            isOneToOne: false;
+            referencedRelation: "locations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "team_member_availability_professional_service_id_fkey";
+            columns: ["professional_service_id"];
+            isOneToOne: false;
+            referencedRelation: "professional_services";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "team_member_availability_slot_fk";
+            columns: ["availability_slot_id", "experience_variant_id"];
+            isOneToOne: false;
+            referencedRelation: "admin_capacity_calendar";
+            referencedColumns: [
+              "availability_slot_id",
+              "experience_variant_id"
+            ];
+          },
+          {
+            foreignKeyName: "team_member_availability_slot_fk";
+            columns: ["availability_slot_id", "experience_variant_id"];
+            isOneToOne: false;
+            referencedRelation: "availability_slots";
+            referencedColumns: ["id", "experience_variant_id"];
+          },
+          {
+            foreignKeyName: "team_member_availability_slot_fk";
+            columns: ["availability_slot_id", "experience_variant_id"];
+            isOneToOne: false;
+            referencedRelation: "booking_availability";
+            referencedColumns: [
+              "availability_slot_id",
+              "experience_variant_id"
+            ];
+          },
+          {
+            foreignKeyName: "team_member_availability_team_member_id_fkey";
+            columns: ["team_member_id"];
+            isOneToOne: false;
+            referencedRelation: "team_member_profile_detail";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "team_member_availability_team_member_id_fkey";
+            columns: ["team_member_id"];
+            isOneToOne: false;
+            referencedRelation: "team_members";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       team_member_certificates: {
         Row: {
           certificate_number: string | null;
           certificate_type: string;
           created_at: string;
+          credential_group: string | null;
+          credential_subgroup: string | null;
           credential_url: string | null;
+          data_quality_status: string;
           description: string | null;
           display_order: number;
           document_media_asset_id: string | null;
           does_not_expire: boolean;
           expires_on: string | null;
+          expiry_rule: string;
           id: string;
           is_featured: boolean;
           is_public: boolean;
           issued_on: string | null;
+          issuing_country_code: string | null;
           issuing_organization: string | null;
+          last_reviewed_at: string | null;
+          lost_on: string | null;
           metadata: Json;
+          reminder_days_before: number[];
+          reminder_enabled: boolean;
+          secondary_reference: string | null;
           short_title: string | null;
           skills: string[];
+          source_document_label: string | null;
+          source_updated_on: string | null;
           status: string;
           team_member_id: string;
           title: string;
           updated_at: string;
           valid_from: string | null;
+          validity_label: string | null;
+          validity_months: number | null;
           verification_status: string;
           verification_url: string | null;
           verified_at: string | null;
@@ -4877,25 +5089,39 @@ export type Database = {
           certificate_number?: string | null;
           certificate_type?: string;
           created_at?: string;
+          credential_group?: string | null;
+          credential_subgroup?: string | null;
           credential_url?: string | null;
+          data_quality_status?: string;
           description?: string | null;
           display_order?: number;
           document_media_asset_id?: string | null;
           does_not_expire?: boolean;
           expires_on?: string | null;
+          expiry_rule?: string;
           id?: string;
           is_featured?: boolean;
           is_public?: boolean;
           issued_on?: string | null;
+          issuing_country_code?: string | null;
           issuing_organization?: string | null;
+          last_reviewed_at?: string | null;
+          lost_on?: string | null;
           metadata?: Json;
+          reminder_days_before?: number[];
+          reminder_enabled?: boolean;
+          secondary_reference?: string | null;
           short_title?: string | null;
           skills?: string[];
+          source_document_label?: string | null;
+          source_updated_on?: string | null;
           status?: string;
           team_member_id: string;
           title: string;
           updated_at?: string;
           valid_from?: string | null;
+          validity_label?: string | null;
+          validity_months?: number | null;
           verification_status?: string;
           verification_url?: string | null;
           verified_at?: string | null;
@@ -4905,25 +5131,39 @@ export type Database = {
           certificate_number?: string | null;
           certificate_type?: string;
           created_at?: string;
+          credential_group?: string | null;
+          credential_subgroup?: string | null;
           credential_url?: string | null;
+          data_quality_status?: string;
           description?: string | null;
           display_order?: number;
           document_media_asset_id?: string | null;
           does_not_expire?: boolean;
           expires_on?: string | null;
+          expiry_rule?: string;
           id?: string;
           is_featured?: boolean;
           is_public?: boolean;
           issued_on?: string | null;
+          issuing_country_code?: string | null;
           issuing_organization?: string | null;
+          last_reviewed_at?: string | null;
+          lost_on?: string | null;
           metadata?: Json;
+          reminder_days_before?: number[];
+          reminder_enabled?: boolean;
+          secondary_reference?: string | null;
           short_title?: string | null;
           skills?: string[];
+          source_document_label?: string | null;
+          source_updated_on?: string | null;
           status?: string;
           team_member_id?: string;
           title?: string;
           updated_at?: string;
           valid_from?: string | null;
+          validity_label?: string | null;
+          validity_months?: number | null;
           verification_status?: string;
           verification_url?: string | null;
           verified_at?: string | null;
@@ -7660,6 +7900,21 @@ export type Database = {
         Args: { p_booking_id: string; p_reason?: string };
         Returns: Json;
       };
+      check_team_member_availability_conflicts: {
+        Args: {
+          p_ends_at: string;
+          p_exclude_id?: string;
+          p_starts_at: string;
+          p_team_member_id: string;
+        };
+        Returns: {
+          ends_at: string;
+          entry_type: string;
+          id: string;
+          starts_at: string;
+          status: string;
+        }[];
+      };
       confirm_paid_booking: {
         Args: { p_booking_id: string; p_provider_payment_id?: string };
         Returns: Json;
@@ -7709,6 +7964,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      current_team_member_id: { Args: never; Returns: string };
       generate_public_code: { Args: { prefix?: string }; Returns: string };
       get_authenticated_credential_file_access: {
         Args: { p_document_file_id: string; p_intent?: string };
@@ -7814,6 +8070,43 @@ export type Database = {
               title: string;
             }[];
           };
+      get_my_team_member_certificates: {
+        Args: never;
+        Returns: {
+          certificate_number: string;
+          certificate_type: string;
+          computed_status: string;
+          created_at: string;
+          credential_group: string;
+          credential_subgroup: string;
+          data_quality_status: string;
+          days_until_expiry: number;
+          description: string;
+          display_order: number;
+          document_media_asset_id: string;
+          does_not_expire: boolean;
+          expires_on: string;
+          expiry_rule: string;
+          id: string;
+          is_featured: boolean;
+          is_public: boolean;
+          issued_on: string;
+          issuing_country_code: string;
+          issuing_organization: string;
+          reminder_days_before: number[];
+          reminder_enabled: boolean;
+          secondary_reference: string;
+          short_title: string;
+          status: string;
+          team_member_id: string;
+          title: string;
+          updated_at: string;
+          valid_from: string;
+          validity_label: string;
+          validity_months: number;
+          verification_status: string;
+        }[];
+      };
       get_public_experience_booking_stories: {
         Args: {
           p_experience_slug: string;
@@ -7914,6 +8207,74 @@ export type Database = {
           win_win: Json;
         }[];
       };
+      get_public_team_member_availability:
+        | {
+            Args: {
+              p_available_only?: boolean;
+              p_locale?: string;
+              p_location?: string;
+              p_range_end: string;
+              p_range_start: string;
+              p_service_category?: string;
+              p_status?: string;
+              p_team_member_slug: string;
+            };
+            Returns: {
+              capacityRemaining: number;
+              capacityReserved: number;
+              capacityTotal: number;
+              cta: Json;
+              dateKey: string;
+              endsAt: string;
+              entryType: string;
+              experience: Json;
+              geographicScope: string;
+              id: string;
+              isAllDay: boolean;
+              locationLabel: string;
+              service: Json;
+              startsAt: string;
+              status: string;
+              summary: string;
+              timezone: string;
+              title: string;
+              travelAvailable: boolean;
+            }[];
+          }
+        | {
+            Args: {
+              p_available_only: boolean;
+              p_locale: string;
+              p_location: string;
+              p_range_end: string;
+              p_range_start: string;
+              p_service_category: string;
+              p_service_filter: string;
+              p_status: string;
+              p_team_member_slug: string;
+            };
+            Returns: {
+              capacityRemaining: number;
+              capacityReserved: number;
+              capacityTotal: number;
+              cta: Json;
+              dateKey: string;
+              endsAt: string;
+              entryType: string;
+              experience: Json;
+              geographicScope: string;
+              id: string;
+              isAllDay: boolean;
+              locationLabel: string;
+              service: Json;
+              startsAt: string;
+              status: string;
+              summary: string;
+              timezone: string;
+              title: string;
+              travelAvailable: boolean;
+            }[];
+          };
       get_shared_credential_file_access: {
         Args: {
           p_document_file_id: string;

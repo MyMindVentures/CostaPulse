@@ -18,6 +18,7 @@ type TeamPageLabels = {
   experienceYears: (years: number) => string;
   specialties: string;
   certifications: string;
+  availability: string;
 };
 
 type TeamPageProps = {
@@ -33,7 +34,8 @@ export function TeamPage({ members, labels }: TeamPageProps) {
     experience: labels.experience,
     experienceYears: labels.experienceYears,
     specialties: labels.specialties,
-    certifications: labels.certifications
+    certifications: labels.certifications,
+    availability: labels.availability
   };
   const singleFeaturedMember =
     members.length === 1 && members[0]?.isFeatured ? members[0] : null;

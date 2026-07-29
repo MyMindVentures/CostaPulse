@@ -32,6 +32,8 @@ Never guess database fields, RPC names, routes or permissions.
 
 Includes discovery, experience cards, experience profiles, team profiles, partner referral entry points, the `/why-costapulse` shared-value strategy page and booking journeys. The strategy page consumes the public, RLS-scoped `strategy_cards_public` read model through the strategies repository and maps its nested JSON into frontend view models before rendering.
 
+Public team-member availability is available at `/availability`, `/availability/[date]`, and `/team/[slug]/availability`. A shared validated view model consumes the exact range RPC response. Desktop uses a semantic seven-column month grid with a persistent detail panel; mobile uses grouped agenda cards rather than compressing the grid. Month, service category, status, availability-only, and location filters remain in the URL and are sent to the backend range contract.
+
 The strategy page passes the active locale to `get_public_strategy_cards`, validates exactly five distinct public ecosystem roles, and presents them through a single-open, accessible accordion. Each expanded card renders its translated, database-owned workflow as semantic numbered steps. Stable role anchors such as `#customer-strategy` open the matching panel and retain the sticky-navigation scroll offset; localized display labels must be resolved through the centralized role display map so database role keys are never exposed as customer-facing copy.
 
 ### Partner discovery
@@ -87,6 +89,8 @@ Rules for these surfaces:
 ### Admin platform
 
 Includes role-aware modules for content, bookings, availability, customers, partners, team, reviews, finance and system administration.
+
+`/admin/availability` manages integrated professional, manual, travel, assignment, and experience-linked entries. Public copy and internal notes are separate fields, and create/update/delete/publication operations use validated server actions protected by the same ownership and role rules as database RLS.
 
 ## Component rules
 

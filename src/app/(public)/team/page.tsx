@@ -32,7 +32,8 @@ export default async function PublicTeamPage() {
         experience: t("experience"),
         experienceYears: (years) => t("experienceYears", { years }),
         specialties: t("specialties"),
-        certifications: t("certifications")
+        certifications: t("certifications"),
+        availability: t("availabilityCta")
       }}
     />
   );

@@ -25,6 +25,7 @@ export default async function AdminLayout({
     "bookings",
     "bookingStories",
     "calendar",
+    "availability",
     "customers"
   ]);
   const items = getAdminDashboardNavItems(sections);
@@ -46,6 +47,7 @@ export default async function AdminLayout({
         bookings: t("bookings"),
         bookingStories: t("bookingStories"),
         calendar: t("calendar"),
+        availability: t("availability"),
         customers: t("customers")
       }}
       footer={<SignOutButton label={t("signOut")} />}
