@@ -69,6 +69,21 @@ Document durable workflow contracts using:
 - Presentational clients never infer publication rights or query protected story records directly.
 - File and media access follows the canonical media architecture and Storage authorization rules.
 
+## Credential access and sharing workflow principles
+
+- Admin-authorized users create credential access grants through server actions that validate payloads and call reviewed RPCs.
+- Magic-link invitations are sent through Supabase Auth with callback routing to a protected credential portal.
+- Authenticated portal reads and tokenized shared reads use separate backend contracts and never expose service-role credentials.
+- Shared-link tokens are generated server-side, persisted only as SHA-256 hashes, and resolved through security-definer RPCs.
+- File open/download actions are permission-gated in backend contracts before issuing short-lived signed Storage URLs.
+- Download and denied-access events are persisted as auditable records.
+
+Current credential workflow entry points:
+
+- server actions in `src/server/credentials/actions.ts` for grant creation, share-link creation, invite resend and revoke;
+- callback route `src/app/auth/callback/route.ts` for magic-link code exchange and grant validation;
+- secure file link handlers under `/api/credentials/files/[fileId]` and `/api/shared/credentials/[token]/files/[fileId]`.
+
 ## Payment principles
 
 - Stripe is the external payment source.

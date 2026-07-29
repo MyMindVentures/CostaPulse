@@ -61,6 +61,21 @@ Includes user-specific bookings, vouchers, confirmations, profile information an
 
 Includes authenticated crew information and workflows such as assignments and sign-on/sign-off records. Live records are loaded from the database and are never stored as documentation.
 
+### Credential portals
+
+Credential-sharing surfaces are split between authenticated and tokenized routes:
+
+- Authenticated portal routes: `/portal/credentials` and `/portal/credentials/[documentId]`
+- Shared token routes: `/shared/credentials/[token]` and `/shared/credentials/[token]/[documentId]`
+- Secure file-link handlers: `/api/credentials/files/[fileId]` and `/api/shared/credentials/[token]/files/[fileId]`
+
+Rules for these surfaces:
+
+- Route guards and repository contracts must enforce access before rendering sensitive data.
+- File links in the UI must resolve through secure API handlers that issue short-lived signed URLs only after backend permission checks.
+- Shared token pages are non-indexable and are not added to sitemap output.
+- Admin grant/share management is exposed in the role-aware admin area under `/admin/documents/shares` and uses server actions backed by validated RPC contracts.
+
 ### Admin platform
 
 Includes role-aware modules for content, bookings, availability, customers, partners, team, reviews, finance and system administration.

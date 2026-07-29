@@ -28,6 +28,7 @@ export const DASHBOARD_NAVIGATION = {
     { labelKey: "overview", href: "/admin" },
     { labelKey: "experiences", href: "/admin/experiences" },
     { labelKey: "media", href: "/admin/media" },
+    { labelKey: "documentsShares", href: "/admin/documents/shares" },
     { labelKey: "partners", href: "/admin/partners" },
     { labelKey: "locations", href: "/admin/locations" },
     { labelKey: "team", href: "/admin/team" },
@@ -43,6 +44,12 @@ export const REFERRAL_FLOW_ENTRY = {
   href: "/referral"
 } as const;
 
+// Guardrail discoverability references for authenticated/tokenized credential flows.
+export const ROUTE_DISCOVERABILITY_REFERENCES = [
+  "/portal/credentials",
+  "/shared"
+] as const;
+
 export type AdminDashboardNavKey =
   (typeof DASHBOARD_NAVIGATION.admin)[number]["labelKey"];
 
@@ -50,6 +57,7 @@ const adminNavHrefBySection = {
   overview: "/admin",
   experiences: "/admin/experiences",
   media: "/admin/media",
+  documentsShares: "/admin/documents/shares",
   partners: "/admin/partners",
   locations: "/admin/locations",
   team: "/admin/team",

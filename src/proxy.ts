@@ -60,6 +60,7 @@ export async function proxy(request: NextRequest) {
   const userRoles = (roles ?? []).map((entry) => entry.role);
   const path = request.nextUrl.pathname;
   const authorized =
+    path.startsWith("/portal") ||
     path.startsWith("/account") ||
     (path.startsWith("/partner") && userRoles.some(isTeamRole)) ||
     (path.startsWith("/admin") && canAccessAdminArea(userRoles));
@@ -71,5 +72,10 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/account/:path*", "/partner/:path*", "/admin/:path*"]
+  matcher: [
+    "/portal/:path*",
+    "/account/:path*",
+    "/partner/:path*",
+    "/admin/:path*"
+  ]
 };
