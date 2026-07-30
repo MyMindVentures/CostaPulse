@@ -126,7 +126,8 @@ export function ProtectedFilePreview({
             throw new Error("Failed to prepare PDF canvas context");
           }
 
-          await page.render({ canvasContext: context, viewport, canvas }).promise;
+          await page.render({ canvasContext: context, viewport, canvas })
+            .promise;
           renderedPages.push(canvas.toDataURL("image/png"));
         }
 
