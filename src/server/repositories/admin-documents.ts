@@ -28,6 +28,8 @@ const professionalDocumentAdminSchema = z.object({
   valid_from: z.string().nullable(),
   expires_on: z.string().nullable(),
   does_not_expire: z.boolean(),
+  language_code: z.string().nullable().optional().default(null),
+  page_count: z.number().int().positive().nullable().optional().default(null),
   confidentiality_level: z.string().min(1),
   qualification: z.string().nullable().optional().default(null),
   stcw_code: z.string().nullable().optional().default(null),
@@ -65,6 +67,8 @@ const professionalDocumentBaseSchema = z.object({
   valid_from: z.string().nullable(),
   expires_on: z.string().nullable(),
   does_not_expire: z.boolean(),
+  language_code: z.string().nullable().optional().default(null),
+  page_count: z.number().int().positive().nullable().optional().default(null),
   confidentiality_level: z.string().min(1),
   qualification: z.string().nullable().optional().default(null),
   stcw_code: z.string().nullable().optional().default(null),
@@ -380,7 +384,7 @@ async function fetchDocumentsFromBaseTablesWithAdmin() {
   const { data, error } = await admin
     .from("professional_documents")
     .select(
-      "id, profile_id, document_type, category, title, document_number, issuing_authority, issuing_country_code, issued_on, valid_from, expires_on, does_not_expire, confidentiality_level, qualification, stcw_code, restrictions, notes, team_member_certificate_id, replaces_document_id, status, verification_status, updated_at, files:professional_document_files(id, file_role, is_current, version_number, original_filename, mime_type, file_size_bytes, created_at)"
+      "id, profile_id, document_type, category, title, document_number, issuing_authority, issuing_country_code, issued_on, valid_from, expires_on, does_not_expire, language_code, page_count, confidentiality_level, qualification, stcw_code, restrictions, notes, team_member_certificate_id, replaces_document_id, status, verification_status, updated_at, files:professional_document_files(id, file_role, is_current, version_number, original_filename, mime_type, file_size_bytes, created_at)"
     )
     .order("updated_at", { ascending: false });
 
@@ -582,7 +586,7 @@ export async function fetchAdminDocumentsOverview(
   const { data, error } = await supabase
     .from("professional_documents_admin")
     .select(
-      "id, profile_id, document_type, category, title, document_number, issuing_authority, issuing_country_code, issued_on, valid_from, expires_on, does_not_expire, confidentiality_level, qualification, stcw_code, restrictions, notes, team_member_certificate_id, replaces_document_id, status, verification_status, computed_status, updated_at, files"
+      "id, profile_id, document_type, category, title, document_number, issuing_authority, issuing_country_code, issued_on, valid_from, expires_on, does_not_expire, language_code, page_count, confidentiality_level, qualification, stcw_code, restrictions, notes, team_member_certificate_id, replaces_document_id, status, verification_status, computed_status, updated_at, files"
     )
     .order("updated_at", { ascending: false });
 
@@ -660,7 +664,7 @@ export async function fetchAdminDocumentDetail(
   const { data, error } = await supabase
     .from("professional_documents_admin")
     .select(
-      "id, profile_id, document_type, category, title, document_number, issuing_authority, issuing_country_code, issued_on, valid_from, expires_on, does_not_expire, confidentiality_level, qualification, stcw_code, restrictions, notes, team_member_certificate_id, replaces_document_id, status, verification_status, computed_status, updated_at, files"
+      "id, profile_id, document_type, category, title, document_number, issuing_authority, issuing_country_code, issued_on, valid_from, expires_on, does_not_expire, language_code, page_count, confidentiality_level, qualification, stcw_code, restrictions, notes, team_member_certificate_id, replaces_document_id, status, verification_status, computed_status, updated_at, files"
     )
     .eq("id", documentId)
     .maybeSingle();

@@ -63,6 +63,8 @@ const documentFixture = {
   stcw_code: null,
   restrictions: null,
   notes: null,
+  language_code: null,
+  page_count: null,
   team_member_certificate_id: null,
   replaces_document_id: null,
   status: "active",

@@ -7,6 +7,7 @@ vi.mock("@/lib/supabase/server", () => ({
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   createCredentialGrantAndSendMagicLinkAction,
+  createRecipientCredentialShareLinkAction,
   createCredentialShareLinkAction,
   resendCredentialMagicLinkAction,
   revokeCredentialGrantAction
@@ -29,6 +30,7 @@ describe("credential actions", () => {
       permissionDownloadFiles: true,
       permissionIncludeHistory: false,
       permissionIncludeDocumentNumber: false,
+      permissionCreateShareLinks: false,
       message: null
     });
 
@@ -51,6 +53,7 @@ describe("credential actions", () => {
       permissionDownloadFiles: false,
       permissionIncludeHistory: false,
       permissionIncludeDocumentNumber: false,
+      permissionCreateShareLinks: false,
       message: null
     });
 
@@ -97,6 +100,28 @@ describe("credential actions", () => {
       })
     );
 
+    vi.unstubAllEnvs();
+  });
+
+  it("uses the server-side recipient share expiry default", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://app.costapulse.test");
+    const rpc = vi.fn().mockResolvedValue({ data: "share-id", error: null });
+    vi.mocked(createSupabaseServerClient).mockResolvedValue({ rpc } as never);
+
+    const result = await createRecipientCredentialShareLinkAction({
+      expiresAt: null
+    });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.shareUrl).toMatch(
+        /^https:\/\/app\.costapulse\.test\/shared\/credentials\/[^/]+\/documents$/
+      );
+    }
+    expect(rpc).toHaveBeenCalledWith(
+      "create_recipient_credential_share_link",
+      expect.objectContaining({ p_expires_at: null })
+    );
     vi.unstubAllEnvs();
   });
 

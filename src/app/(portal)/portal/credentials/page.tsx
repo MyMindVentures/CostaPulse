@@ -179,6 +179,11 @@ export default async function PortalCredentialsPage({
             <p className="mt-2 text-sm text-white/78">
               {t("accessExpires")} {humanDate(portfolio.access_expires_at)}
             </p>
+            <Button asChild variant="light" className="mt-6 min-h-11">
+              <Link href="/portal/credentials/documents">
+                {t("applicationDocuments.openPortfolio")}
+              </Link>
+            </Button>
           </div>
         </header>
 

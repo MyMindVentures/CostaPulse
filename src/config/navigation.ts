@@ -49,6 +49,7 @@ export const REFERRAL_FLOW_ENTRY = {
 // Guardrail discoverability references for authenticated/tokenized credential flows.
 export const ROUTE_DISCOVERABILITY_REFERENCES = [
   "/portal/credentials",
+  "/portal/credentials/documents",
   "/shared"
 ] as const;
 

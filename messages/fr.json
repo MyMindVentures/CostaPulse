@@ -846,6 +846,9 @@
       "documentsSharesPermissionDownloadFiles": "Download files",
       "documentsSharesPermissionHistory": "Include history",
       "documentsSharesPermissionDocumentNumber": "Include document number",
+      "documentsSharesPermissionCreateLinks": "Autoriser le repartage contrôlé",
+      "documentsLanguageCode": "Code de langue du document",
+      "documentsPageCount": "Nombre de pages",
       "documentsSharesFileRoles": "Permitted file roles",
       "documentsSharesDocuments": "Select credentials",
       "documentsSharesDocumentsEmpty": "No shareable credentials are available.",
@@ -1141,33 +1144,85 @@
       "openFile": "Open file",
       "downloadFile": "Download file"
     },
+    "applicationDocuments": {
+      "metaOverviewTitle": "Documents de candidature",
+      "metaDetailTitle": "Document de candidature",
+      "metaSharedOverviewTitle": "Documents de candidature partagés",
+      "metaSharedDetailTitle": "Document de candidature partagé",
+      "openPortfolio": "Voir le CV et la lettre de motivation",
+      "kicker": "Portfolio de candidature privé",
+      "heading": "Documents de candidature",
+      "backToCredentials": "Retour aux qualifications professionnelles",
+      "backToDocuments": "Retour aux documents de candidature",
+      "activeAccess": "Accès autorisé",
+      "expires": "Expiration de l’accès :",
+      "types": {
+        "cv": "Curriculum Vitae",
+        "motivation_letter": "Lettre de motivation"
+      },
+      "metadata": {
+        "language": "Langue",
+        "version": "Date de version",
+        "updated": "Dernière mise à jour",
+        "pages": "Pages"
+      },
+      "actions": {
+        "view": {
+          "cv": "Voir le CV",
+          "motivation_letter": "Voir la lettre de motivation"
+        },
+        "download": "Télécharger le PDF"
+      },
+      "unavailable": "Indisponible actuellement",
+      "missingFile": "Le PDF approuvé est actuellement indisponible.",
+      "preview": {
+        "loading": "Chargement de l’aperçu sécurisé…",
+        "unavailable": "L’aperçu sécurisé est indisponible.",
+        "browserFallback": "La visionneuse PDF du navigateur est utilisée.",
+        "page": "page"
+      },
+      "share": {
+        "heading": "Partage contrôlé",
+        "description": "Créez un lien autorisé avec sa propre expiration. Il ne peut pas dépasser votre accès.",
+        "action": "Créer et partager le lien",
+        "expiry": "Expiration du lien",
+        "copied": "Lien autorisé copié.",
+        "shared": "Lien autorisé partagé.",
+        "error": "Le lien n’a pas pu être créé.",
+        "notPermitted": "Cette autorisation ne permet pas le repartage."
+      },
+      "accessUnavailable": {
+        "title": "Ce portfolio est indisponible",
+        "description": "Le lien peut être expiré, révoqué ou invalide. Demandez un nouveau lien autorisé."
+      }
+    },
     "labels": {
       "verificationStatus": {
-        "verified": "Verified",
-        "pending": "Pending",
-        "rejected": "Rejected",
-        "unverified": "Unverified"
+        "verified": "Vérifié",
+        "pending": "En attente",
+        "rejected": "Rejeté",
+        "unverified": "Non vérifié"
       },
       "computedStatus": {
-        "valid": "Valid",
-        "validityUnknown": "Validity unknown",
-        "expiresWithin180Days": "Expires within 180 days",
-        "expiresWithin90Days": "Expires within 90 days",
-        "expiresWithin60Days": "Expires within 60 days",
-        "expiresWithin30Days": "Expires within 30 days",
-        "expired": "Expired"
+        "valid": "Valide",
+        "validityUnknown": "Validité inconnue",
+        "expiresWithin180Days": "Expire dans les 180 jours",
+        "expiresWithin90Days": "Expire dans les 90 jours",
+        "expiresWithin60Days": "Expire dans les 60 jours",
+        "expiresWithin30Days": "Expire dans les 30 jours",
+        "expired": "Expiré"
       },
       "recordStatus": {
-        "active": "Active",
-        "replaced": "Replaced"
+        "active": "Actif",
+        "replaced": "Remplacé"
       },
       "fileRole": {
-        "primary": "Primary",
-        "front": "Front",
-        "back": "Back",
-        "translation": "Translation",
-        "attachment": "Attachment",
-        "supportingEvidence": "Supporting evidence"
+        "primary": "Principal",
+        "front": "Recto",
+        "back": "Verso",
+        "translation": "Traduction",
+        "attachment": "Pièce jointe",
+        "supportingEvidence": "Justificatif"
       }
     }
   },

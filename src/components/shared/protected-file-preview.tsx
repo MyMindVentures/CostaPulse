@@ -7,13 +7,36 @@ type ProtectedFilePreviewProps = {
   fileId: string;
   fileName: string;
   mimeType: string;
+  requestUrl?: string;
+  mode?: "thumbnail" | "document";
+  labels?: {
+    loading: string;
+    unavailable: string;
+    pdfFallback: string;
+    page: string;
+  };
   className?: string;
 };
+
+export function getProtectedPdfPageLimit(
+  mode: "thumbnail" | "document",
+  pageCount: number
+): number {
+  return mode === "thumbnail" ? Math.min(1, pageCount) : pageCount;
+}
 
 export function ProtectedFilePreview({
   fileId,
   fileName,
   mimeType,
+  requestUrl,
+  mode = "document",
+  labels = {
+    loading: "Loading preview...",
+    unavailable: "Inline preview is unavailable.",
+    pdfFallback: "The browser PDF viewer is being used.",
+    page: "page"
+  },
   className = "h-[22rem] w-full"
 }: ProtectedFilePreviewProps) {
   const [loadedFile, setLoadedFile] = useState<{
@@ -30,8 +53,8 @@ export function ProtectedFilePreview({
   } | null>(null);
 
   const previewUrl = useMemo(
-    () => `/api/admin/documents/files/${fileId}?intent=view`,
-    [fileId]
+    () => requestUrl ?? `/api/admin/documents/files/${fileId}?intent=view`,
+    [fileId, requestUrl]
   );
   const currentFile = loadedFile?.requestUrl === previewUrl ? loadedFile : null;
   const blobUrl = currentFile?.blobUrl ?? null;
@@ -118,11 +141,8 @@ export function ProtectedFilePreview({
         const pdfDocument = await task.promise;
 
         const renderedPages: string[] = [];
-        for (
-          let pageNumber = 1;
-          pageNumber <= pdfDocument.numPages;
-          pageNumber++
-        ) {
+        const pageLimit = getProtectedPdfPageLimit(mode, pdfDocument.numPages);
+        for (let pageNumber = 1; pageNumber <= pageLimit; pageNumber++) {
           const page = await pdfDocument.getPage(pageNumber);
           const viewport = page.getViewport({ scale: 1.4 });
           const canvas = window.document.createElement("canvas");
@@ -166,12 +186,12 @@ export function ProtectedFilePreview({
     return () => {
       active = false;
     };
-  }, [resolvedMimeType, blob]);
+  }, [resolvedMimeType, blob, mode]);
 
   if (loadError) {
     return (
       <div className="text-navy/70 flex h-[22rem] items-center justify-center p-4 text-sm">
-        Inline preview is niet beschikbaar ({loadError}).
+        {labels.unavailable} ({loadError})
       </div>
     );
   }
@@ -179,7 +199,7 @@ export function ProtectedFilePreview({
   if (!blobUrl) {
     return (
       <div className="text-navy/70 flex h-[22rem] items-center justify-center p-4 text-sm">
-        Preview laden...
+        {labels.loading}
       </div>
     );
   }
@@ -200,6 +220,15 @@ export function ProtectedFilePreview({
 
   if (resolvedMimeType === "application/pdf") {
     if (pdfPageImages.length === 0) {
+      if (mode === "thumbnail") {
+        return (
+          <div
+            className={`${className} text-muted flex items-center justify-center bg-white p-4 text-center text-sm`}
+          >
+            {pdfRenderError ? labels.unavailable : labels.loading}
+          </div>
+        );
+      }
       return (
         <div className={`${className} bg-white`}>
           <iframe
@@ -208,10 +237,7 @@ export function ProtectedFilePreview({
             className="h-full w-full border-0"
           />
           {pdfRenderError ? (
-            <p className="sr-only">
-              PDF.js preview is niet beschikbaar ({pdfRenderError}). De
-              ingebouwde PDF-viewer wordt gebruikt.
-            </p>
+            <p className="sr-only">{labels.pdfFallback}</p>
           ) : null}
         </div>
       );
@@ -224,7 +250,7 @@ export function ProtectedFilePreview({
             <Image
               key={`${fileId}-page-${index + 1}`}
               src={pageImage}
-              alt={`${fileName} pagina ${index + 1}`}
+              alt={`${fileName} ${labels.page} ${index + 1}`}
               width={1200}
               height={1700}
               unoptimized
@@ -269,7 +295,7 @@ export function ProtectedFilePreview({
   return (
     <object data={blobUrl} type={resolvedMimeType} className={className}>
       <div className="text-navy/70 flex h-[22rem] items-center justify-center p-4 text-sm">
-        Inline preview is niet beschikbaar voor dit bestandstype.
+        {labels.unavailable}
       </div>
     </object>
   );

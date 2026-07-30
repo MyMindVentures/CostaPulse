@@ -64,6 +64,19 @@ Use environment-specific secret management and rotate credentials after suspecte
 - Validate file type, size and ownership.
 - Do not rely on unguessable URLs as access control.
 
+Credential files remain in the private `professional-credentials` bucket.
+Authenticated and tokenized file handlers validate the live grant, document
+scope, file role, intent and expiry before issuing a 120-second signed URL.
+Anonymous callers cannot execute authenticated file-access RPCs.
+
+## Credential links and telemetry
+
+- Credential share tokens are random, stored only as SHA-256 hashes, and never rendered as UI labels.
+- Recipient-created links require an email-matched authenticated grant and explicit controlled-share permission; they inherit scope and cannot extend the grant lifetime.
+- Credential overview, detail, file and shared-token responses are private, no-store, non-indexable and use a no-referrer policy.
+- PostHog and Sentry discard credential-route events and transactions so tokens, signed URLs and file identifiers cannot enter analytics or error telemetry.
+- Portfolio payloads expose safe identity and document metadata only; internal notes, arbitrary metadata and Storage locations are excluded.
+
 ## Audit logging
 
 Sensitive actions should record actor, action, entity, timestamp, reason and relevant before/after context where lawful and appropriate. Examples include role changes, refunds, cancellations, publication changes, price changes and voucher redemption.

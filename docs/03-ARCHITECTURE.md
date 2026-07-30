@@ -63,6 +63,14 @@ Agents must never guess a table, field, route, role or backend contract.
 
 Operational endpoints such as `/api/health`, `/api/ready`, booking, availability and Stripe webhook routes are not marketing pages.
 
+Private credential portfolio routes extend the existing credential-sharing
+architecture rather than introducing a separate crewing document service.
+Authenticated recipients use `/portal/credentials/documents` and its `cv` or
+`motivation-letter` detail route. Token recipients use the equivalent
+`/shared/credentials/[token]/documents` hierarchy. Both route families consume
+the same grant-scoped portfolio projection and protected file handlers; they
+are dynamic, non-indexed, private, and excluded from sitemap output.
+
 ## Code ownership map
 
 | Path                         | Responsibility                                     |
@@ -150,3 +158,10 @@ The repository is limited to `README.md`, `AGENTS.md` and the ten numbered docum
 ### ADR-003 — Railway Railpack deployment
 
 Production tracks `main` and deploys through Railway Railpack using `railway.json`. A root deployment Dockerfile is intentionally not used.
+
+### ADR-004 — Crewing documents reuse credential grants
+
+CV and motivation-letter portfolios reuse professional documents, credential
+grants, hashed share links, access events, and the private professional
+credentials Storage bucket. Recipient-created links inherit the parent grant's
+document scope and permissions and cannot outlive that grant.

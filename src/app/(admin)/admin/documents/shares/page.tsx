@@ -20,6 +20,7 @@ import {
   type RevokeCredentialGrantResult,
   type ResendCredentialMagicLinkResult
 } from "@/server/credentials/actions";
+import { getDefaultCredentialExpiry } from "@/lib/credentials/access-expiry";
 import { requireAreaAccess } from "@/server/auth/protected-area";
 import { canAccessAdminSection } from "@/server/auth/role-access";
 import {
@@ -53,10 +54,9 @@ function humanDate(value: string | null): string {
   if (!value) return "-";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "-";
-  return date.toLocaleDateString("en-GB", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit"
+  return date.toLocaleString("en-GB", {
+    dateStyle: "medium",
+    timeStyle: "short"
   });
 }
 
@@ -72,6 +72,13 @@ function toIsoOrNull(value: string): string | null {
   }
 
   return parsed.toISOString();
+}
+
+function toDateTimeLocalValue(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return local.toISOString().slice(0, 16);
 }
 
 function toPositiveIntegerOrNull(value: string): number | null {
@@ -151,6 +158,8 @@ export default async function AdminDocumentSharesPage({
         formData.get("permissionIncludeHistory") === "on",
       permissionIncludeDocumentNumber:
         formData.get("permissionIncludeDocumentNumber") === "on",
+      permissionCreateShareLinks:
+        formData.get("permissionCreateShareLinks") === "on",
       message: message || null
     };
 
@@ -198,9 +207,7 @@ export default async function AdminDocumentSharesPage({
     const result: CreateCredentialShareLinkResult =
       await createCredentialShareLinkAction({
         grantId,
-        expiresAt:
-          shareExpiresAt ??
-          new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        expiresAt: shareExpiresAt,
         recipientEmail:
           String(formData.get("shareRecipientEmail") ?? "").trim() || null,
         recipientAgencyLabel:
@@ -327,6 +334,7 @@ export default async function AdminDocumentSharesPage({
             <input
               type="datetime-local"
               name="accessExpiresAt"
+              defaultValue={toDateTimeLocalValue(getDefaultCredentialExpiry())}
               className="border-border min-h-11 rounded-md border px-3"
             />
           </label>
@@ -360,6 +368,10 @@ export default async function AdminDocumentSharesPage({
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" name="permissionIncludeDocumentNumber" />
               {t("documentsSharesPermissionDocumentNumber")}
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="permissionCreateShareLinks" />
+              {t("documentsSharesPermissionCreateLinks")}
             </label>
           </div>
         </fieldset>
@@ -500,10 +512,16 @@ export default async function AdminDocumentSharesPage({
                             {t("documentsSharesPermissionDocumentNumber")}
                           </Badge>
                         ) : null}
+                        {grant.permission_create_share_links ? (
+                          <Badge variant="outline" className="text-xs">
+                            {t("documentsSharesPermissionCreateLinks")}
+                          </Badge>
+                        ) : null}
                         {!grant.permission_view_files &&
                         !grant.permission_download_files &&
                         !grant.permission_include_history &&
-                        !grant.permission_include_document_number ? (
+                        !grant.permission_include_document_number &&
+                        !grant.permission_create_share_links ? (
                           <span className="text-muted text-xs">-</span>
                         ) : null}
                       </div>
@@ -526,6 +544,9 @@ export default async function AdminDocumentSharesPage({
                             <input
                               type="datetime-local"
                               name="shareExpiresAt"
+                              defaultValue={toDateTimeLocalValue(
+                                getDefaultCredentialExpiry()
+                              )}
                               className="border-border min-h-10 rounded-md border px-2 text-xs"
                             />
                             <div className="grid grid-cols-2 gap-2">

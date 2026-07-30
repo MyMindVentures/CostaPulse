@@ -6,6 +6,11 @@ import {
 } from "@/server/repositories/credential-portal";
 
 const SIGNED_URL_TTL_SECONDS = 120;
+const PRIVATE_HEADERS = {
+  "Cache-Control": "private, no-store",
+  "Referrer-Policy": "no-referrer",
+  "X-Robots-Tag": "noindex, nofollow, noarchive"
+};
 
 function parseIntent(value: string | null): "view" | "download" {
   return value === "download" ? "download" : "view";
@@ -27,7 +32,7 @@ export async function GET(
   if (!admin) {
     return NextResponse.json(
       { error: "Storage access is not configured." },
-      { status: 500 }
+      { status: 500, headers: PRIVATE_HEADERS }
     );
   }
 
@@ -49,21 +54,25 @@ export async function GET(
     if (error || !data?.signedUrl) {
       return NextResponse.json(
         { error: error?.message ?? "Failed to generate file link." },
-        { status: 500 }
+        { status: 500, headers: PRIVATE_HEADERS }
       );
     }
 
-    return NextResponse.redirect(data.signedUrl, 302);
+    const response = NextResponse.redirect(data.signedUrl, 302);
+    Object.entries(PRIVATE_HEADERS).forEach(([key, value]) =>
+      response.headers.set(key, value)
+    );
+    return response;
   } catch (error) {
     if (error instanceof CredentialPortfolioError) {
       return NextResponse.json(
         { error: error.message },
-        { status: mapErrorStatus(error) }
+        { status: mapErrorStatus(error), headers: PRIVATE_HEADERS }
       );
     }
     return NextResponse.json(
       { error: "Unexpected file access error." },
-      { status: 500 }
+      { status: 500, headers: PRIVATE_HEADERS }
     );
   }
 }
