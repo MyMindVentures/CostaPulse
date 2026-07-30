@@ -1312,6 +1312,7 @@ export type Database = {
           last_magic_link_sent_at: string | null;
           message: string | null;
           owner_profile_id: string;
+          permission_create_share_links: boolean;
           permission_download_files: boolean;
           permission_include_document_number: boolean;
           permission_include_history: boolean;
@@ -1332,6 +1333,7 @@ export type Database = {
           last_magic_link_sent_at?: string | null;
           message?: string | null;
           owner_profile_id: string;
+          permission_create_share_links?: boolean;
           permission_download_files?: boolean;
           permission_include_document_number?: boolean;
           permission_include_history?: boolean;
@@ -1352,6 +1354,7 @@ export type Database = {
           last_magic_link_sent_at?: string | null;
           message?: string | null;
           owner_profile_id?: string;
+          permission_create_share_links?: boolean;
           permission_download_files?: boolean;
           permission_include_document_number?: boolean;
           permission_include_history?: boolean;
@@ -3807,8 +3810,10 @@ export type Database = {
           issued_on: string | null;
           issuing_authority: string | null;
           issuing_country_code: string | null;
+          language_code: string | null;
           metadata: Json;
           notes: string | null;
+          page_count: number | null;
           profile_id: string;
           qualification: string | null;
           replaces_document_id: string | null;
@@ -3836,8 +3841,10 @@ export type Database = {
           issued_on?: string | null;
           issuing_authority?: string | null;
           issuing_country_code?: string | null;
+          language_code?: string | null;
           metadata?: Json;
           notes?: string | null;
+          page_count?: number | null;
           profile_id: string;
           qualification?: string | null;
           replaces_document_id?: string | null;
@@ -3865,8 +3872,10 @@ export type Database = {
           issued_on?: string | null;
           issuing_authority?: string | null;
           issuing_country_code?: string | null;
+          language_code?: string | null;
           metadata?: Json;
           notes?: string | null;
+          page_count?: number | null;
           profile_id?: string;
           qualification?: string | null;
           replaces_document_id?: string | null;
@@ -6559,8 +6568,10 @@ export type Database = {
           issued_on: string | null;
           issuing_authority: string | null;
           issuing_country_code: string | null;
+          language_code: string | null;
           metadata: Json | null;
           notes: string | null;
+          page_count: number | null;
           profile_id: string | null;
           qualification: string | null;
           replaces_document_id: string | null;
@@ -6590,8 +6601,10 @@ export type Database = {
           issued_on?: string | null;
           issuing_authority?: string | null;
           issuing_country_code?: string | null;
+          language_code?: string | null;
           metadata?: Json | null;
           notes?: string | null;
+          page_count?: number | null;
           profile_id?: string | null;
           qualification?: string | null;
           replaces_document_id?: string | null;
@@ -6621,8 +6634,10 @@ export type Database = {
           issued_on?: string | null;
           issuing_authority?: string | null;
           issuing_country_code?: string | null;
+          language_code?: string | null;
           metadata?: Json | null;
           notes?: string | null;
+          page_count?: number | null;
           profile_id?: string | null;
           qualification?: string | null;
           replaces_document_id?: string | null;
@@ -7884,6 +7899,10 @@ export type Database = {
         Args: { p_slot_id: string };
         Returns: number;
       };
+      build_credential_portfolio_payload: {
+        Args: { p_grant_id: string; p_share_link_id?: string };
+        Returns: Json;
+      };
       build_professional_document_filename: {
         Args: {
           p_document_number: string;
@@ -7924,6 +7943,7 @@ export type Database = {
           p_access_expires_at?: string;
           p_document_ids: string[];
           p_message?: string;
+          p_permission_create_share_links?: boolean;
           p_permission_download_files?: boolean;
           p_permission_include_document_number?: boolean;
           p_permission_include_history?: boolean;
@@ -7936,7 +7956,7 @@ export type Database = {
       };
       create_credential_share_link: {
         Args: {
-          p_expires_at: string;
+          p_expires_at?: string;
           p_grant_id: string;
           p_max_downloads?: number;
           p_max_views?: number;
@@ -7963,6 +7983,10 @@ export type Database = {
           p_terms_accepted?: boolean;
         };
         Returns: Json;
+      };
+      create_recipient_credential_share_link: {
+        Args: { p_expires_at?: string; p_token_hash: string };
+        Returns: string;
       };
       current_team_member_id: { Args: never; Returns: string };
       generate_public_code: { Args: { prefix?: string }; Returns: string };
@@ -8309,6 +8333,7 @@ export type Database = {
           last_magic_link_sent_at: string | null;
           message: string | null;
           owner_profile_id: string;
+          permission_create_share_links: boolean;
           permission_download_files: boolean;
           permission_include_document_number: boolean;
           permission_include_history: boolean;
@@ -8347,12 +8372,20 @@ export type Database = {
         Args: { object_name: string };
         Returns: boolean;
       };
+      record_authenticated_credential_detail_view: {
+        Args: { p_document_id: string };
+        Returns: undefined;
+      };
       record_referral_verification_email_outcome: {
         Args: {
           p_provider_message_id?: string;
           p_succeeded: boolean;
           p_verification_token_hash: string;
         };
+        Returns: undefined;
+      };
+      record_shared_credential_detail_view: {
+        Args: { p_document_id: string; p_token: string };
         Returns: undefined;
       };
       register_partner_referral_visit: {

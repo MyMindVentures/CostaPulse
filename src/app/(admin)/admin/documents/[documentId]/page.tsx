@@ -239,6 +239,20 @@ export default async function AdminDocumentDetailPage({
               {document.restrictions ?? "-"}
             </dd>
           </div>
+          <div className={detailMetaItemClass}>
+            <dt className={detailMetaTermClass}>
+              {t("documentsLanguageCode")}
+            </dt>
+            <dd className={detailMetaValueClass}>
+              {document.language_code ?? "-"}
+            </dd>
+          </div>
+          <div className={detailMetaItemClass}>
+            <dt className={detailMetaTermClass}>{t("documentsPageCount")}</dt>
+            <dd className={detailMetaValueClass}>
+              {document.page_count ?? "-"}
+            </dd>
+          </div>
           <div className={detailMetaItemWideClass}>
             <dt className={detailMetaTermClass}>{t("documentsDetailNotes")}</dt>
             <dd

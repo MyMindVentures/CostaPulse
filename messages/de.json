@@ -846,6 +846,9 @@
       "documentsSharesPermissionDownloadFiles": "Download files",
       "documentsSharesPermissionHistory": "Include history",
       "documentsSharesPermissionDocumentNumber": "Include document number",
+      "documentsSharesPermissionCreateLinks": "Kontrolliertes erneutes Teilen erlauben",
+      "documentsLanguageCode": "Sprachcode des Dokuments",
+      "documentsPageCount": "Seitenzahl",
       "documentsSharesFileRoles": "Permitted file roles",
       "documentsSharesDocuments": "Select credentials",
       "documentsSharesDocumentsEmpty": "No shareable credentials are available.",
@@ -1140,6 +1143,54 @@
       "noFiles": "No files are available for this credential.",
       "openFile": "Open file",
       "downloadFile": "Download file"
+    },
+    "applicationDocuments": {
+      "openPortfolio": "Lebenslauf und Motivationsschreiben ansehen",
+      "kicker": "Privates Bewerbungsportfolio",
+      "heading": "Bewerbungsunterlagen",
+      "backToCredentials": "Zurück zu den beruflichen Nachweisen",
+      "backToDocuments": "Zurück zu den Bewerbungsunterlagen",
+      "activeAccess": "Autorisierter Zugriff",
+      "expires": "Zugriff läuft ab:",
+      "types": {
+        "cv": "Lebenslauf",
+        "motivation_letter": "Motivationsschreiben"
+      },
+      "metadata": {
+        "language": "Sprache",
+        "version": "Versionsdatum",
+        "updated": "Zuletzt aktualisiert",
+        "pages": "Seiten"
+      },
+      "actions": {
+        "view": {
+          "cv": "Lebenslauf ansehen",
+          "motivation_letter": "Motivationsschreiben ansehen"
+        },
+        "download": "PDF herunterladen"
+      },
+      "unavailable": "Derzeit nicht verfügbar",
+      "missingFile": "Das freigegebene PDF ist derzeit nicht verfügbar.",
+      "preview": {
+        "loading": "Sichere Vorschau wird geladen…",
+        "unavailable": "Die sichere Vorschau ist nicht verfügbar.",
+        "browserFallback": "Der PDF-Betrachter des Browsers wird verwendet.",
+        "page": "Seite"
+      },
+      "share": {
+        "heading": "Kontrolliertes Teilen",
+        "description": "Erstellen Sie einen autorisierten Link mit eigener Laufzeit. Er kann Ihren Zugriff nicht überdauern.",
+        "action": "Link erstellen und teilen",
+        "expiry": "Freigabelink läuft ab",
+        "copied": "Autorisierter Link kopiert.",
+        "shared": "Autorisierter Link geteilt.",
+        "error": "Der Link konnte nicht erstellt werden.",
+        "notPermitted": "Diese Freigabe erlaubt kein erneutes Teilen."
+      },
+      "accessUnavailable": {
+        "title": "Dieses Portfolio ist nicht verfügbar",
+        "description": "Der Link kann abgelaufen, widerrufen oder ungültig sein. Fordern Sie einen neuen autorisierten Link an."
+      }
     },
     "labels": {
       "verificationStatus": {

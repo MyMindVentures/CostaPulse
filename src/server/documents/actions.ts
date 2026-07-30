@@ -64,6 +64,7 @@ const formSchema = z.object({
     "training_certificate",
     "insurance",
     "cv",
+    "motivation_letter",
     "assessment",
     "other"
   ]),
@@ -85,6 +86,12 @@ const formSchema = z.object({
   validFrom: z.string().trim().nullable(),
   expiresOn: z.string().trim().nullable(),
   doesNotExpire: z.boolean(),
+  languageCode: z
+    .string()
+    .trim()
+    .regex(/^[a-z]{2,3}(-[A-Z][a-z]{3})?(-[A-Z]{2}|-[0-9]{3})?$/)
+    .nullable(),
+  pageCount: z.number().int().positive().nullable(),
   issuingCountryCode: z.string().trim().nullable(),
   qualification: z.string().trim().nullable(),
   stcwCode: z.string().trim().nullable(),
@@ -470,6 +477,11 @@ export async function createProfessionalDocumentAction(formData: FormData) {
     validFrom: String(formData.get("validFrom") ?? "").trim() || null,
     expiresOn: String(formData.get("expiresOn") ?? "").trim() || null,
     doesNotExpire: formData.get("doesNotExpire") === "on",
+    languageCode: String(formData.get("languageCode") ?? "").trim() || null,
+    pageCount: (() => {
+      const value = String(formData.get("pageCount") ?? "").trim();
+      return value ? Number(value) : null;
+    })(),
     issuingCountryCode:
       String(formData.get("issuingCountryCode") ?? "").trim() || null,
     qualification: String(formData.get("qualification") ?? "").trim() || null,
@@ -602,6 +614,8 @@ export async function createProfessionalDocumentAction(formData: FormData) {
         valid_from: validFrom,
         expires_on: expiresOn,
         does_not_expire: payload.data.doesNotExpire,
+        language_code: payload.data.languageCode,
+        page_count: payload.data.pageCount,
         confidentiality_level: payload.data.confidentialityLevel,
         qualification: payload.data.qualification,
         stcw_code: payload.data.stcwCode,
@@ -740,6 +754,11 @@ export async function updateProfessionalDocumentAction(formData: FormData) {
     validFrom: String(formData.get("validFrom") ?? "").trim() || null,
     expiresOn: String(formData.get("expiresOn") ?? "").trim() || null,
     doesNotExpire: formData.get("doesNotExpire") === "on",
+    languageCode: String(formData.get("languageCode") ?? "").trim() || null,
+    pageCount: (() => {
+      const value = String(formData.get("pageCount") ?? "").trim();
+      return value ? Number(value) : null;
+    })(),
     issuingCountryCode:
       String(formData.get("issuingCountryCode") ?? "").trim() || null,
     qualification: String(formData.get("qualification") ?? "").trim() || null,
@@ -841,6 +860,8 @@ export async function updateProfessionalDocumentAction(formData: FormData) {
         valid_from: validFrom,
         expires_on: expiresOn,
         does_not_expire: payload.data.doesNotExpire,
+        language_code: payload.data.languageCode,
+        page_count: payload.data.pageCount,
         confidentiality_level: payload.data.confidentialityLevel,
         qualification: payload.data.qualification,
         stcw_code: payload.data.stcwCode,

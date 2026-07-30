@@ -69,6 +69,8 @@ Credential-sharing surfaces are split between authenticated and tokenized routes
 
 - Authenticated portal routes: `/portal/credentials` and `/portal/credentials/[documentId]`
 - Shared token routes: `/shared/credentials/[token]` and `/shared/credentials/[token]/[documentId]`
+- Authenticated application portfolio routes: `/portal/credentials/documents` and `/portal/credentials/documents/[documentType]`
+- Shared application portfolio routes: `/shared/credentials/[token]/documents` and `/shared/credentials/[token]/documents/[documentType]`
 - Secure file-link handlers: `/api/credentials/files/[fileId]` and `/api/shared/credentials/[token]/files/[fileId]`
 - Admin owner-management routes: `/admin/documents`, `/admin/documents/new`, `/admin/documents/[documentId]`, and `/admin/documents/[documentId]/edit`
 - Admin secure file-link handler: `/api/admin/documents/files/[fileId]`
@@ -79,11 +81,15 @@ Rules for these surfaces:
 - Credential enums and tokenized values (document type, verification, computed status, record status and file roles) must be rendered through the shared formatter module (`src/features/credentials/labels.ts`) with translation keys under `CredentialPortal.labels`, never as raw snake_case tokens in UI copy.
 - File links in the UI must resolve through secure API handlers that issue short-lived signed URLs only after backend permission checks.
 - Shared token pages are non-indexable and are not added to sitemap output.
+- Application document route slugs are limited to `cv` and `motivation-letter`. Each resolves the newest active, verified and granted backend record, with truthful unavailable states when no approved PDF exists.
+- Application portfolio cards use the first protected PDF page; detail routes use the full protected viewer. Preview and download links retain authenticated or token context and are never requested without file-view permission.
+- Authenticated recipient resharing is rendered only when the portfolio grants controlled-share permission. Native Web Share is preferred with a clipboard fallback and announced status feedback.
+- Credential routes and file handlers use private/no-store responses and `noindex, nofollow`; tokenized URLs, signed URLs and file identifiers are suppressed from PostHog and Sentry.
 - Admin grant/share management is exposed in the role-aware admin area under `/admin/documents/shares` and uses server actions backed by validated RPC contracts.
 - Admin document editing, verification-state updates and file replacement must execute through server actions that revalidate both overview and detail routes after mutation.
 - Renewal uses the existing `/admin/documents/new` route with a source document context; the server action links the new document through `replaces_document_id` and marks the previous document status as `replaced` after a successful replacement upload flow.
 - Admin document overview supports URL-driven search, filtering and sorting (search by title, issuing authority and masked number; filters for type, category, computed status, verification, confidentiality and expiry; sort by expiry or updated date).
-- Admin document create/edit forms capture extended metadata (`issuing_country_code`, `qualification`, `stcw_code`, `restrictions`, `notes`, and optional `team_member_certificate_id`) through validated server actions.
+- Admin document create/edit forms capture extended metadata (`issuing_country_code`, `qualification`, `stcw_code`, `restrictions`, `notes`, optional `team_member_certificate_id`, `language_code`, and positive `page_count`) through validated server actions, including the `motivation_letter` document type.
 - Verification state mutation controls are shown only to roles allowed to mutate operational content, and server actions enforce the same authorization before applying status changes.
 
 ### Admin platform

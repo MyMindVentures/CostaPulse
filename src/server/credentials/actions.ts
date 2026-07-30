@@ -25,6 +25,7 @@ const createGrantInputSchema = z.object({
   permissionDownloadFiles: z.boolean(),
   permissionIncludeHistory: z.boolean(),
   permissionIncludeDocumentNumber: z.boolean(),
+  permissionCreateShareLinks: z.boolean(),
   message: z.string().trim().max(2000).nullable().optional()
 });
 
@@ -41,11 +42,15 @@ export type CreateCredentialGrantAndInviteResult =
 
 const createCredentialShareLinkSchema = z.object({
   grantId: z.string().uuid(),
-  expiresAt: z.string().datetime({ offset: true }),
+  expiresAt: z.string().datetime({ offset: true }).nullable().optional(),
   recipientEmail: z.string().trim().email().nullable().optional(),
   recipientAgencyLabel: z.string().trim().max(200).nullable().optional(),
   maxViews: z.number().int().positive().nullable().optional(),
   maxDownloads: z.number().int().positive().nullable().optional()
+});
+
+const createRecipientCredentialShareLinkSchema = z.object({
+  expiresAt: z.string().datetime({ offset: true }).nullable().optional()
 });
 
 const revokeCredentialGrantSchema = z.object({
@@ -59,6 +64,10 @@ const resendCredentialMagicLinkSchema = z.object({
 });
 
 export type CreateCredentialShareLinkResult =
+  | { ok: true; shareId: string; shareUrl: string }
+  | { ok: false; message: string };
+
+export type CreateRecipientCredentialShareLinkResult =
   | { ok: true; shareId: string; shareUrl: string }
   | { ok: false; message: string };
 
@@ -110,6 +119,7 @@ export async function createCredentialGrantAndSendMagicLinkAction(
       p_permission_include_history: parsed.data.permissionIncludeHistory,
       p_permission_include_document_number:
         parsed.data.permissionIncludeDocumentNumber,
+      p_permission_create_share_links: parsed.data.permissionCreateShareLinks,
       p_message: parsed.data.message ?? null
     }
   );
@@ -183,7 +193,7 @@ export async function createCredentialShareLinkAction(
   const { data, error } = await rpcClient.rpc("create_credential_share_link", {
     p_grant_id: parsed.data.grantId,
     p_token_hash: tokenHash,
-    p_expires_at: parsed.data.expiresAt,
+    p_expires_at: parsed.data.expiresAt ?? null,
     p_recipient_email: parsed.data.recipientEmail ?? null,
     p_recipient_agency_label: parsed.data.recipientAgencyLabel ?? null,
     p_max_views: parsed.data.maxViews ?? null,
@@ -199,6 +209,42 @@ export async function createCredentialShareLinkAction(
 
   const shareUrl = `${getSiteOrigin()}/shared/credentials/${rawToken}`;
   return { ok: true, shareId: data, shareUrl };
+}
+
+export async function createRecipientCredentialShareLinkAction(
+  input: z.infer<typeof createRecipientCredentialShareLinkSchema>
+): Promise<CreateRecipientCredentialShareLinkResult> {
+  const parsed = createRecipientCredentialShareLinkSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, message: "Invalid share-link payload." };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) {
+    return { ok: false, message: "Authentication is not configured." };
+  }
+
+  const { rawToken, tokenHash } = createShareTokenParts();
+  const { data, error } = await (supabase as unknown as RpcClient).rpc(
+    "create_recipient_credential_share_link",
+    {
+      p_token_hash: tokenHash,
+      p_expires_at: parsed.data.expiresAt ?? null
+    }
+  );
+
+  if (error || typeof data !== "string") {
+    return {
+      ok: false,
+      message: error?.message ?? "Failed to create share link."
+    };
+  }
+
+  return {
+    ok: true,
+    shareId: data,
+    shareUrl: `${getSiteOrigin()}/shared/credentials/${rawToken}/documents`
+  };
 }
 
 export async function revokeCredentialGrantAction(

@@ -846,6 +846,9 @@
       "documentsSharesPermissionDownloadFiles": "Download files",
       "documentsSharesPermissionHistory": "Include history",
       "documentsSharesPermissionDocumentNumber": "Include document number",
+      "documentsSharesPermissionCreateLinks": "Permitir volver a compartir de forma controlada",
+      "documentsLanguageCode": "Código de idioma del documento",
+      "documentsPageCount": "Número de páginas",
       "documentsSharesFileRoles": "Permitted file roles",
       "documentsSharesDocuments": "Select credentials",
       "documentsSharesDocumentsEmpty": "No shareable credentials are available.",
@@ -1140,6 +1143,54 @@
       "noFiles": "No files are available for this credential.",
       "openFile": "Open file",
       "downloadFile": "Download file"
+    },
+    "applicationDocuments": {
+      "openPortfolio": "Ver CV y carta de motivación",
+      "kicker": "Portafolio privado de candidatura",
+      "heading": "Documentos de candidatura",
+      "backToCredentials": "Volver a las credenciales profesionales",
+      "backToDocuments": "Volver a los documentos de candidatura",
+      "activeAccess": "Acceso autorizado",
+      "expires": "El acceso caduca:",
+      "types": {
+        "cv": "Currículum Vitae",
+        "motivation_letter": "Carta de motivación"
+      },
+      "metadata": {
+        "language": "Idioma",
+        "version": "Fecha de versión",
+        "updated": "Última actualización",
+        "pages": "Páginas"
+      },
+      "actions": {
+        "view": {
+          "cv": "Ver CV",
+          "motivation_letter": "Ver carta de motivación"
+        },
+        "download": "Descargar PDF"
+      },
+      "unavailable": "No disponible actualmente",
+      "missingFile": "El PDF aprobado no está disponible actualmente.",
+      "preview": {
+        "loading": "Cargando vista previa segura…",
+        "unavailable": "La vista previa segura no está disponible.",
+        "browserFallback": "Se está usando el visor PDF del navegador.",
+        "page": "página"
+      },
+      "share": {
+        "heading": "Uso compartido controlado",
+        "description": "Crea un enlace autorizado con su propia caducidad. No puede superar tu acceso.",
+        "action": "Crear y compartir enlace",
+        "expiry": "El enlace caduca",
+        "copied": "Enlace autorizado copiado.",
+        "shared": "Enlace autorizado compartido.",
+        "error": "No se pudo crear el enlace.",
+        "notPermitted": "Este acceso no permite volver a compartir."
+      },
+      "accessUnavailable": {
+        "title": "Este portafolio no está disponible",
+        "description": "El enlace puede estar caducado, revocado o ser inválido. Solicita un nuevo enlace autorizado."
+      }
     },
     "labels": {
       "verificationStatus": {

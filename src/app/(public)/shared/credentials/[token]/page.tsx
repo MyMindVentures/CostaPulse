@@ -196,6 +196,11 @@ export default async function SharedCredentialPortalPage({
               {t("shareExpires")}{" "}
               {humanDate(portfolio.share_expires_at ?? null)}
             </p>
+            <Button asChild variant="light" className="mt-6 min-h-11">
+              <Link href={`/shared/credentials/${token}/documents`}>
+                {t("applicationDocuments.openPortfolio")}
+              </Link>
+            </Button>
           </div>
         </header>
 

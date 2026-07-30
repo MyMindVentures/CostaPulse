@@ -846,6 +846,9 @@
       "documentsSharesPermissionDownloadFiles": "Download files",
       "documentsSharesPermissionHistory": "Include history",
       "documentsSharesPermissionDocumentNumber": "Include document number",
+      "documentsSharesPermissionCreateLinks": "Beheerd opnieuw delen toestaan",
+      "documentsLanguageCode": "Taalcode document",
+      "documentsPageCount": "Aantal pagina's",
       "documentsSharesFileRoles": "Permitted file roles",
       "documentsSharesDocuments": "Select credentials",
       "documentsSharesDocumentsEmpty": "No shareable credentials are available.",
@@ -1140,6 +1143,54 @@
       "noFiles": "No files are available for this credential.",
       "openFile": "Open file",
       "downloadFile": "Download file"
+    },
+    "applicationDocuments": {
+      "openPortfolio": "Bekijk cv en motivatiebrief",
+      "kicker": "Privé sollicitatieportfolio",
+      "heading": "Sollicitatiedocumenten",
+      "backToCredentials": "Terug naar professionele certificaten",
+      "backToDocuments": "Terug naar sollicitatiedocumenten",
+      "activeAccess": "Geautoriseerde toegang",
+      "expires": "Toegang verloopt:",
+      "types": {
+        "cv": "Curriculum Vitae",
+        "motivation_letter": "Motivatiebrief"
+      },
+      "metadata": {
+        "language": "Taal",
+        "version": "Versiedatum",
+        "updated": "Laatst bijgewerkt",
+        "pages": "Pagina's"
+      },
+      "actions": {
+        "view": {
+          "cv": "Bekijk cv",
+          "motivation_letter": "Bekijk motivatiebrief"
+        },
+        "download": "Pdf downloaden"
+      },
+      "unavailable": "Momenteel niet beschikbaar",
+      "missingFile": "De goedgekeurde pdf is momenteel niet beschikbaar.",
+      "preview": {
+        "loading": "Beveiligde preview laden…",
+        "unavailable": "De beveiligde preview is niet beschikbaar.",
+        "browserFallback": "De pdf-viewer van de browser wordt gebruikt.",
+        "page": "pagina"
+      },
+      "share": {
+        "heading": "Beheerd delen",
+        "description": "Maak een geautoriseerde link met een eigen vervaldatum. Deze kan niet langer geldig zijn dan jouw toegang.",
+        "action": "Link maken en delen",
+        "expiry": "Deellink verloopt",
+        "copied": "Geautoriseerde link gekopieerd.",
+        "shared": "Geautoriseerde link gedeeld.",
+        "error": "De link kon niet worden gemaakt.",
+        "notPermitted": "Deze toegang staat opnieuw delen niet toe."
+      },
+      "accessUnavailable": {
+        "title": "Dit portfolio is niet beschikbaar",
+        "description": "De toegangslink kan verlopen, ingetrokken of ongeldig zijn. Vraag een nieuwe geautoriseerde link aan."
+      }
     },
     "labels": {
       "verificationStatus": {

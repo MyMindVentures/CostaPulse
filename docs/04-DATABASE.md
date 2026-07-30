@@ -76,9 +76,13 @@ Key invariants:
 
 - Browser access to credential grant and share tables is denied by restrictive RLS; trusted access is mediated by reviewed security-definer RPCs.
 - Recipient emails are normalized and grants/shares are time-bounded with explicit revoke fields.
+- New grants and share links default to exactly seven days from their server-recorded creation time when no expiry is supplied. Existing null-expiry grants remain valid for compatibility.
+- Recipient-created share links require an authenticated email-matched grant with `permission_create_share_links`, require file-view permission, inherit the grant scope, and cannot outlive the parent grant.
 - Share links store only token hashes, never plaintext tokens.
 - File access is constrained by grant-level permissions and per-document file-role allow lists.
 - Open/download attempts and denials emit audit events.
+- CV and motivation-letter records use `professional_documents` types `cv` and `motivation_letter`; optional `language_code` and positive `page_count` fields provide safe portfolio metadata.
+- Portfolio projections expose only matching active team-member display identity, safe document metadata and scoped file descriptors. Notes, arbitrary metadata, Storage bucket names and Storage paths are excluded.
 
 Current credential access RPC contracts include:
 
@@ -89,6 +93,9 @@ Current credential access RPC contracts include:
 - `create_credential_access_grant`
 - `mark_credential_magic_link_sent`
 - `create_credential_share_link`
+- `create_recipient_credential_share_link`
+- `record_authenticated_credential_detail_view`
+- `record_shared_credential_detail_view`
 - `revoke_credential_access_grant`
 - `list_owner_credential_access_grants`
 

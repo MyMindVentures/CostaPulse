@@ -846,6 +846,9 @@
       "documentsSharesPermissionDownloadFiles": "Download files",
       "documentsSharesPermissionHistory": "Include history",
       "documentsSharesPermissionDocumentNumber": "Include document number",
+      "documentsSharesPermissionCreateLinks": "Allow controlled resharing",
+      "documentsLanguageCode": "Document language code",
+      "documentsPageCount": "Page count",
       "documentsSharesFileRoles": "Permitted file roles",
       "documentsSharesDocuments": "Select credentials",
       "documentsSharesDocumentsEmpty": "No shareable credentials are available.",
@@ -1016,6 +1019,54 @@
       "noFiles": "No files are available for this credential.",
       "openFile": "Open file",
       "downloadFile": "Download file"
+    },
+    "applicationDocuments": {
+      "openPortfolio": "View CV and motivation letter",
+      "kicker": "Private recruitment portfolio",
+      "heading": "Application documents",
+      "backToCredentials": "Back to professional credentials",
+      "backToDocuments": "Back to application documents",
+      "activeAccess": "Authorized access",
+      "expires": "Access expires:",
+      "types": {
+        "cv": "Curriculum Vitae",
+        "motivation_letter": "Motivation Letter"
+      },
+      "metadata": {
+        "language": "Language",
+        "version": "Version date",
+        "updated": "Last updated",
+        "pages": "Pages"
+      },
+      "actions": {
+        "view": {
+          "cv": "View CV",
+          "motivation_letter": "View motivation letter"
+        },
+        "download": "Download PDF"
+      },
+      "unavailable": "Not currently available",
+      "missingFile": "The approved PDF is currently unavailable.",
+      "preview": {
+        "loading": "Loading secure preview…",
+        "unavailable": "The secure preview is unavailable.",
+        "browserFallback": "The browser PDF viewer is being used.",
+        "page": "page"
+      },
+      "share": {
+        "heading": "Controlled sharing",
+        "description": "Create an authorized link with its own expiry. It cannot outlive your access.",
+        "action": "Create and share link",
+        "expiry": "Share link expires",
+        "copied": "Authorized link copied.",
+        "shared": "Authorized link shared.",
+        "error": "The link could not be created.",
+        "notPermitted": "This access grant does not permit resharing."
+      },
+      "accessUnavailable": {
+        "title": "This portfolio is unavailable",
+        "description": "The access link may be expired, revoked or invalid. Request a new authorized link."
+      }
     },
     "labels": {
       "verificationStatus": {

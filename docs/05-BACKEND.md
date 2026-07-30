@@ -77,10 +77,15 @@ Document durable workflow contracts using:
 - Shared-link tokens are generated server-side, persisted only as SHA-256 hashes, and resolved through security-definer RPCs.
 - File open/download actions are permission-gated in backend contracts before issuing short-lived signed Storage URLs.
 - Download and denied-access events are persisted as auditable records.
+- Grant and share expiry defaults are calculated from the database-recorded `created_at` timestamp, not browser time. The default is seven days, and child shares are capped by the parent grant.
+- Authenticated recipients may create a same-scope token link only when their normalized Auth email matches an active grant with controlled-share permission. Successful and denied attempts emit `share_created` or `access_denied`.
+- Authenticated and tokenized document detail routes validate scope before recording `credential_detail_viewed`.
+- Portfolio RPC payloads are validated at the repository boundary and omit internal notes, arbitrary metadata and Storage locations.
 
 Current credential workflow entry points:
 
 - server actions in `src/server/credentials/actions.ts` for grant creation, share-link creation, invite resend and revoke;
+- recipient share creation through `create_recipient_credential_share_link`;
 - callback route `src/app/auth/callback/route.ts` for magic-link code exchange and grant validation;
 - secure file link handlers under `/api/credentials/files/[fileId]` and `/api/shared/credentials/[token]/files/[fileId]`.
 

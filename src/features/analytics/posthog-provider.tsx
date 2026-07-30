@@ -15,6 +15,7 @@ import {
   writeAnalyticsConsent,
   type AnalyticsConsent
 } from "@/lib/analytics/consent";
+import { isPrivateCredentialUrl } from "@/lib/security/credential-route-privacy";
 
 type PostHogContextValue = {
   consent: AnalyticsConsent | null;
@@ -61,6 +62,10 @@ async function updatePostHog(consent: AnalyticsConsent) {
       posthog.init(key, {
         api_host: host,
         capture_pageview: true,
+        before_send: (event) =>
+          event && isPrivateCredentialUrl(event.properties?.$current_url)
+            ? null
+            : event,
         persistence: "localStorage+cookie",
         person_profiles: "identified_only"
       });

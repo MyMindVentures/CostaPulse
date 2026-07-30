@@ -114,9 +114,32 @@ export default async function AdminNewDocumentPage({
             <option value="training_certificate">training certificate</option>
             <option value="insurance">insurance</option>
             <option value="cv">cv</option>
+            <option value="motivation_letter">motivation letter</option>
             <option value="assessment">assessment</option>
             <option value="other">other</option>
           </select>
+        </label>
+
+        <label className="flex flex-col gap-1 text-sm">
+          {t("documentsLanguageCode")}
+          <input
+            name="languageCode"
+            className="border-border min-h-11 rounded-md border px-3"
+            placeholder="en"
+            defaultValue={renewDocument?.language_code ?? ""}
+          />
+        </label>
+
+        <label className="flex flex-col gap-1 text-sm">
+          {t("documentsPageCount")}
+          <input
+            name="pageCount"
+            type="number"
+            min={1}
+            step={1}
+            className="border-border min-h-11 rounded-md border px-3"
+            defaultValue={renewDocument?.page_count ?? ""}
+          />
         </label>
 
         <label className="flex flex-col gap-1 text-sm">
