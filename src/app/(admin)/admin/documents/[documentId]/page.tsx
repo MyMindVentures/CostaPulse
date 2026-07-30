@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { ProtectedFilePreview } from "@/components/shared/protected-file-preview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SectionKicker } from "@/components/shared/section-kicker";
@@ -23,6 +24,19 @@ type Props = {
   params: Promise<{ documentId: string }>;
   searchParams: Promise<{ status?: string; message?: string }>;
 };
+
+const detailPanelClass =
+  "border-navy/10 bg-gradient-to-br from-white via-white to-sand/60 relative overflow-hidden rounded-2xl border p-5 shadow-[0_14px_34px_rgba(2,16,31,0.08)]";
+
+const detailMetaItemClass =
+  "border-navy/10 rounded-xl border bg-white/85 p-3 shadow-[0_6px_16px_rgba(2,16,31,0.04)]";
+
+const detailMetaItemWideClass = `${detailMetaItemClass} md:col-span-2`;
+
+const detailMetaTermClass =
+  "text-navy/70 text-xs font-semibold tracking-[0.08em] uppercase";
+
+const detailMetaValueClass = "text-ink mt-1 text-sm font-semibold leading-6";
 
 function formatDate(value: string | null): string {
   if (!value) return "-";
@@ -157,77 +171,91 @@ export default async function AdminDocumentDetailPage({
         </p>
       ) : null}
 
-      <div className="border-border rounded-2xl border bg-white p-5">
-        <dl className="grid gap-3 md:grid-cols-2">
-          <div>
-            <dt className="text-muted text-xs uppercase">
-              {t("documentsTableType")}
-            </dt>
-            <dd className="text-ink mt-1">
+      <div className={detailPanelClass}>
+        <div
+          aria-hidden
+          className="bg-gold/12 pointer-events-none absolute -top-14 -right-10 h-40 w-40 rounded-full blur-2xl"
+        />
+        <div
+          aria-hidden
+          className="bg-turquoise/12 pointer-events-none absolute -bottom-16 -left-12 h-40 w-40 rounded-full blur-2xl"
+        />
+        <dl className="relative grid gap-3 sm:gap-4 md:grid-cols-2">
+          <div className={detailMetaItemClass}>
+            <dt className={detailMetaTermClass}>{t("documentsTableType")}</dt>
+            <dd className={detailMetaValueClass}>
               {formatStatus(document.document_type)}
             </dd>
           </div>
-          <div>
-            <dt className="text-muted text-xs uppercase">
-              {t("documentsTableIssuer")}
-            </dt>
-            <dd className="text-ink mt-1">
+          <div className={detailMetaItemClass}>
+            <dt className={detailMetaTermClass}>{t("documentsTableIssuer")}</dt>
+            <dd className={detailMetaValueClass}>
               {document.issuing_authority ?? "-"}
             </dd>
           </div>
-          <div>
-            <dt className="text-muted text-xs uppercase">
-              {t("documentsTableExpiry")}
-            </dt>
-            <dd className="text-ink mt-1">{formatDate(document.expires_on)}</dd>
+          <div className={detailMetaItemClass}>
+            <dt className={detailMetaTermClass}>{t("documentsTableExpiry")}</dt>
+            <dd className={detailMetaValueClass}>
+              {formatDate(document.expires_on)}
+            </dd>
           </div>
-          <div>
-            <dt className="text-muted text-xs uppercase">
+          <div className={detailMetaItemClass}>
+            <dt className={detailMetaTermClass}>
               {t("documentsDetailIssued")}
             </dt>
-            <dd className="text-ink mt-1">{formatDate(document.issued_on)}</dd>
+            <dd className={detailMetaValueClass}>
+              {formatDate(document.issued_on)}
+            </dd>
           </div>
-          <div>
-            <dt className="text-muted text-xs uppercase">
+          <div className={detailMetaItemClass}>
+            <dt className={detailMetaTermClass}>
               {t("documentsDetailIssuingCountry")}
             </dt>
-            <dd className="text-ink mt-1">
+            <dd className={detailMetaValueClass}>
               {document.issuing_country_code ?? "-"}
             </dd>
           </div>
-          <div>
-            <dt className="text-muted text-xs uppercase">
+          <div className={detailMetaItemClass}>
+            <dt className={detailMetaTermClass}>
               {t("documentsDetailQualification")}
             </dt>
-            <dd className="text-ink mt-1">{document.qualification ?? "-"}</dd>
+            <dd className={detailMetaValueClass}>
+              {document.qualification ?? "-"}
+            </dd>
           </div>
-          <div>
-            <dt className="text-muted text-xs uppercase">
+          <div className={detailMetaItemClass}>
+            <dt className={detailMetaTermClass}>
               {t("documentsDetailStcwCode")}
             </dt>
-            <dd className="text-ink mt-1">{document.stcw_code ?? "-"}</dd>
+            <dd className={detailMetaValueClass}>
+              {document.stcw_code ?? "-"}
+            </dd>
           </div>
-          <div>
-            <dt className="text-muted text-xs uppercase">
+          <div className={detailMetaItemClass}>
+            <dt className={detailMetaTermClass}>
               {t("documentsDetailRestrictions")}
             </dt>
-            <dd className="text-ink mt-1">{document.restrictions ?? "-"}</dd>
+            <dd className={detailMetaValueClass}>
+              {document.restrictions ?? "-"}
+            </dd>
           </div>
-          <div>
-            <dt className="text-muted text-xs uppercase">
-              {t("documentsDetailNotes")}
-            </dt>
-            <dd className="text-ink mt-1">{document.notes ?? "-"}</dd>
+          <div className={detailMetaItemWideClass}>
+            <dt className={detailMetaTermClass}>{t("documentsDetailNotes")}</dt>
+            <dd
+              className={`${detailMetaValueClass} break-words whitespace-pre-wrap`}
+            >
+              {document.notes ?? "-"}
+            </dd>
           </div>
-          <div>
-            <dt className="text-muted text-xs uppercase">
+          <div className={detailMetaItemWideClass}>
+            <dt className={detailMetaTermClass}>
               {t("documentsDetailReplaces")}
             </dt>
-            <dd className="text-ink mt-1">
+            <dd className={`${detailMetaValueClass} break-all`}>
               {document.replaces_document_id ? (
                 <Link
                   href={`/admin/documents/${document.replaces_document_id}`}
-                  className="underline underline-offset-4"
+                  className="text-navy hover:text-coral inline-flex min-h-11 items-center font-semibold underline underline-offset-4 transition-colors"
                 >
                   {document.replaces_document_id}
                 </Link>
@@ -236,11 +264,13 @@ export default async function AdminDocumentDetailPage({
               )}
             </dd>
           </div>
-          <div>
-            <dt className="text-muted text-xs uppercase">
+          <div className={detailMetaItemClass}>
+            <dt className={detailMetaTermClass}>
               {t("documentsTableUpdated")}
             </dt>
-            <dd className="text-ink mt-1">{formatDate(document.updated_at)}</dd>
+            <dd className={detailMetaValueClass}>
+              {formatDate(document.updated_at)}
+            </dd>
           </div>
         </dl>
       </div>
@@ -252,46 +282,62 @@ export default async function AdminDocumentDetailPage({
         {document.files.length === 0 ? (
           <p className="text-muted mt-2 text-sm">-</p>
         ) : (
-          <ul className="mt-3 grid gap-3">
-            {document.files.map((file) => (
-              <li
-                key={file.id}
-                className="border-border flex flex-wrap items-center justify-between gap-3 rounded-md border p-3"
-              >
-                <div>
-                  <p className="text-ink text-sm font-medium">
-                    {formatStatus(file.file_role)} · v{file.version_number}
-                  </p>
-                  <p className="text-muted text-xs">
-                    {file.original_filename ?? "file"} ·
-                  </p>
-                  <p className="text-muted text-xs">
-                    {file.mime_type} · {Math.ceil(file.file_size_bytes / 1024)}{" "}
-                    KB
-                  </p>
-                </div>
-                <div className="flex gap-4">
-                  <Link
-                    href={`/api/admin/documents/files/${file.id}?intent=view`}
-                    className="text-sm font-medium underline-offset-4 hover:underline"
-                  >
-                    Preview
-                  </Link>
-                  <Link
-                    href={`/api/admin/documents/files/${file.id}?intent=download`}
-                    className="text-sm font-medium underline-offset-4 hover:underline"
-                  >
-                    Download
-                  </Link>
-                  <Link
-                    href={`/admin/documents/${document.id}/edit`}
-                    className="text-sm font-medium underline-offset-4 hover:underline"
-                  >
-                    {t("documentsActionEdit")}
-                  </Link>
-                </div>
-              </li>
-            ))}
+          <ul className="mt-3 grid gap-5">
+            {document.files.map((file) => {
+              const fileLabel = file.original_filename ?? "file";
+              const viewHref = `/api/admin/documents/files/${file.id}?intent=view`;
+              const downloadHref = `/api/admin/documents/files/${file.id}?intent=download`;
+
+              return (
+                <li
+                  key={file.id}
+                  className="border-border min-w-0 rounded-xl border bg-white p-4"
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="text-ink text-sm font-medium break-all">
+                        {fileLabel}
+                      </p>
+                      <p className="text-muted mt-1 text-xs">
+                        {formatStatus(file.file_role)} · {file.mime_type} ·{" "}
+                        {Math.ceil(file.file_size_bytes / 1024)} KB · v
+                        {file.version_number}
+                      </p>
+                    </div>
+                    <div className="flex min-h-11 flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                      <a
+                        href={viewHref}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-ink hover:text-coral inline-flex min-h-11 items-center font-medium underline underline-offset-4 transition-colors"
+                      >
+                        {t("documentsActionPreview")}
+                      </a>
+                      <a
+                        href={downloadHref}
+                        className="text-ink hover:text-coral inline-flex min-h-11 items-center font-medium underline underline-offset-4 transition-colors"
+                      >
+                        {t("documentsActionDownload")}
+                      </a>
+                      <Link
+                        href={`/admin/documents/${document.id}/edit`}
+                        className="text-ink hover:text-coral inline-flex min-h-11 items-center font-medium underline underline-offset-4 transition-colors"
+                      >
+                        {t("documentsActionEdit")}
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="border-border bg-sand/20 mt-3 overflow-hidden rounded-lg border">
+                    <ProtectedFilePreview
+                      fileId={file.id}
+                      fileName={fileLabel}
+                      mimeType={file.mime_type}
+                    />
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>

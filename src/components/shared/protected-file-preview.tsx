@@ -16,32 +16,36 @@ export function ProtectedFilePreview({
   mimeType,
   className = "h-[22rem] w-full"
 }: ProtectedFilePreviewProps) {
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
-  const [blob, setBlob] = useState<Blob | null>(null);
-  const [resolvedMimeType, setResolvedMimeType] = useState(mimeType);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [pdfPageImages, setPdfPageImages] = useState<string[]>([]);
-  const [pdfRenderError, setPdfRenderError] = useState<string | null>(null);
+  const [loadedFile, setLoadedFile] = useState<{
+    requestUrl: string;
+    blobUrl: string | null;
+    blob: Blob | null;
+    mimeType: string;
+    error: string | null;
+  } | null>(null);
+  const [renderedPdf, setRenderedPdf] = useState<{
+    blob: Blob;
+    pageImages: string[];
+    error: string | null;
+  } | null>(null);
 
   const previewUrl = useMemo(
     () => `/api/admin/documents/files/${fileId}?intent=view`,
     [fileId]
   );
+  const currentFile = loadedFile?.requestUrl === previewUrl ? loadedFile : null;
+  const blobUrl = currentFile?.blobUrl ?? null;
+  const blob = currentFile?.blob ?? null;
+  const resolvedMimeType = currentFile?.mimeType ?? mimeType;
+  const loadError = currentFile?.error ?? null;
+  const currentPdf = renderedPdf?.blob === blob ? renderedPdf : null;
+  const pdfPageImages = currentPdf?.pageImages ?? [];
+  const pdfRenderError = currentPdf?.error ?? null;
 
   useEffect(() => {
     const controller = new AbortController();
     let active = true;
     let objectUrl: string | null = null;
-
-    // A preview component can remain mounted while another file is selected.
-    // Clear every derived state value immediately so an old file is never
-    // shown as the live preview for the newly selected file.
-    setBlobUrl(null);
-    setBlob(null);
-    setResolvedMimeType(mimeType);
-    setLoadError(null);
-    setPdfPageImages([]);
-    setPdfRenderError(null);
 
     async function load() {
       try {
@@ -61,18 +65,25 @@ export function ProtectedFilePreview({
         }
 
         objectUrl = URL.createObjectURL(loadedBlob);
-        setResolvedMimeType(loadedBlob.type || mimeType);
-        setBlobUrl(objectUrl);
-        setBlob(loadedBlob);
+        setLoadedFile({
+          requestUrl: previewUrl,
+          blobUrl: objectUrl,
+          blob: loadedBlob,
+          mimeType: loadedBlob.type || mimeType,
+          error: null
+        });
       } catch (error) {
         if (!active || controller.signal.aborted) {
           return;
         }
 
-        setBlobUrl(null);
-        setBlob(null);
-        setPdfPageImages([]);
-        setLoadError(error instanceof Error ? error.message : "Preview failed");
+        setLoadedFile({
+          requestUrl: previewUrl,
+          blobUrl: null,
+          blob: null,
+          mimeType,
+          error: error instanceof Error ? error.message : "Preview failed"
+        });
       }
     }
 
@@ -88,9 +99,6 @@ export function ProtectedFilePreview({
   }, [previewUrl, mimeType]);
 
   useEffect(() => {
-    setPdfPageImages([]);
-    setPdfRenderError(null);
-
     if (resolvedMimeType !== "application/pdf" || !blob) {
       return;
     }
@@ -135,17 +143,21 @@ export function ProtectedFilePreview({
           return;
         }
 
-        setPdfRenderError(null);
-        setPdfPageImages(renderedPages);
+        setRenderedPdf({
+          blob: currentBlob,
+          pageImages: renderedPages,
+          error: null
+        });
       } catch (error) {
         if (!active) {
           return;
         }
 
-        setPdfPageImages([]);
-        setPdfRenderError(
-          error instanceof Error ? error.message : "PDF preview failed"
-        );
+        setRenderedPdf({
+          blob: currentBlob,
+          pageImages: [],
+          error: error instanceof Error ? error.message : "PDF preview failed"
+        });
       }
     }
 
@@ -187,19 +199,20 @@ export function ProtectedFilePreview({
   }
 
   if (resolvedMimeType === "application/pdf") {
-    if (pdfRenderError) {
-      return (
-        <div className="text-navy/70 flex h-[22rem] items-center justify-center p-4 text-sm">
-          PDF preview is niet beschikbaar ({pdfRenderError}). Gebruik Open of
-          Download.
-        </div>
-      );
-    }
-
     if (pdfPageImages.length === 0) {
       return (
-        <div className="text-navy/70 flex h-[22rem] items-center justify-center p-4 text-sm">
-          PDF preview laden...
+        <div className={`${className} bg-white`}>
+          <iframe
+            src={blobUrl}
+            title={`Preview ${fileName}`}
+            className="h-full w-full border-0"
+          />
+          {pdfRenderError ? (
+            <p className="sr-only">
+              PDF.js preview is niet beschikbaar ({pdfRenderError}). De
+              ingebouwde PDF-viewer wordt gebruikt.
+            </p>
+          ) : null}
         </div>
       );
     }
