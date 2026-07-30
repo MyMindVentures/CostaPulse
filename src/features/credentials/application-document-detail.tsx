@@ -18,6 +18,7 @@ type Props = {
   fileBaseHref: string;
   canDownload: boolean;
   canShare: boolean;
+  maximumShareExpiry?: string | null;
 };
 
 function formatDate(value: string | null, locale: string): string {
@@ -37,7 +38,8 @@ export async function ApplicationDocumentDetailPage({
   overviewHref,
   fileBaseHref,
   canDownload,
-  canShare
+  canShare,
+  maximumShareExpiry = null
 }: Props) {
   const t = await getTranslations("CredentialPortal.applicationDocuments");
   const file = document.currentFile;
@@ -69,7 +71,7 @@ export async function ApplicationDocumentDetailPage({
             <Badge variant="muted">
               {t("metadata.version")} {formatDate(document.issued_on, locale)}
             </Badge>
-            {file && canDownload ? (
+            {file ? (
               <Badge variant="outline">PDF · v{file.version_number}</Badge>
             ) : null}
           </div>
@@ -128,7 +130,7 @@ export async function ApplicationDocumentDetailPage({
           </dl>
 
           <div className="grid content-start gap-3">
-            {file ? (
+            {file && canDownload ? (
               <Button asChild className="min-h-11">
                 <a href={`${fileBaseHref}/${file.id}?intent=download`}>
                   {t("actions.download")}
@@ -137,6 +139,7 @@ export async function ApplicationDocumentDetailPage({
             ) : null}
             {canShare ? (
               <ApplicationDocumentShare
+                maximumExpiry={maximumShareExpiry}
                 labels={{
                   action: t("share.action"),
                   expiry: t("share.expiry"),

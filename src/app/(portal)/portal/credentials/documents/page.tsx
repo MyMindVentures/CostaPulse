@@ -1,15 +1,19 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ApplicationDocumentPortfolioPage } from "@/features/credentials/application-document-portfolio";
 import {
   CredentialPortfolioError,
   getAuthenticatedApplicationDocumentPortfolio
 } from "@/server/repositories/credential-portal";
 
-export const metadata = {
-  title: "Application documents",
-  robots: { index: false, follow: false }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("CredentialPortal.applicationDocuments");
+  return {
+    title: t("metaOverviewTitle"),
+    robots: { index: false, follow: false }
+  };
+}
 
 export const dynamic = "force-dynamic";
 

@@ -240,6 +240,7 @@ export async function ApplicationDocumentPortfolioPage({
             </div>
             <div className="max-w-md">
               <ApplicationDocumentShare
+                maximumExpiry={portfolio.access_expires_at}
                 labels={{
                   action: t("share.action"),
                   expiry: t("share.expiry"),

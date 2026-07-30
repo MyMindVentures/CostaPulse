@@ -1,5 +1,6 @@
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ApplicationDocumentDetailPage } from "@/features/credentials/application-document-detail";
 import {
   applicationDocumentTypeFromRoute,
@@ -8,10 +9,13 @@ import {
   recordAuthenticatedCredentialDetailView
 } from "@/server/repositories/credential-portal";
 
-export const metadata = {
-  title: "Application document",
-  robots: { index: false, follow: false }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("CredentialPortal.applicationDocuments");
+  return {
+    title: t("metaDetailTitle"),
+    robots: { index: false, follow: false }
+  };
+}
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +60,7 @@ export default async function AuthenticatedApplicationDocumentPage({
       fileBaseHref="/api/credentials/files"
       canDownload={result.portfolio.permissions.canDownloadFiles}
       canShare={result.portfolio.permissions.canShare}
+      maximumShareExpiry={result.portfolio.access_expires_at}
     />
   );
 }

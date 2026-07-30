@@ -1145,6 +1145,10 @@
       "downloadFile": "Download file"
     },
     "applicationDocuments": {
+      "metaOverviewTitle": "Documentos de candidatura",
+      "metaDetailTitle": "Documento de candidatura",
+      "metaSharedOverviewTitle": "Documentos de candidatura compartidos",
+      "metaSharedDetailTitle": "Documento de candidatura compartido",
       "openPortfolio": "Ver CV y carta de motivación",
       "kicker": "Portafolio privado de candidatura",
       "heading": "Documentos de candidatura",
@@ -1194,31 +1198,31 @@
     },
     "labels": {
       "verificationStatus": {
-        "verified": "Verified",
-        "pending": "Pending",
-        "rejected": "Rejected",
-        "unverified": "Unverified"
+        "verified": "Verificado",
+        "pending": "Pendiente",
+        "rejected": "Rechazado",
+        "unverified": "Sin verificar"
       },
       "computedStatus": {
-        "valid": "Valid",
-        "validityUnknown": "Validity unknown",
-        "expiresWithin180Days": "Expires within 180 days",
-        "expiresWithin90Days": "Expires within 90 days",
-        "expiresWithin60Days": "Expires within 60 days",
-        "expiresWithin30Days": "Expires within 30 days",
-        "expired": "Expired"
+        "valid": "Válido",
+        "validityUnknown": "Validez desconocida",
+        "expiresWithin180Days": "Caduca en 180 días",
+        "expiresWithin90Days": "Caduca en 90 días",
+        "expiresWithin60Days": "Caduca en 60 días",
+        "expiresWithin30Days": "Caduca en 30 días",
+        "expired": "Caducado"
       },
       "recordStatus": {
-        "active": "Active",
-        "replaced": "Replaced"
+        "active": "Activo",
+        "replaced": "Sustituido"
       },
       "fileRole": {
-        "primary": "Primary",
-        "front": "Front",
-        "back": "Back",
-        "translation": "Translation",
-        "attachment": "Attachment",
-        "supportingEvidence": "Supporting evidence"
+        "primary": "Principal",
+        "front": "Anverso",
+        "back": "Reverso",
+        "translation": "Traducción",
+        "attachment": "Adjunto",
+        "supportingEvidence": "Justificante"
       }
     }
   },

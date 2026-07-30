@@ -7,6 +7,8 @@ vi.mock("@/lib/supabase/server", () => ({
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
+  applicationDocumentRouteFromType,
+  applicationDocumentTypeFromRoute,
   CredentialPortfolioError,
   getAuthenticatedCredentialPortfolio,
   getSharedCredentialPortfolio,
@@ -38,6 +40,19 @@ describe("credential portal repository", () => {
     await expect(getAuthenticatedCredentialPortfolio()).rejects.toMatchObject({
       code: "UNAUTHORIZED"
     });
+  });
+
+  it("accepts only the two supported application-document route slugs", () => {
+    expect(applicationDocumentTypeFromRoute("cv")).toBe("cv");
+    expect(applicationDocumentTypeFromRoute("motivation-letter")).toBe(
+      "motivation_letter"
+    );
+    expect(applicationDocumentTypeFromRoute("motivation_letter")).toBeNull();
+    expect(applicationDocumentTypeFromRoute("passport")).toBeNull();
+    expect(applicationDocumentRouteFromType("cv")).toBe("cv");
+    expect(applicationDocumentRouteFromType("motivation_letter")).toBe(
+      "motivation-letter"
+    );
   });
 
   it("returns parsed portfolio for shared token rpc", async () => {

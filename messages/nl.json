@@ -1145,6 +1145,10 @@
       "downloadFile": "Download file"
     },
     "applicationDocuments": {
+      "metaOverviewTitle": "Sollicitatiedocumenten",
+      "metaDetailTitle": "Sollicitatiedocument",
+      "metaSharedOverviewTitle": "Gedeelde sollicitatiedocumenten",
+      "metaSharedDetailTitle": "Gedeeld sollicitatiedocument",
       "openPortfolio": "Bekijk cv en motivatiebrief",
       "kicker": "Privé sollicitatieportfolio",
       "heading": "Sollicitatiedocumenten",
@@ -1194,31 +1198,31 @@
     },
     "labels": {
       "verificationStatus": {
-        "verified": "Verified",
-        "pending": "Pending",
-        "rejected": "Rejected",
-        "unverified": "Unverified"
+        "verified": "Geverifieerd",
+        "pending": "In afwachting",
+        "rejected": "Afgewezen",
+        "unverified": "Niet geverifieerd"
       },
       "computedStatus": {
-        "valid": "Valid",
-        "validityUnknown": "Validity unknown",
-        "expiresWithin180Days": "Expires within 180 days",
-        "expiresWithin90Days": "Expires within 90 days",
-        "expiresWithin60Days": "Expires within 60 days",
-        "expiresWithin30Days": "Expires within 30 days",
-        "expired": "Expired"
+        "valid": "Geldig",
+        "validityUnknown": "Geldigheid onbekend",
+        "expiresWithin180Days": "Verloopt binnen 180 dagen",
+        "expiresWithin90Days": "Verloopt binnen 90 dagen",
+        "expiresWithin60Days": "Verloopt binnen 60 dagen",
+        "expiresWithin30Days": "Verloopt binnen 30 dagen",
+        "expired": "Verlopen"
       },
       "recordStatus": {
-        "active": "Active",
-        "replaced": "Replaced"
+        "active": "Actief",
+        "replaced": "Vervangen"
       },
       "fileRole": {
-        "primary": "Primary",
-        "front": "Front",
-        "back": "Back",
-        "translation": "Translation",
-        "attachment": "Attachment",
-        "supportingEvidence": "Supporting evidence"
+        "primary": "Primair",
+        "front": "Voorzijde",
+        "back": "Achterzijde",
+        "translation": "Vertaling",
+        "attachment": "Bijlage",
+        "supportingEvidence": "Ondersteunend bewijs"
       }
     }
   },

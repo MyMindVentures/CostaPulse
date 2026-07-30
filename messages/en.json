@@ -1021,6 +1021,10 @@
       "downloadFile": "Download file"
     },
     "applicationDocuments": {
+      "metaOverviewTitle": "Application documents",
+      "metaDetailTitle": "Application document",
+      "metaSharedOverviewTitle": "Shared application documents",
+      "metaSharedDetailTitle": "Shared application document",
       "openPortfolio": "View CV and motivation letter",
       "kicker": "Private recruitment portfolio",
       "heading": "Application documents",

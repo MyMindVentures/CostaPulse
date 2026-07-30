@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ApplicationDocumentPortfolioPage } from "@/features/credentials/application-document-portfolio";
 import {
@@ -5,10 +6,13 @@ import {
   getSharedApplicationDocumentPortfolio
 } from "@/server/repositories/credential-portal";
 
-export const metadata = {
-  title: "Shared application documents",
-  robots: { index: false, follow: false }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("CredentialPortal.applicationDocuments");
+  return {
+    title: t("metaSharedOverviewTitle"),
+    robots: { index: false, follow: false }
+  };
+}
 
 export const dynamic = "force-dynamic";
 

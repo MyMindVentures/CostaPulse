@@ -1,5 +1,6 @@
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ApplicationDocumentDetailPage } from "@/features/credentials/application-document-detail";
 import {
   applicationDocumentTypeFromRoute,
@@ -8,10 +9,13 @@ import {
   recordSharedCredentialDetailView
 } from "@/server/repositories/credential-portal";
 
-export const metadata = {
-  title: "Shared application document",
-  robots: { index: false, follow: false }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("CredentialPortal.applicationDocuments");
+  return {
+    title: t("metaSharedDetailTitle"),
+    robots: { index: false, follow: false }
+  };
+}
 
 export const dynamic = "force-dynamic";
 

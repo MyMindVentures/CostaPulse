@@ -1145,6 +1145,10 @@
       "downloadFile": "Download file"
     },
     "applicationDocuments": {
+      "metaOverviewTitle": "Bewerbungsunterlagen",
+      "metaDetailTitle": "Bewerbungsunterlage",
+      "metaSharedOverviewTitle": "Geteilte Bewerbungsunterlagen",
+      "metaSharedDetailTitle": "Geteilte Bewerbungsunterlage",
       "openPortfolio": "Lebenslauf und Motivationsschreiben ansehen",
       "kicker": "Privates Bewerbungsportfolio",
       "heading": "Bewerbungsunterlagen",
@@ -1194,31 +1198,31 @@
     },
     "labels": {
       "verificationStatus": {
-        "verified": "Verified",
-        "pending": "Pending",
-        "rejected": "Rejected",
-        "unverified": "Unverified"
+        "verified": "Verifiziert",
+        "pending": "Ausstehend",
+        "rejected": "Abgelehnt",
+        "unverified": "Nicht verifiziert"
       },
       "computedStatus": {
-        "valid": "Valid",
-        "validityUnknown": "Validity unknown",
-        "expiresWithin180Days": "Expires within 180 days",
-        "expiresWithin90Days": "Expires within 90 days",
-        "expiresWithin60Days": "Expires within 60 days",
-        "expiresWithin30Days": "Expires within 30 days",
-        "expired": "Expired"
+        "valid": "Gültig",
+        "validityUnknown": "Gültigkeit unbekannt",
+        "expiresWithin180Days": "Läuft innerhalb von 180 Tagen ab",
+        "expiresWithin90Days": "Läuft innerhalb von 90 Tagen ab",
+        "expiresWithin60Days": "Läuft innerhalb von 60 Tagen ab",
+        "expiresWithin30Days": "Läuft innerhalb von 30 Tagen ab",
+        "expired": "Abgelaufen"
       },
       "recordStatus": {
-        "active": "Active",
-        "replaced": "Replaced"
+        "active": "Aktiv",
+        "replaced": "Ersetzt"
       },
       "fileRole": {
-        "primary": "Primary",
-        "front": "Front",
-        "back": "Back",
-        "translation": "Translation",
-        "attachment": "Attachment",
-        "supportingEvidence": "Supporting evidence"
+        "primary": "Primär",
+        "front": "Vorderseite",
+        "back": "Rückseite",
+        "translation": "Übersetzung",
+        "attachment": "Anlage",
+        "supportingEvidence": "Nachweis"
       }
     }
   },

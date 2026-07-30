@@ -6,6 +6,7 @@ import { getDefaultCredentialExpiry } from "@/lib/credentials/access-expiry";
 import { createRecipientCredentialShareLinkAction } from "@/server/credentials/actions";
 
 type Props = {
+  maximumExpiry?: string | null;
   labels: {
     action: string;
     expiry: string;
@@ -21,26 +22,48 @@ function toDateTimeLocal(value: string): string {
   return local.toISOString().slice(0, 16);
 }
 
-export function ApplicationDocumentShare({ labels }: Props) {
+export function ApplicationDocumentShare({
+  labels,
+  maximumExpiry = null
+}: Props) {
+  const maximumExpiryDate = maximumExpiry ? new Date(maximumExpiry) : null;
+  const maximumExpiryTime =
+    maximumExpiryDate && !Number.isNaN(maximumExpiryDate.getTime())
+      ? maximumExpiryDate.getTime()
+      : null;
   const [isPending, startTransition] = useTransition();
-  const [expiry, setExpiry] = useState(() =>
-    toDateTimeLocal(getDefaultCredentialExpiry())
-  );
+  const [expiry, setExpiry] = useState(() => {
+    const defaultExpiry = new Date(getDefaultCredentialExpiry());
+    const initialExpiry =
+      maximumExpiryTime !== null && maximumExpiryTime < defaultExpiry.getTime()
+        ? new Date(maximumExpiryTime)
+        : defaultExpiry;
+    return toDateTimeLocal(initialExpiry.toISOString());
+  });
   const [status, setStatus] = useState("");
 
   function share() {
     startTransition(async () => {
       setStatus("");
       const parsedExpiry = expiry ? new Date(expiry) : null;
+      if (!parsedExpiry || Number.isNaN(parsedExpiry.getTime())) {
+        setStatus(labels.error);
+        return;
+      }
+      const parsedExpiryTime = parsedExpiry.getTime();
+      if (
+        parsedExpiryTime <= Date.now() ||
+        (maximumExpiryTime !== null && parsedExpiryTime > maximumExpiryTime)
+      ) {
+        setStatus(labels.error);
+        return;
+      }
       const result = await createRecipientCredentialShareLinkAction({
-        expiresAt:
-          parsedExpiry && !Number.isNaN(parsedExpiry.getTime())
-            ? parsedExpiry.toISOString()
-            : null
+        expiresAt: parsedExpiry.toISOString()
       });
 
       if (!result.ok) {
-        setStatus(`${labels.error}: ${result.message}`);
+        setStatus(labels.error);
         return;
       }
 
@@ -73,6 +96,11 @@ export function ApplicationDocumentShare({ labels }: Props) {
         <input
           type="datetime-local"
           value={expiry}
+          max={
+            maximumExpiryTime === null
+              ? undefined
+              : toDateTimeLocal(new Date(maximumExpiryTime).toISOString())
+          }
           onChange={(event) => setExpiry(event.target.value)}
           className="border-border bg-card min-h-11 rounded-md border px-3 text-sm"
         />
