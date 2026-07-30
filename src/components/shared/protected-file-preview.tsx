@@ -18,6 +18,7 @@ export function ProtectedFilePreview({
 }: ProtectedFilePreviewProps) {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [blob, setBlob] = useState<Blob | null>(null);
+  const [resolvedMimeType, setResolvedMimeType] = useState(mimeType);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [pdfPageImages, setPdfPageImages] = useState<string[]>([]);
   const [pdfRenderError, setPdfRenderError] = useState<string | null>(null);
@@ -32,6 +33,16 @@ export function ProtectedFilePreview({
     let active = true;
     let objectUrl: string | null = null;
 
+    // A preview component can remain mounted while another file is selected.
+    // Clear every derived state value immediately so an old file is never
+    // shown as the live preview for the newly selected file.
+    setBlobUrl(null);
+    setBlob(null);
+    setResolvedMimeType(mimeType);
+    setLoadError(null);
+    setPdfPageImages([]);
+    setPdfRenderError(null);
+
     async function load() {
       try {
         const response = await fetch(previewUrl, {
@@ -44,19 +55,23 @@ export function ProtectedFilePreview({
           throw new Error(`Preview failed (${response.status})`);
         }
 
-        const blob = await response.blob();
+        const loadedBlob = await response.blob();
         if (!active) {
           return;
         }
 
-        objectUrl = URL.createObjectURL(blob);
+        objectUrl = URL.createObjectURL(loadedBlob);
+        setResolvedMimeType(loadedBlob.type || mimeType);
         setBlobUrl(objectUrl);
-        setBlob(blob);
+        setBlob(loadedBlob);
       } catch (error) {
         if (!active || controller.signal.aborted) {
           return;
         }
 
+        setBlobUrl(null);
+        setBlob(null);
+        setPdfPageImages([]);
         setLoadError(error instanceof Error ? error.message : "Preview failed");
       }
     }
@@ -70,10 +85,13 @@ export function ProtectedFilePreview({
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [previewUrl]);
+  }, [previewUrl, mimeType]);
 
   useEffect(() => {
-    if (mimeType !== "application/pdf" || !blob) {
+    setPdfPageImages([]);
+    setPdfRenderError(null);
+
+    if (resolvedMimeType !== "application/pdf" || !blob) {
       return;
     }
 
@@ -108,8 +126,7 @@ export function ProtectedFilePreview({
             throw new Error("Failed to prepare PDF canvas context");
           }
 
-          await page.render({ canvasContext: context, viewport, canvas })
-            .promise;
+          await page.render({ canvasContext: context, viewport, canvas }).promise;
           renderedPages.push(canvas.toDataURL("image/png"));
         }
 
@@ -124,6 +141,7 @@ export function ProtectedFilePreview({
           return;
         }
 
+        setPdfPageImages([]);
         setPdfRenderError(
           error instanceof Error ? error.message : "PDF preview failed"
         );
@@ -135,7 +153,7 @@ export function ProtectedFilePreview({
     return () => {
       active = false;
     };
-  }, [mimeType, blob]);
+  }, [resolvedMimeType, blob]);
 
   if (loadError) {
     return (
@@ -153,7 +171,7 @@ export function ProtectedFilePreview({
     );
   }
 
-  if (mimeType.startsWith("image/")) {
+  if (resolvedMimeType.startsWith("image/")) {
     return (
       <Image
         src={blobUrl}
@@ -162,12 +180,12 @@ export function ProtectedFilePreview({
         height={880}
         unoptimized
         loading="lazy"
-        className="h-[22rem] w-full object-contain"
+        className={`${className} object-contain`}
       />
     );
   }
 
-  if (mimeType === "application/pdf") {
+  if (resolvedMimeType === "application/pdf") {
     if (pdfRenderError) {
       return (
         <div className="text-navy/70 flex h-[22rem] items-center justify-center p-4 text-sm">
@@ -186,7 +204,7 @@ export function ProtectedFilePreview({
     }
 
     return (
-      <div className="h-[22rem] overflow-y-auto bg-white p-2">
+      <div className={`${className} overflow-y-auto bg-white p-2`}>
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-3">
           {pdfPageImages.map((pageImage, index) => (
             <Image
@@ -204,13 +222,13 @@ export function ProtectedFilePreview({
     );
   }
 
-  if (mimeType.startsWith("video/")) {
+  if (resolvedMimeType.startsWith("video/")) {
     return (
       <video src={blobUrl} controls className={className} preload="metadata" />
     );
   }
 
-  if (mimeType.startsWith("audio/")) {
+  if (resolvedMimeType.startsWith("audio/")) {
     return (
       <div className="flex h-[22rem] items-center justify-center p-4">
         <audio
@@ -223,7 +241,7 @@ export function ProtectedFilePreview({
     );
   }
 
-  if (mimeType.startsWith("text/")) {
+  if (resolvedMimeType.startsWith("text/")) {
     return (
       <iframe
         src={blobUrl}
@@ -235,7 +253,7 @@ export function ProtectedFilePreview({
   }
 
   return (
-    <object data={blobUrl} type={mimeType} className={className}>
+    <object data={blobUrl} type={resolvedMimeType} className={className}>
       <div className="text-navy/70 flex h-[22rem] items-center justify-center p-4 text-sm">
         Inline preview is niet beschikbaar voor dit bestandstype.
       </div>
