@@ -71,7 +71,8 @@ export async function GET(
     );
   }
 
-  const contentType = fileRow.mime_type || binary.type || "application/octet-stream";
+  const contentType =
+    fileRow.mime_type || binary.type || "application/octet-stream";
   const dispositionType = intent === "download" ? "attachment" : "inline";
   const encodedFileName = encodeURIComponent(
     fileRow.original_filename || "file"
