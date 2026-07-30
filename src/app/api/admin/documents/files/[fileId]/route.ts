@@ -40,25 +40,27 @@ export async function GET(
   const { fileId } = await context.params;
   const intent = parseIntent(request.nextUrl.searchParams.get("intent"));
 
-  const admin = createSupabaseAdminClient();
-  if (!admin) {
-    return NextResponse.json(
-      { error: "Storage access is not configured." },
-      { status: 500 }
-    );
-  }
+  // Prefer the service-role client when it is configured, but do not make
+  // protected previews depend on it. The authenticated server client already
+  // carries Kevin's session and is governed by the existing RLS/storage
+  // policies. This keeps previews working in production environments where
+  // SUPABASE_SERVICE_ROLE_KEY is intentionally not exposed.
+  const storageClient = createSupabaseAdminClient() ?? supabase;
 
-  const { data: fileRow, error: fileError } = await admin
+  const { data: fileRow, error: fileError } = await storageClient
     .from("professional_document_files")
     .select("id, storage_bucket, storage_path, original_filename, mime_type")
     .eq("id", fileId)
     .single();
 
   if (fileError || !fileRow) {
-    return NextResponse.json({ error: "File not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: fileError?.message ?? "File not found" },
+      { status: fileError ? 403 : 404 }
+    );
   }
 
-  const { data: binary, error: downloadError } = await admin.storage
+  const { data: binary, error: downloadError } = await storageClient.storage
     .from(fileRow.storage_bucket)
     .download(fileRow.storage_path);
 
@@ -69,7 +71,7 @@ export async function GET(
     );
   }
 
-  const contentType = fileRow.mime_type || "application/octet-stream";
+  const contentType = fileRow.mime_type || binary.type || "application/octet-stream";
   const dispositionType = intent === "download" ? "attachment" : "inline";
   const encodedFileName = encodeURIComponent(
     fileRow.original_filename || "file"
@@ -81,6 +83,7 @@ export async function GET(
       "Content-Type": contentType,
       "Content-Disposition": `${dispositionType}; filename*=UTF-8''${encodedFileName}`,
       "Cache-Control": "private, no-store",
+      "X-Content-Type-Options": "nosniff",
       "X-Frame-Options": "SAMEORIGIN",
       "Content-Security-Policy": "frame-ancestors 'self'"
     }
