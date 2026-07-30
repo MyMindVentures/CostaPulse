@@ -40,11 +40,8 @@ export async function GET(
   const { fileId } = await context.params;
   const intent = parseIntent(request.nextUrl.searchParams.get("intent"));
 
-  // Prefer the service-role client when it is configured, but do not make
-  // protected previews depend on it. The authenticated server client already
-  // carries Kevin's session and is governed by the existing RLS/storage
-  // policies. This keeps previews working in production environments where
-  // SUPABASE_SERVICE_ROLE_KEY is intentionally not exposed.
+  // Prefer service-role access when configured, while retaining the authorized
+  // server session as a fallback governed by the existing RLS/storage policies.
   const storageClient = createSupabaseAdminClient() ?? supabase;
 
   const { data: fileRow, error: fileError } = await storageClient
